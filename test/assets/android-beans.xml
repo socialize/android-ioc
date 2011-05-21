@@ -1,0 +1,37 @@
+<beans>
+	<bean name="bean0" class="com.socialize.android.ioc.test.mocks.BaseClass"/>
+
+	<bean name="bean1" class="com.socialize.android.ioc.test.mocks.BaseClass2">
+		<arg value="22" type="integer"/>
+	</bean>
+	
+	<bean name="bean2" class="com.socialize.android.ioc.test.mocks.SubClass">
+		<arg value="foobar" type="string"/>
+	</bean>
+	
+	<bean name="bean3" class="com.socialize.android.ioc.test.mocks.SubClass">
+		<property name="param" value="foobar" type="string"/>
+	</bean>
+	
+	<bean name="bean4" class="com.socialize.android.ioc.test.mocks.ContainedClass">
+		<arg value="bean2" type="bean"/>
+	</bean>
+	
+	<bean name="bean5" class="com.socialize.android.ioc.test.mocks.ContextClass">
+		<arg type="context"/>
+	</bean>
+	
+	<bean name="bean6" class="com.socialize.android.ioc.test.mocks.ContextClass">
+		<property name="context" type="context"/>
+	</bean>
+	
+	<bean name="bean7" class="com.socialize.android.ioc.test.mocks.MultiProperty">
+		<property name="string" value="foobar" type="string"/>
+		<property name="integer" value="22" type="integer"/>
+		<property name="lng" value="333333" type="long"/>
+		<property name="shrt" value="4" type="short"/>
+		<property name="chr" value="d" type="char"/>
+		<property name="bool" value="true" type="boolean"/>
+	</bean>
+	
+</beans>

@@ -64,12 +64,4 @@ public class Container {
 	protected Map<String, Object> getBeans() {
 		return beans;
 	}
-	
-	public BeanMapping getMapping() {
-		return mapping;
-	}
-
-	protected void setMapping(BeanMapping mapping) {
-		this.mapping = mapping;
-	}
 }

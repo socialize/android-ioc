@@ -16,6 +16,10 @@ public class AndroidIOCTest extends AndroidTestCase {
 		ioc.initFromAsset(getContext(), "android-beans-asset.xml");
 	}
 	
+	public void testAndroidIOCInitFromClassPath() throws Exception {
+        AndroidIOC ioc = AndroidIOC.getInstance();
+		ioc.initFromClassPath(getContext());
+	}
 	
 	public void testAndroidIOCInitFromClassPathWithName() throws Exception {
         AndroidIOC ioc = AndroidIOC.getInstance();

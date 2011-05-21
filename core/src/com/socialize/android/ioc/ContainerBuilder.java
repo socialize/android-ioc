@@ -167,7 +167,7 @@ public class ContainerBuilder {
 	}
 	
 	public Container build(Context context, BeanMapping mapping) {
-		Container container = new Container(context, mapping, this);
+		Container container = new Container(mapping, this);
 
 		// Build beans
 		buildBeans(context, container, builder, mapping, mapping.getBeanRefs(), 0);

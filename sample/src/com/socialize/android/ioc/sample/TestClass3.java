@@ -1,4 +1,4 @@
-package com.socialize.android.ioc.test.mocks;
+package com.socialize.android.ioc.sample;
 
 import java.util.List;
 

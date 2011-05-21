@@ -49,22 +49,22 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		// Make sure each bean has correct data.
 		
 		/**
-		 * <bean name="bean0" class="com.socialize.android.ioc.test.mocks.BaseClass"/>
+		 * <bean name="bean0" class="com.socialize.android.ioc.sample.TestClass"/>
 		 */
 		BeanRef beanRef = mapping.getBeanRef("bean0");
 		assertNotNull(beanRef);
-		assertEquals("com.socialize.android.ioc.test.mocks.BaseClass", beanRef.getClassName());
+		assertEquals("com.socialize.android.ioc.sample.TestClass", beanRef.getClassName());
 		
 		
 		/**
-		 * <bean name="bean1" class="com.socialize.android.ioc.test.mocks.BaseClass2">
+		 * <bean name="bean1" class="com.socialize.android.ioc.sample.TestClass2">
 				<arg value="22" type="integer"/>
 			</bean>
 		 */
 		
 		beanRef = mapping.getBeanRef("bean1");
 		assertNotNull(beanRef);
-		assertEquals("com.socialize.android.ioc.test.mocks.BaseClass2", beanRef.getClassName());
+		assertEquals("com.socialize.android.ioc.sample.TestClass2", beanRef.getClassName());
 		assertNotNull(beanRef.getConstructorArgs());
 		assertEquals(1, beanRef.getConstructorArgs().size());
 		assertNotNull(beanRef.getConstructorArgs().get(0));
@@ -72,13 +72,13 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertEquals(RefType.INTEGER, beanRef.getConstructorArgs().get(0).getType());
 		
 		/**
-		 * <bean name="bean2" class="com.socialize.android.ioc.test.mocks.SubClass">
+		 * <bean name="bean2" class="com.socialize.android.ioc.sample.SubClass">
 				<arg value="foobar" type="string"/>
 			</bean>
 		 */
 		beanRef = mapping.getBeanRef("bean2");
 		assertNotNull(beanRef);
-		assertEquals("com.socialize.android.ioc.test.mocks.SubClass", beanRef.getClassName());
+		assertEquals("com.socialize.android.ioc.sample.SubClass", beanRef.getClassName());
 		assertNotNull(beanRef.getConstructorArgs());
 		assertEquals(1, beanRef.getConstructorArgs().size());
 		assertNotNull(beanRef.getConstructorArgs().get(0));
@@ -86,13 +86,13 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertEquals(RefType.STRING, beanRef.getConstructorArgs().get(0).getType());
 		
 		/**
-		 * 	<bean name="bean3" class="com.socialize.android.ioc.test.mocks.SubClass">
+		 * 	<bean name="bean3" class="com.socialize.android.ioc.sample.SubClass">
 				<property name="param" value="foobar" type="string"/>
 			</bean>
 		 */
 		beanRef = mapping.getBeanRef("bean3");
 		assertNotNull(beanRef);
-		assertEquals("com.socialize.android.ioc.test.mocks.SubClass", beanRef.getClassName());
+		assertEquals("com.socialize.android.ioc.sample.SubClass", beanRef.getClassName());
 		assertNotNull(beanRef.getProperties());
 		assertEquals(1, beanRef.getProperties().size());
 		assertNotNull(beanRef.getProperties().get(0));
@@ -102,13 +102,13 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		
 		
 		/**
-		 * 	<bean name="bean4" class="com.socialize.android.ioc.test.mocks.ContainedClass">
+		 * 	<bean name="bean4" class="com.socialize.android.ioc.sample.ContainedClass">
 				<arg value="bean2" type="bean"/>
 			</bean>
 		 */
 		beanRef = mapping.getBeanRef("bean4");
 		assertNotNull(beanRef);
-		assertEquals("com.socialize.android.ioc.test.mocks.ContainedClass", beanRef.getClassName());
+		assertEquals("com.socialize.android.ioc.sample.ContainedClass", beanRef.getClassName());
 		assertNotNull(beanRef.getConstructorArgs());
 		assertEquals(1, beanRef.getConstructorArgs().size());
 		assertNotNull(beanRef.getConstructorArgs().get(0));
@@ -116,13 +116,13 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertEquals(RefType.BEAN, beanRef.getConstructorArgs().get(0).getType());
 		
 		/**
-		 * 	<bean name="bean5" class="com.socialize.android.ioc.test.mocks.ContextClass">
+		 * 	<bean name="bean5" class="com.socialize.android.ioc.sample.ContextClass">
 				<arg type="context"/>
 			</bean>
 		 */
 		beanRef = mapping.getBeanRef("bean5");
 		assertNotNull(beanRef);
-		assertEquals("com.socialize.android.ioc.test.mocks.ContextClass", beanRef.getClassName());
+		assertEquals("com.socialize.android.ioc.sample.ContextClass", beanRef.getClassName());
 		assertNotNull(beanRef.getConstructorArgs());
 		assertEquals(1, beanRef.getConstructorArgs().size());
 		assertNotNull(beanRef.getConstructorArgs().get(0));
@@ -130,13 +130,13 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		
 		
 		/**
-		 * 	<bean name="bean6" class="com.socialize.android.ioc.test.mocks.ContextClass">
+		 * 	<bean name="bean6" class="com.socialize.android.ioc.sample.ContextClass">
 				<property name="context" type="context"/>
 			</bean>
 		 */
 		beanRef = mapping.getBeanRef("bean6");
 		assertNotNull(beanRef);
-		assertEquals("com.socialize.android.ioc.test.mocks.ContextClass", beanRef.getClassName());
+		assertEquals("com.socialize.android.ioc.sample.ContextClass", beanRef.getClassName());
 		assertNotNull(beanRef.getProperties());
 		assertEquals(1, beanRef.getProperties().size());
 		assertNotNull(beanRef.getProperties().get(0));
@@ -145,7 +145,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		
 		
 		/**
-			<bean name="bean7" class="com.socialize.android.ioc.test.mocks.MultiProperty">
+			<bean name="bean7" class="com.socialize.android.ioc.sample.MultiProperty">
 				<property name="string" value="foobar" type="string"/>
 				<property name="integer" value="22" type="integer"/>
 				<property name="lng" value="333333" type="long"/>
@@ -156,7 +156,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		 */
 		beanRef = mapping.getBeanRef("bean7");
 		assertNotNull(beanRef);
-		assertEquals("com.socialize.android.ioc.test.mocks.MultiProperty", beanRef.getClassName());
+		assertEquals("com.socialize.android.ioc.sample.MultiProperty", beanRef.getClassName());
 		assertNotNull(beanRef.getProperties());
 		assertEquals(6, beanRef.getProperties().size());
 		assertNotNull(beanRef.getProperties().get(0));

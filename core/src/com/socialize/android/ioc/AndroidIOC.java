@@ -25,6 +25,11 @@ import java.io.IOException;
 
 import android.content.Context;
 
+/**
+ * 
+ * @author Jason Polites
+ *
+ */
 public final class AndroidIOC {
 
 	private static final AndroidIOC instance = new AndroidIOC();
@@ -39,9 +44,24 @@ public final class AndroidIOC {
 		return instance;
 	}
 	
-	public final void init(Context context) throws IOException {
+	public final void initFromClassPath(Context context, String filename) throws IOException {
 		ContainerBuilder builder = new ContainerBuilder(context);
-		container = builder.build(context);
+		container = builder.buildFromClassPath(context, filename);
+	}
+	
+	public final void initFromAsset(Context context, String filename) throws IOException {
+		ContainerBuilder builder = new ContainerBuilder(context);
+		container = builder.buildFromAsset(context, filename);
+	}
+	
+	public final void initFromClassPath(Context context) throws IOException {
+		ContainerBuilder builder = new ContainerBuilder(context);
+		container = builder.buildFromClassPath(context);
+	}
+	
+	public final void initFromAsset(Context context) throws IOException {
+		ContainerBuilder builder = new ContainerBuilder(context);
+		container = builder.buildFromAsset(context);
 	}
 	
 	@SuppressWarnings("unchecked")

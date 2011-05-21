@@ -8,12 +8,12 @@ import com.socialize.android.ioc.Container;
 import com.socialize.android.ioc.ContainerBuilder;
 import com.socialize.android.ioc.KeyValuePair;
 import com.socialize.android.ioc.KeyValuePair.RefType;
-import com.socialize.android.ioc.test.mocks.TestClass;
-import com.socialize.android.ioc.test.mocks.TestClass2;
-import com.socialize.android.ioc.test.mocks.ContainedClass;
-import com.socialize.android.ioc.test.mocks.ContextClass;
-import com.socialize.android.ioc.test.mocks.MultiProperty;
-import com.socialize.android.ioc.test.mocks.SubClass;
+import com.socialize.android.ioc.sample.ContainedClass;
+import com.socialize.android.ioc.sample.ContextClass;
+import com.socialize.android.ioc.sample.MultiProperty;
+import com.socialize.android.ioc.sample.SubClass;
+import com.socialize.android.ioc.sample.TestClass;
+import com.socialize.android.ioc.sample.TestClass2;
 
 
 public class ContainerBuilderTest extends AndroidTestCase {
@@ -220,8 +220,8 @@ public class ContainerBuilderTest extends AndroidTestCase {
 	
 	
 	public void testContainerBuilderBeanWithBeanPropertyReversed() throws Exception {
-		String bean1Name = "bean1";
-		String bean2Name = "bean2";
+		String bean1Name = "bean2";
+		String bean2Name = "bean1";
 		String prop = "property";
 		
 		BeanMapping mapping = new BeanMapping();
@@ -259,8 +259,8 @@ public class ContainerBuilderTest extends AndroidTestCase {
 	
 	
 	public void testContainerBuilderBeanWithBeanConstructorArgumentReversed() throws Exception {
-		String bean1Name = "bean1";
-		String bean2Name = "bean2";
+		String bean1Name = "bean2";
+		String bean2Name = "bean1";
 		String prop = "property";
 		
 		BeanMapping mapping = new BeanMapping();

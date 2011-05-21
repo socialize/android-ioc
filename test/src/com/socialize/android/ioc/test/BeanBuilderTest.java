@@ -6,10 +6,10 @@ import java.util.List;
 import android.test.AndroidTestCase;
 
 import com.socialize.android.ioc.BeanBuilder;
-import com.socialize.android.ioc.test.mocks.TestClass;
-import com.socialize.android.ioc.test.mocks.TestClass2;
-import com.socialize.android.ioc.test.mocks.TestClass3;
-import com.socialize.android.ioc.test.mocks.SubClass2;
+import com.socialize.android.ioc.sample.SubClass2;
+import com.socialize.android.ioc.sample.TestClass;
+import com.socialize.android.ioc.sample.TestClass2;
+import com.socialize.android.ioc.sample.TestClass3;
 
 public class BeanBuilderTest extends AndroidTestCase {
 

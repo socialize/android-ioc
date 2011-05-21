@@ -1,14 +1,11 @@
 package com.socialize.android.ioc.test;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import android.content.Context;
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 import com.socialize.android.ioc.BeanMapping;
 import com.socialize.android.ioc.BeanMappingParser;
@@ -17,26 +14,11 @@ import com.socialize.android.ioc.KeyValuePair.RefType;
 
 public class BeanMapperParserTest extends AndroidTestCase {
 	
-	private Context mContext;
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
-		try {
-			Method m = AndroidTestCase.class.getMethod("getTestContext", new Class[] {});
-			mContext = (Context) m.invoke(this, (Object[]) null);
-		} catch (Exception x) {
-			Log.e("BeanMapperParserTest", "Error getting test context: ", x);
-			throw x;
-		}
-	}
-
 	public void testBeanMapperParser() throws IOException {
 		
 		BeanMappingParser parser = new BeanMappingParser();
 		
-		BeanMapping mapping = parser.parseFromAsset(mContext);
+		BeanMapping mapping = parser.parseFromAsset(getContext());
 		
 		assertNotNull(mapping);
 		

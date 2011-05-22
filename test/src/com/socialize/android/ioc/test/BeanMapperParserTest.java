@@ -25,7 +25,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		Collection<BeanRef> beanRefs = mapping.getBeanRefs();
 		
 		assertNotNull(beanRefs);
-		assertEquals(8, beanRefs.size());
+		assertEquals(9, beanRefs.size());
 		
 		 // Taken from test file
 		Set<String> names = new HashSet<String>();
@@ -38,6 +38,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		names.add("bean5");
 		names.add("bean6");
 		names.add("bean7");
+		names.add("bean8");
 		
 		for (BeanRef beanRef : beanRefs) {
 			assertTrue(names.contains(beanRef.getName()));

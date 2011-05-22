@@ -34,4 +34,6 @@
 		<property name="bool" value="true" type="boolean"/>
 	</bean>
 	
+	<bean name="bean8" class="com.socialize.android.ioc.sample.TestClass" initMethod="doInit"/>
+	
 </beans>

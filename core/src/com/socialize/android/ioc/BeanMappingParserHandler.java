@@ -53,6 +53,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 			currentRef = new BeanRef();
 			currentRef.setClassName(attributes.getValue("class"));
 			currentRef.setName(attributes.getValue("name"));
+			currentRef.setInitMethod(attributes.getValue("initMethod"));
 			
 			String singleton = attributes.getValue("singleton");
 			

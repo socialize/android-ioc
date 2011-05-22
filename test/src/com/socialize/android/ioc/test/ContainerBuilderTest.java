@@ -296,4 +296,99 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertEquals(prop, bc2.getObject().getParam());
 	}
 	
+	public void testContainerBuilderSingletonBean() {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClass.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(true);
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		Object beanA = container.getBean(beanName);
+		Object beanB = container.getBean(beanName);
+		
+		assertNotNull(beanA);
+		assertTrue(TestClass.class.isAssignableFrom(beanA.getClass()));
+		
+		assertNotNull(beanB);
+		assertTrue(TestClass.class.isAssignableFrom(beanB.getClass()));
+		
+		assertTrue(beanA == beanB);
+	}
+	
+	public void testContainerBuilderNonSingletonBean() {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClass.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(false);
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		Object beanA = container.getBean(beanName);
+		Object beanB = container.getBean(beanName);
+		
+		assertNotNull(beanA);
+		assertTrue(TestClass.class.isAssignableFrom(beanA.getClass()));
+		
+		assertNotNull(beanB);
+		assertTrue(TestClass.class.isAssignableFrom(beanB.getClass()));
+		
+		assertFalse(beanA == beanB);
+	}
+	
+	public void testContainerBuilderSingletonBeanInitMethod() {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClass.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(true);
+		ref.setInitMethod("doInit");
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		TestClass beanA = container.getBean(beanName);
+		
+		assertTrue(beanA.isInitialized());
+		
+	}
+	
+	public void testContainerBuilderNonSingletonBeanInitMethod() {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClass.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(false);
+		ref.setInitMethod("doInit");
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		TestClass beanA = container.getBean(beanName);
+		
+		assertTrue(beanA.isInitialized());
+		
+	}
+	
+	
 }

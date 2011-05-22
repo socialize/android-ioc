@@ -39,6 +39,7 @@ public class Container {
 		super();
 		beans = new TreeMap<String, Object>();
 		this.mapping = mapping;
+		this.builder = builder;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -48,6 +49,8 @@ public class Container {
 			BeanRef beanRef = mapping.getBeanRef(name);
 			if(!beanRef.isSingleton()) {
 				bean = builder.buildBean(this, beanRef);
+				builder.setBeanProperties(this, beanRef, bean);
+				builder.initBean(beanRef, bean);
 			}
 		}
 		return (T) bean;

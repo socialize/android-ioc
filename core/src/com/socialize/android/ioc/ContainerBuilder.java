@@ -21,7 +21,11 @@
  */
 package com.socialize.android.ioc;
 
+import static com.socialize.android.ioc.KeyValuePair.RefType.BEAN;
+import static com.socialize.android.ioc.KeyValuePair.RefType.CONTEXT;
+
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,8 +34,6 @@ import java.util.Set;
 
 import android.content.Context;
 import android.util.Log;
-
-import static com.socialize.android.ioc.KeyValuePair.RefType.*;
 
 /**
  * 
@@ -112,6 +114,7 @@ public class ContainerBuilder {
 					beanRef.getName() +
 					"]", e);
 		}
+
 		return (T) bean;
 
 	}
@@ -180,9 +183,37 @@ public class ContainerBuilder {
 			BeanRef ref = mapping.getBeanRef(name);
 			Object bean = beans.get(name);
 			setBeanProperties(container, ref, bean);
+			initBean(ref, bean);
 		}
 
 		return container;
+	}
+	
+	public void initBean(BeanRef beanRef, Object bean) {
+		
+		if(bean != null) {
+			if(beanRef.getInitMethod() != null && beanRef.getInitMethod().trim().length() > 0) {
+				Method[] methods = bean.getClass().getMethods();
+				for (Method method : methods) {
+					if(method.getName().equals(beanRef.getInitMethod())) {
+						// Make sure no params
+						if(method.getParameterTypes().length == 0) {
+							try {
+								method.invoke(bean, (Object[])null);
+							}
+							catch (Exception e) {
+								Log.e(getClass().getSimpleName(), "Failed to invoke init method [" +
+										beanRef.getInitMethod() +
+										"] on bean [" +
+										beanRef.getName() +
+										"]", e);
+							}
+						}
+					}
+				}
+			}
+		}
+		
 	}
 	
 	

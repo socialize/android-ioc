@@ -33,7 +33,8 @@ public class BeanRef {
 
 	private String name;
 	private String className;
-
+	private String initMethod;
+	
 	private List<KeyValuePair> properties;
 	private List<KeyValuePair> constructorArgs;
 	
@@ -88,5 +89,12 @@ public class BeanRef {
 	public void setSingleton(boolean singleton) {
 		this.singleton = singleton;
 	}
-	
+
+	public String getInitMethod() {
+		return initMethod;
+	}
+
+	public void setInitMethod(String initMethod) {
+		this.initMethod = initMethod;
+	}
 }

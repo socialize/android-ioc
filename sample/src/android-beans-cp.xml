@@ -1,0 +1,39 @@
+<beans>
+	<bean name="bean0" class="com.socialize.android.ioc.sample.TestClass"/>
+
+	<bean name="bean1" class="com.socialize.android.ioc.sample.TestClass2">
+		<arg value="22" type="integer"/>
+	</bean>
+	
+	<bean name="bean2" class="com.socialize.android.ioc.sample.SubClass">
+		<arg value="foobar" type="string"/>
+	</bean>
+	
+	<bean name="bean3" class="com.socialize.android.ioc.sample.SubClass">
+		<property name="param" value="foobar" type="string"/>
+	</bean>
+	
+	<bean name="bean4" class="com.socialize.android.ioc.sample.ContainedClass">
+		<arg value="bean2" type="bean"/>
+	</bean>
+	
+	<bean name="bean5" class="com.socialize.android.ioc.sample.ContextClass">
+		<arg type="context"/>
+	</bean>
+	
+	<bean name="bean6" class="com.socialize.android.ioc.sample.ContextClass">
+		<property name="context" type="context"/>
+	</bean>
+	
+	<bean name="bean7" class="com.socialize.android.ioc.sample.MultiProperty">
+		<property name="string" value="foobar" type="string"/>
+		<property name="integer" value="22" type="integer"/>
+		<property name="lng" value="333333" type="long"/>
+		<property name="shrt" value="4" type="short"/>
+		<property name="chr" value="d" type="char"/>
+		<property name="bool" value="true" type="boolean"/>
+	</bean>
+	
+	<bean name="bean8" class="com.socialize.android.ioc.sample.TestClass" initMethod="doInit"/>
+	
+</beans>

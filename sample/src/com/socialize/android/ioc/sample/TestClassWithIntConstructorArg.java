@@ -1,9 +1,9 @@
 package com.socialize.android.ioc.sample;
 
-public class TestClass2 {
+public class TestClassWithIntConstructorArg {
 	int param;
 	
-	public TestClass2(int param) {
+	public TestClassWithIntConstructorArg(int param) {
 		super();
 		this.param = param;
 	}

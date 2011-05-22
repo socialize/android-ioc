@@ -1,10 +1,10 @@
 package com.socialize.android.ioc.sample;
 
-public class TestClass {
+public class TestClassWithInitMethod {
 	
 	private boolean initialized = false;
 	
-	public TestClass() {
+	public TestClassWithInitMethod() {
 		super();
 	}
 	

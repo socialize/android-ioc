@@ -2,13 +2,13 @@ package com.socialize.android.ioc.sample;
 
 import android.content.Context;
 
-public class ContextClass {
+public class TestClassWithContextConstuctorArg {
 	Context context;
 	
-	public ContextClass() {
+	public TestClassWithContextConstuctorArg() {
 		super();
 	}
-	public ContextClass(Context context) {
+	public TestClassWithContextConstuctorArg(Context context) {
 		super();
 		this.context = context;
 	}

@@ -1,13 +1,13 @@
 package com.socialize.android.ioc.sample;
 
-public class SubClass extends TestClass {
+public class SubClassOfTestClassWithInitMethod extends TestClassWithInitMethod {
 	String param;
 	
-	public SubClass(String param) {
+	public SubClassOfTestClassWithInitMethod(String param) {
 		super();
 		this.param = param;
 	}
-	public SubClass() {
+	public SubClassOfTestClassWithInitMethod() {
 		super();
 	}
 	public String getParam() {

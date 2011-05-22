@@ -1,6 +1,6 @@
 package com.socialize.android.ioc.sample;
 
-public class MultiProperty {
+public class TestClassWithMultipleProperties {
 	String string;
 	int integer;
 	long lng;
@@ -8,7 +8,7 @@ public class MultiProperty {
 	char chr;
 	boolean bool;
 	
-	public MultiProperty() {
+	public TestClassWithMultipleProperties() {
 		super();
 	}
 

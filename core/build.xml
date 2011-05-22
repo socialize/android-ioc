@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="android-ioc" default="build">
+	<property file="local.properties" />
+	<property file="build.properties" />
+	<property file="default.properties" />
+	
+    <path id="android.antlibs">
+        <pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
+        <pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
+        <pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
+    </path>
+
+    <taskdef name="setup"
+        classname="com.android.ant.SetupTask"
+        classpathref="android.antlibs"/>
+	
+	<setup/>
+
+	<target name="build" depends="compile">
+		<jar destfile="build/android-ioc-${version}.jar" basedir="${out.dir}/classes">
+			<manifest>
+				<attribute name="Built-By" value="${vendor}" />
+				<attribute name="Implementation-Vendor" value="${vendor}" />
+				<attribute name="Implementation-Title" value="${title}" />
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
+		</jar>
+	</target>
+</project>

@@ -1,31 +1,31 @@
 <beans>
-	<bean name="bean0" class="com.socialize.android.ioc.sample.TestClass"/>
+	<bean name="bean0" class="com.socialize.android.ioc.sample.TestClassWithInitMethod"/>
 
-	<bean name="bean1" class="com.socialize.android.ioc.sample.TestClass2">
+	<bean name="bean1" class="com.socialize.android.ioc.sample.TestClassWithIntConstructorArg">
 		<arg value="22" type="integer"/>
 	</bean>
 	
-	<bean name="bean2" class="com.socialize.android.ioc.sample.SubClass">
+	<bean name="bean2" class="com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod">
 		<arg value="foobar" type="string"/>
 	</bean>
 	
-	<bean name="bean3" class="com.socialize.android.ioc.sample.SubClass">
+	<bean name="bean3" class="com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod">
 		<property name="param" value="foobar" type="string"/>
 	</bean>
 	
-	<bean name="bean4" class="com.socialize.android.ioc.sample.ContainedClass">
-		<arg value="bean2" type="bean"/>
+	<bean name="bean4" class="com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg">
+		<arg ref="bean2"/>
 	</bean>
 	
-	<bean name="bean5" class="com.socialize.android.ioc.sample.ContextClass">
+	<bean name="bean5" class="com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg">
 		<arg type="context"/>
 	</bean>
 	
-	<bean name="bean6" class="com.socialize.android.ioc.sample.ContextClass">
+	<bean name="bean6" class="com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg">
 		<property name="context" type="context"/>
 	</bean>
 	
-	<bean name="bean7" class="com.socialize.android.ioc.sample.MultiProperty">
+	<bean name="bean7" class="com.socialize.android.ioc.sample.TestClassWithMultipleProperties">
 		<property name="string" value="foobar" type="string"/>
 		<property name="integer" value="22" type="integer"/>
 		<property name="lng" value="333333" type="long"/>
@@ -34,6 +34,18 @@
 		<property name="bool" value="true" type="boolean"/>
 	</bean>
 	
-	<bean name="bean8" class="com.socialize.android.ioc.sample.TestClass" initMethod="doInit"/>
+	<bean name="bean8" class="com.socialize.android.ioc.sample.TestClassWithInitMethod" initMethod="doInit"/>
+	
+	<bean name="bean9" class="com.socialize.android.ioc.sample.TestClassWithInitMethodTakingBean">
+		<init name="init">
+			<arg type="context"/>
+			<arg ref="bean0"/>
+		</init>
+	</bean>
+	
+	<bean name="bean10" class="com.socialize.android.ioc.sample.TestClassWithInitAndDestroy">
+		<init name="init"/>
+		<destroy name="destroy"/>
+	</bean>
 	
 </beans>

@@ -6,23 +6,14 @@ import com.socialize.android.ioc.AndroidIOC;
 
 public class AndroidIOCTest extends AndroidTestCase {
 
-	public void testAndroidIOCInitFromAsset() throws Exception {
+	public void testAndroidIOCInit() throws Exception {
         AndroidIOC ioc = AndroidIOC.getInstance();
-		ioc.initFromAsset(getContext());
+		ioc.init(getContext());
 	}
 	
-	public void testAndroidIOCInitFromAssetWithName() throws Exception {
+	public void testAndroidIOCInitWithName() throws Exception {
         AndroidIOC ioc = AndroidIOC.getInstance();
-		ioc.initFromAsset(getContext(), "android-beans-asset.xml");
+		ioc.init(getContext(), "android-beans.xml");
 	}
 	
-	public void testAndroidIOCInitFromClassPath() throws Exception {
-        AndroidIOC ioc = AndroidIOC.getInstance();
-		ioc.initFromClassPath(getContext());
-	}
-	
-	public void testAndroidIOCInitFromClassPathWithName() throws Exception {
-        AndroidIOC ioc = AndroidIOC.getInstance();
-		ioc.initFromClassPath(getContext(), "android-beans-cp.xml");
-	}
 }

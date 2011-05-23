@@ -1,0 +1,21 @@
+<beans>
+	<bean id="bean0" class="com.socialize.android.ioc.sample.TestClassWithInitMethod"/>
+	
+	<bean id="bean8" class="com.socialize.android.ioc.sample.TestClassWithInitMethod" initMethod="doInit"/>
+	
+	<bean id="bean9" class="com.socialize.android.ioc.sample.TestClassWithInitMethodTakingBean">
+		<init-method name="init">
+			<arg type="context"/>
+			<arg ref="bean0"/>
+		</init-method>
+	</bean>
+	
+	<bean id="bean16" class="com.socialize.android.ioc.sample.TestClassWithSetConstructorArg">
+		<constructor-arg>
+			<set>
+				<ref id="bean8"/>
+				<ref id="bean9"/>
+			</set>
+		</constructor-arg>
+	</bean>
+</beans>

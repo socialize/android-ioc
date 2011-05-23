@@ -27,6 +27,7 @@ import com.socialize.android.ioc.sample.TestClassWithListConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithListInit;
 import com.socialize.android.ioc.sample.TestClassWithListParam;
 import com.socialize.android.ioc.sample.TestClassWithMultipleProperties;
+import com.socialize.android.ioc.sample.TestClassWithSetConstructorArg;
 
 public class BeanMapperParserTest extends AndroidTestCase {
 	
@@ -518,6 +519,47 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		
 		assertEquals(RefType.BEAN, child1.getType());
 		assertEquals("bean8", child1.getValue());
+	}
+	
+	// 16-set-constructor-arg.xml
+	public void testSetConstructor() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"16-set-constructor-arg.xml");
+		assertNotNull(mapping);
+		BeanRef ref = mapping.getBeanRef("bean16");
+		assertNotNull(ref);
+		assertEquals(TestClassWithSetConstructorArg.class.getName(), ref.getClassName());
+		
+		assertNull(ref.getDestroyMethod());
+		assertNull(ref.getInitMethod());
+		assertNull(ref.getProperties());
+		
+		List<Argument> constructorArgs = ref.getConstructorArgs();
+		assertNotNull(constructorArgs);
+		assertEquals(1, constructorArgs.size());
+		
+		Argument argument = constructorArgs.get(0);
+		
+		assertEquals(RefType.SET, argument.getType());
+		assertNull(argument.getValue());
+		assertNull(argument.getKey());
+		
+		assertNotNull(argument.getChildren());
+		assertNotNull(argument.getCollectionType());
+		
+		assertEquals(2, argument.getChildren().size());
+		assertEquals(CollectionType.HASHSET, argument.getCollectionType());
+		
+		
+		Argument child0 = argument.getChildren().get(0);
+		Argument child1 = argument.getChildren().get(1);
+		
+		assertEquals(RefType.BEAN, child0.getType());
+		assertEquals("bean8", child0.getValue());
+	
+		
+		assertEquals(RefType.BEAN, child1.getType());
+		assertEquals("bean9", child1.getValue());
 	}
 	
 	public void testBeanMapperParser() throws IOException {

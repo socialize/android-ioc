@@ -1,6 +1,6 @@
 <beans>
 	<bean id="bean8" class="com.socialize.android.ioc.sample.TestClassWithInitMethod" initMethod="doInit"/>
-	<bean id="bean13" class="com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg">
+	<bean id="bean15" class="com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg">
 		<constructor-arg>
 			<map>
 				<entry>

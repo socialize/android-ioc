@@ -167,19 +167,6 @@ public class BeanMappingParserHandler extends DefaultHandler {
 			else {
 				Log.w(getClass().getSimpleName(), "No current argument for list element.  List types can only be can only be declared within a <property>, <arg> or <constructor-arg> element");
 			}
-//			
-//			if(inConstructor) {
-//				currentBean.addConstructorArgument(currentArg);
-//			}
-//			else if(inInitMethod) {
-//				currentBean.getInitMethod().addArgument(currentArg);
-//			}
-//			else if(inDestroyMethod) {
-//				currentBean.getDestroyMethod().addArgument(currentArg);
-//			}
-//			else {
-//				Log.w(getClass().getSimpleName(), "No current method for list property.  List types can only be declared within a <constructor-arg>, <init-method> or <destroy-method> element");
-//			}
 		}
 		else if(localName.equalsIgnoreCase(SET)) {
 			if(currentArg != null) {
@@ -207,6 +194,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 					inMapEntry = true;
 					currentMapEntry = new Argument();
 					currentMapEntry.setType(RefType.MAPENTRY);
+					currentArg.addChild(currentMapEntry);
 				}
 				else {
 					Log.w(getClass().getSimpleName(), "No current argument for map property.  Map types can only be declared within a <property>, <arg> or <constructor-arg> element");
@@ -383,6 +371,9 @@ public class BeanMappingParserHandler extends DefaultHandler {
 			if(type != null && type.trim().length() > 0) {
 				type = type.trim().toUpperCase();
 				prop.setType(RefType.valueOf(type));
+			}
+			else {
+				prop.setType(RefType.STRING);
 			}
 		}
 		return prop;

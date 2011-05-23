@@ -95,7 +95,7 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean id="bean13" class="com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg">
+	<bean id="bean14" class="com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg">
 		<constructor-arg>
 			<map>
 				<entry>

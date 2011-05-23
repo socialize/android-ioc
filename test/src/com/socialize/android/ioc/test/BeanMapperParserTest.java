@@ -18,6 +18,7 @@ import com.socialize.android.ioc.MethodRef;
 import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg;
+import com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithInitAndDestroy;
 import com.socialize.android.ioc.sample.TestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassWithInitMethodTakingBean;
@@ -471,6 +472,54 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertEquals("bean9", child1.getValue());
 	}
 	
+	// 15-map-constructor-arg.xml
+	public void testMapConstructor() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"15-map-constructor-arg.xml");
+		assertNotNull(mapping);
+		BeanRef ref = mapping.getBeanRef("bean15");
+		assertNotNull(ref);
+		assertEquals(TestClassWithDualMapConstructorArg.class.getName(), ref.getClassName());
+		
+		assertNull(ref.getDestroyMethod());
+		assertNull(ref.getInitMethod());
+		assertNull(ref.getProperties());
+		
+		List<Argument> constructorArgs = ref.getConstructorArgs();
+		assertNotNull(constructorArgs);
+		assertEquals(1, constructorArgs.size());
+		
+		Argument argument = constructorArgs.get(0);
+		
+		assertEquals(RefType.MAP, argument.getType());
+		assertNull(argument.getValue());
+		assertNull(argument.getKey());
+		
+		assertNotNull(argument.getChildren());
+		assertNotNull(argument.getCollectionType());
+		assertEquals(CollectionType.HASHMAP, argument.getCollectionType());
+		
+		// 1 child with two sub-childen
+		assertEquals(1, argument.getChildren().size());
+		
+		Argument entry = argument.getChildren().get(0);
+		
+		assertEquals(RefType.MAPENTRY, entry.getType());
+		
+		assertNotNull(entry.getChildren());
+		assertEquals(2, entry.getChildren().size());
+		
+		Argument child0 = entry.getChildren().get(0);
+		Argument child1 = entry.getChildren().get(1);
+		
+		assertEquals("key", child0.getKey());
+		assertEquals("foo", child0.getValue());
+		assertEquals(RefType.STRING, child0.getType());
+		
+		assertEquals(RefType.BEAN, child1.getType());
+		assertEquals("bean8", child1.getValue());
+	}
+	
 	public void testBeanMapperParser() throws IOException {
 		
 		BeanMappingParser parser = new BeanMappingParser();
@@ -482,7 +531,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		Collection<BeanRef> beanRefs = mapping.getBeanRefs();
 		
 		assertNotNull(beanRefs);
-		assertEquals(14, beanRefs.size());
+		assertEquals(15, beanRefs.size());
 		
 		 // Taken from test file
 		Set<String> names = new HashSet<String>();
@@ -501,6 +550,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		names.add("bean11");
 		names.add("bean12");
 		names.add("bean13");
+		names.add("bean14");
 		
 		for (BeanRef beanRef : beanRefs) {
 			assertTrue(names.contains(beanRef.getName()));

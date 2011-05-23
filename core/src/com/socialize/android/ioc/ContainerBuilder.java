@@ -45,13 +45,11 @@ import com.socialize.android.ioc.Argument.CollectionType;
 import com.socialize.android.ioc.Argument.RefType;
 
 /**
- * 
  * @author Jason Polites
- *
  */
 public class ContainerBuilder {
 
-	static final int MAX_ITERATIONS = 20;
+	static final int MAX_ITERATIONS = 5;
 	
 	private BeanBuilder builder = null;
 	private BeanMappingParser parser = null;
@@ -231,7 +229,15 @@ public class ContainerBuilder {
 			Object[] args = new Object[list.size()];
 			int argIndex = 0;
 			for (Argument arg : list) {
-				args[argIndex] = getArgumentValue(container, arg);
+				
+				Object argumentValue = getArgumentValue(container, arg);
+				
+				if(argumentValue == null && !arg.getType().equals(RefType.NULL)) {
+					// Bail
+					return null;
+				}
+				
+				args[argIndex] = argumentValue;
 				argIndex++;
 			}
 			
@@ -328,6 +334,11 @@ public class ContainerBuilder {
 				for (Argument child : children) {
 					Object value = getArgumentValue(container, child);
 					
+					if(value == null && !child.getType().equals(RefType.NULL)) {
+						// Can't complete so just abort
+						return null;
+					}
+					
 					if(value != null) {
 						list.add(value);
 					}
@@ -346,17 +357,30 @@ public class ContainerBuilder {
 		MapEntry entry = new MapEntry();
 		List<Argument> children = arg.getChildren();
 		
-		Argument child0 = children.get(0);
-		Argument child1 = children.get(1);
+		Argument keyArg = children.get(0);
+		Argument valArg = children.get(1);
+
+		if(valArg.getKey() != null && valArg.getKey().equals("key")) {
+			
+			Argument tmp = keyArg;
+			keyArg = valArg;
+			valArg = tmp;
+		}
 		
-		if(child0.getKey().equals("key")) {
-			entry.setKey(child0);
-			entry.setValue(child1);
+		Object key = getArgumentValue(container, keyArg);
+		Object value = getArgumentValue(container, valArg);
+		
+		if(key == null) {
+			// No bueno.. return here (must be dependency failure)
+			return null;
 		}
-		else {
-			entry.setKey(child1);
-			entry.setValue(child0);
+		
+		if(value == null && !valArg.getType().equals(RefType.NULL)) {
+			return null;
 		}
+		
+		entry.setKey(key);
+		entry.setValue(value);
 		
 		return entry;
 	}
@@ -393,9 +417,14 @@ public class ContainerBuilder {
 					
 					if(child.getType().equals(RefType.MAPENTRY)) {
 						MapEntry entry = (MapEntry) getArgumentValue(container, child);
-						if(entry != null) {
-							list.put(entry.getKey(), entry.getValue());
+						
+						if(entry == null) {
+							// Can't complete so just abort
+							return null;
 						}
+						
+						list.put(entry.getKey(), entry.getValue());
+						
 					}
 					else {
 						throw new IllegalArgumentException("Invalid argument type.  Expected " +
@@ -441,6 +470,11 @@ public class ContainerBuilder {
 			if(children != null) {
 				for (Argument child : children) {
 					Object value = getArgumentValue(container, child);
+					
+					if(value == null && !child.getType().equals(RefType.NULL)) {
+						// Can't complete so just abort
+						return null;
+					}
 					
 					if(value != null) {
 						list.add(value);

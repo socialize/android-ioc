@@ -69,8 +69,7 @@ public class BeanBuilder {
 		return object;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T extends Object> T coerce(Argument value) {
+	public Object coerce(Argument value) {
 
 		Object coerced = null;
 
@@ -111,7 +110,7 @@ public class BeanBuilder {
 			}
 		}
 
-		return (T) coerced;
+		return coerced;
 	}
 
 	public void setProperty(Object instance, String name, Object value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
@@ -248,7 +247,11 @@ public class BeanBuilder {
 
 		if(asColl.size() > 0) {
 			ParameterizedType parType = (ParameterizedType) genericParams[index];
-			if(parType.getActualTypeArguments()[0].equals(asColl.iterator().next().getClass())) {
+			
+			Type actualType = parType.getActualTypeArguments()[0];
+			Class<?> componentType = asColl.iterator().next().getClass();
+			
+			if(actualType.equals(componentType)) {
 				return true;
 			}
 		}
@@ -281,7 +284,7 @@ public class BeanBuilder {
 			return true;
 		}
 		
-		return true;
+		return false;
 	}
 	
 	private boolean isArrayMatch(Type[] genericParams, int index, Object arg) {

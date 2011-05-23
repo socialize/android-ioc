@@ -32,6 +32,8 @@ import java.util.List;
 public final class Argument {
 
 	public static enum RefType {
+		UNDEFINED,
+		NULL,
 		BEAN, 
 		CONTEXT,
 		SHORT, 
@@ -59,7 +61,7 @@ public final class Argument {
 	
 	private String key;
 	private String value;
-	private RefType type;
+	private RefType type = RefType.UNDEFINED;
 	private CollectionType collectionType;
 	
 	private List<Argument> children;

@@ -559,7 +559,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 	
 		
 		assertEquals(RefType.BEAN, child1.getType());
-		assertEquals("bean9", child1.getValue());
+		assertEquals("bean0", child1.getValue());
 	}
 	
 	public void testBeanMapperParser() throws IOException {
@@ -573,7 +573,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		Collection<BeanRef> beanRefs = mapping.getBeanRefs();
 		
 		assertNotNull(beanRefs);
-		assertEquals(15, beanRefs.size());
+		assertEquals(16, beanRefs.size());
 		
 		 // Taken from test file
 		Set<String> names = new HashSet<String>();
@@ -593,6 +593,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		names.add("bean12");
 		names.add("bean13");
 		names.add("bean14");
+		names.add("bean15");
 		
 		for (BeanRef beanRef : beanRefs) {
 			assertTrue(names.contains(beanRef.getName()));

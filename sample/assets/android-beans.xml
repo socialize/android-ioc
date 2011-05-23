@@ -106,4 +106,13 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="bean15" class="com.socialize.android.ioc.sample.TestClassWithSetConstructorArg">
+		<constructor-arg>
+			<set>
+				<ref id="bean8"/>
+				<ref id="bean0"/>
+			</set>
+		</constructor-arg>
+	</bean>
+	
 </beans>

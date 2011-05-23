@@ -1,21 +1,31 @@
 package com.socialize.android.ioc.test;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import android.test.AndroidTestCase;
 
+import com.socialize.android.ioc.Argument;
+import com.socialize.android.ioc.Argument.RefType;
 import com.socialize.android.ioc.BeanMapping;
 import com.socialize.android.ioc.BeanRef;
 import com.socialize.android.ioc.Container;
 import com.socialize.android.ioc.ContainerBuilder;
-import com.socialize.android.ioc.Argument;
-import com.socialize.android.ioc.Argument.RefType;
 import com.socialize.android.ioc.MethodRef;
+import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg;
-import com.socialize.android.ioc.sample.TestClassWithMultipleProperties;
-import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
+import com.socialize.android.ioc.sample.TestClassWithDualListConstructorArg;
+import com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithInitMethod;
-import com.socialize.android.ioc.sample.TestClassWithIntConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithInitMethodTakingBean;
+import com.socialize.android.ioc.sample.TestClassWithIntConstructorArg;
+import com.socialize.android.ioc.sample.TestClassWithMultipleProperties;
+import com.socialize.android.ioc.sample.TestClassWithSetConstructorArg;
 
 
 public class ContainerBuilderTest extends AndroidTestCase {
@@ -39,7 +49,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertTrue(TestClassWithInitMethod.class.isAssignableFrom(bean.getClass()));
 	}
 	
-	public void testContainerBuilderSingleBeanWithConstructorArgs() throws Exception {
+	public void testContainerBuilderBeanWithIntConstructorArgs() throws Exception {
 		String beanName = "bean";
 		
 		BeanMapping mapping = new BeanMapping();
@@ -64,7 +74,232 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertEquals(69, bc2.getParam());
 	}
 	
-	public void testContainerBuilderSingleBeanWithContextConstructorArgs() throws Exception {
+	public void testContainerBuilderBeanWithStringListConstructorArgs() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithDualListConstructorArg.class.getName());
+		ref.setName(beanName);
+		
+		Argument listElement0 = new Argument(null, "foo", RefType.STRING);
+		Argument listElement1 = new Argument(null, "bar", RefType.STRING);
+		Argument list = new Argument(null, null, RefType.LIST);
+		
+		list.addChild(listElement0);
+		list.addChild(listElement1);
+		
+		ref.addConstructorArgument(list);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		Object bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertTrue(TestClassWithDualListConstructorArg.class.isAssignableFrom(bean.getClass()));
+		
+		TestClassWithDualListConstructorArg typedBean = container.getBean(beanName);
+		
+		List<String> stringList = typedBean.getStringList();
+		
+		assertNotNull(stringList);
+		assertTrue(LinkedList.class.isAssignableFrom(stringList.getClass()));
+		assertEquals(2, stringList.size());
+		
+		String string0 = stringList.get(0);
+		String string1 = stringList.get(1);
+		
+		assertEquals("foo", string0);
+		assertEquals("bar", string1);
+	}
+	
+	// Tests creating referenced beans and using in a constructor
+	public void testContainerBuilderBeanWithBeanListConstructorArgs() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithDualListConstructorArg.class.getName());
+		ref.setName(beanName);
+		
+		BeanRef refBean0 = new BeanRef();
+		refBean0.setClassName(TestClassWithInitMethod.class.getName());
+		refBean0.setName("refBean0");
+		refBean0.setInitMethod(new MethodRef("doInit"));
+		
+		
+		BeanRef refBean1 = new BeanRef();
+		refBean1.setClassName(TestClassWithInitMethod.class.getName());
+		refBean1.setName("refBean1");
+		
+		mapping.addBeanRef(refBean0);
+		mapping.addBeanRef(refBean1);
+		
+		Argument listElement0 = new Argument(null, "refBean0", RefType.BEAN);
+		Argument listElement1 = new Argument(null, "refBean1", RefType.BEAN);
+		Argument list = new Argument(null, null, RefType.LIST);
+		
+		list.addChild(listElement0);
+		list.addChild(listElement1);
+		
+		ref.addConstructorArgument(list);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		Object bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertTrue(TestClassWithDualListConstructorArg.class.isAssignableFrom(bean.getClass()));
+		
+		TestClassWithDualListConstructorArg typedBean = container.getBean(beanName);
+		
+		List<TestClassWithInitMethod> beanList = typedBean.getBeanList();
+		
+		assertNotNull(beanList);
+		assertTrue(LinkedList.class.isAssignableFrom(beanList.getClass()));
+		assertEquals(2, beanList.size());
+		
+		TestClassWithInitMethod bean0 = beanList.get(0);
+		TestClassWithInitMethod bean1 = beanList.get(1);
+		
+		assertTrue(bean0.isInitialized());
+		assertFalse(bean1.isInitialized());
+	}
+	
+	// Tests creating referenced beans and using in a constructor
+	public void testContainerBuilderBeanWithBeanSetConstructorArgs() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithSetConstructorArg.class.getName());
+		ref.setName(beanName);
+		
+		BeanRef refBean0 = new BeanRef();
+		refBean0.setClassName(TestClassWithInitMethod.class.getName());
+		refBean0.setName("refBean0");
+		refBean0.setInitMethod(new MethodRef("doInit"));
+		
+		
+		BeanRef refBean1 = new BeanRef();
+		refBean1.setClassName(TestClassWithInitMethod.class.getName());
+		refBean1.setName("refBean1");
+		
+		mapping.addBeanRef(refBean0);
+		mapping.addBeanRef(refBean1);
+		
+		Argument listElement0 = new Argument(null, "refBean0", RefType.BEAN);
+		Argument listElement1 = new Argument(null, "refBean1", RefType.BEAN);
+		Argument list = new Argument(null, null, RefType.SET);
+		
+		list.addChild(listElement0);
+		list.addChild(listElement1);
+		
+		ref.addConstructorArgument(list);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		Object bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertTrue(TestClassWithSetConstructorArg.class.isAssignableFrom(bean.getClass()));
+		
+		TestClassWithSetConstructorArg typedBean = container.getBean(beanName);
+		
+		Set<TestClassWithInitMethod> beanSet = typedBean.getSet();
+		
+		assertNotNull(beanSet);
+		assertTrue(HashSet.class.isAssignableFrom(beanSet.getClass()));
+		assertEquals(2, beanSet.size());
+		
+		int inited = 0;
+		int notInited = 0;
+		
+		for (TestClassWithInitMethod bean0 : beanSet) {
+			if(bean0.isInitialized()) {
+				inited++;
+			}
+			else {
+				notInited++;
+			}
+		}
+		
+		assertEquals(1, inited);
+		assertEquals(1, notInited);
+	}
+	
+	public void testContainerBuilderBeanWithBeanMapConstructorArgs() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithDualMapConstructorArg.class.getName());
+		ref.setName(beanName);
+		
+		BeanRef refBean0 = new BeanRef();
+		refBean0.setClassName(TestClassWithInitMethod.class.getName());
+		refBean0.setName("refBean0");
+		refBean0.setInitMethod(new MethodRef("doInit"));
+
+		mapping.addBeanRef(refBean0);
+		
+		Argument key = new Argument("key", "foo", RefType.STRING); // This is the key
+		Argument value = new Argument(null, "refBean0", RefType.BEAN);
+	
+		Argument entryElement = new Argument(null, null, RefType.MAPENTRY);
+		
+		entryElement.addChild(key);
+		entryElement.addChild(value);
+		
+		Argument mapElement = new Argument(null, null, RefType.MAP);
+		
+		mapElement.addChild(entryElement);
+		
+		ref.addConstructorArgument(mapElement);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		Object bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertTrue(TestClassWithDualMapConstructorArg.class.isAssignableFrom(bean.getClass()));
+		
+		TestClassWithDualMapConstructorArg typedBean = container.getBean(beanName);
+		
+		Map<String, TestClassWithInitMethod> beanMap = typedBean.getBeanMap();
+		
+		assertNotNull(beanMap);
+		assertTrue(HashMap.class.isAssignableFrom(beanMap.getClass()));
+		assertEquals(1, beanMap.size());
+		
+		TestClassWithInitMethod entry = beanMap.get("foo");
+		
+		assertNotNull(entry);
+		
+		assertTrue(entry.isInitialized());
+	}
+	
+	
+	public void testContainerBuilderBeanWithContextConstructorArgs() throws Exception {
 		String beanName = "bean";
 		
 		BeanMapping mapping = new BeanMapping();

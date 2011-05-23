@@ -29,7 +29,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import android.content.Context;
-import android.util.Log;
 
 /**
  * 
@@ -87,7 +86,7 @@ public class BeanMappingParser {
 			mapping = handler.getBeanMapping();
 		}
 		catch (Exception e) {
-			Log.e("BeanMappingParser", "IOC Parse error", e);
+			Logger.e("BeanMappingParser", "IOC Parse error", e);
 		}
 		return mapping;
 	}

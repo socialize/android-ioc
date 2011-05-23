@@ -20,11 +20,9 @@ public class BeanBuilderTest extends AndroidTestCase {
 		
 		assertNotNull(b);
 		
-		try {
-			constructor.construct(TestClassWithIntConstructorArg.class);
-			fail();
-		}
-		catch (Exception e) {}
+		TestClassWithIntConstructorArg fail = constructor.construct(TestClassWithIntConstructorArg.class);
+		
+		assertNull(fail);
 		
 		TestClassWithIntConstructorArg b2 = constructor.construct(TestClassWithIntConstructorArg.class, 1);
 		

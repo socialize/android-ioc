@@ -40,7 +40,6 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.socialize.android.ioc.Argument.CollectionType;
 import com.socialize.android.ioc.Argument.RefType;
@@ -80,12 +79,10 @@ public class ContainerBuilder {
 		Object bean = null;
 		
 		try {
-			
 			List<Argument> constructorArgs = beanRef.getConstructorArgs();
-			
 			if(constructorArgs != null && constructorArgs.size() > 0) {
 				Object[] args = getArguments(context, container, constructorArgs);
-				if(args != null) {
+				if(args != null && args.length > 0) {
 					bean = builder.construct(beanRef.getClassName(), args);
 				}
 			}
@@ -95,7 +92,7 @@ public class ContainerBuilder {
 			
 		}
 		catch (Exception e) {
-			Log.e(getClass().getSimpleName(), "Failed to create bean [" +
+			Logger.e(getClass().getSimpleName(), "Failed to create bean [" +
 					beanRef.getName() +
 					"]", e);
 		}
@@ -124,7 +121,7 @@ public class ContainerBuilder {
 			}
 		}
 		catch (Exception e) {
-			Log.e(getClass().getSimpleName(), "Failed to set properties on bean [" +
+			Logger.e(getClass().getSimpleName(), "Failed to set properties on bean [" +
 					ref.getName() +
 					"]", e);
 		}
@@ -174,7 +171,7 @@ public class ContainerBuilder {
 						method.invoke(bean, args);
 					}
 					catch (Exception e) {
-						Log.e(getClass().getSimpleName(), "Failed to invoke init method [" +
+						Logger.e(getClass().getSimpleName(), "Failed to invoke init method [" +
 								beanRef.getInitMethod() +
 								"] on bean [" +
 								beanRef.getName() +
@@ -182,7 +179,7 @@ public class ContainerBuilder {
 					}
 				}
 				else {
-					Log.e(getClass().getSimpleName(), "Could not find method matching [" +
+					Logger.e(getClass().getSimpleName(), "Could not find method matching [" +
 							beanRef.getInitMethod().getName() +
 							"] in bean [" +
 							beanRef.getName()  +
@@ -217,7 +214,7 @@ public class ContainerBuilder {
 					}
 				}
 				catch (Exception e) {
-					Log.e(getClass().getSimpleName(), "Failed to create bean [" +
+					Logger.e(getClass().getSimpleName(), "Failed to create bean [" +
 							beanRef.getName() +
 							"]", e);
 				}
@@ -288,7 +285,7 @@ public class ContainerBuilder {
 			}
 		}
 		else {
-			Log.e(getClass().getSimpleName(), "No argument type specified!");
+			Logger.e(getClass().getSimpleName(), "No argument type specified!");
 		}
 		
 		return object;
@@ -338,7 +335,7 @@ public class ContainerBuilder {
 			}
 		}
 		catch (Exception e) {
-			Log.e(getClass().getSimpleName(), "Failed to create list for argument of type[" +
+			Logger.e(getClass().getSimpleName(), "Failed to create list for argument of type[" +
 					arg.getType() +
 					"]", e);
 		}
@@ -409,7 +406,7 @@ public class ContainerBuilder {
 			}
 		}
 		catch (Exception e) {
-			Log.e(getClass().getSimpleName(), "Failed to create map for argument of type[" +
+			Logger.e(getClass().getSimpleName(), "Failed to create map for argument of type[" +
 					arg.getType() +
 					"]", e);
 		}
@@ -452,7 +449,7 @@ public class ContainerBuilder {
 			}
 		}
 		catch (Exception e) {
-			Log.e(getClass().getSimpleName(), "Failed to create set for argument of type[" +
+			Logger.e(getClass().getSimpleName(), "Failed to create set for argument of type[" +
 					arg.getType() +
 					"]", e);
 		}

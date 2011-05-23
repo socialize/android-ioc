@@ -63,7 +63,7 @@ public class BeanBuilder {
 		}
 		else {
 			// No constructor found.
-			throw new InstantiationException("No valid constructor found for class [" + clazz.getName() + "]");
+			Logger.e(getClass().getSimpleName(), "No valid constructor found for class [" + clazz.getName() + "]");
 		}
 
 		return object;

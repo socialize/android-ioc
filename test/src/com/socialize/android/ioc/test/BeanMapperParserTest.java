@@ -207,7 +207,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertNotNull(props);
 		assertEquals(7, props.size());
 		
-//		<property name="string" value="foobar" type="string"/>
+		// <property name="string" value="foobar" type="string"/>
 		Argument argument0 = props.get(0);
 		assertEquals(RefType.STRING, argument0.getType());
 		assertEquals("string", argument0.getKey());
@@ -215,7 +215,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertNull(argument0.getChildren());
 		assertNull(argument0.getCollectionType());
 		
-//		<property name="integer" value="22" type="integer"/>
+		// <property name="integer" value="22" type="integer"/>
 		Argument argument1 = props.get(1);
 		assertEquals(RefType.INTEGER, argument1.getType());
 		assertEquals("integer", argument1.getKey());
@@ -223,7 +223,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertNull(argument1.getChildren());
 		assertNull(argument1.getCollectionType());
 		
-//		<property name="lng" value="333333" type="long"/>
+		// <property name="lng" value="333333" type="long"/>
 		Argument argument2 = props.get(2);
 		assertEquals(RefType.LONG, argument2.getType());
 		assertEquals("lng", argument2.getKey());
@@ -231,7 +231,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertNull(argument2.getChildren());
 		assertNull(argument2.getCollectionType());
 		
-//		<property name="shrt" value="4" type="short"/>
+		// <property name="shrt" value="4" type="short"/>
 		Argument argument3 = props.get(3);
 		assertEquals(RefType.SHORT, argument3.getType());
 		assertEquals("shrt", argument3.getKey());
@@ -239,7 +239,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertNull(argument3.getChildren());
 		assertNull(argument3.getCollectionType());
 		
-//		<property name="chr" value="d" type="char"/>
+		// <property name="chr" value="d" type="char"/>
 		Argument argument4 = props.get(4);
 		assertEquals(RefType.CHAR, argument4.getType());
 		assertEquals("chr", argument4.getKey());
@@ -247,7 +247,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertNull(argument4.getChildren());
 		assertNull(argument4.getCollectionType());
 		
-//		<property name="bool" value="true" type="boolean"/>
+		// <property name="bool" value="true" type="boolean"/>
 		Argument argument5 = props.get(5);
 		assertEquals(RefType.BOOLEAN, argument5.getType());
 		assertEquals("bool", argument5.getKey());
@@ -255,7 +255,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertNull(argument5.getChildren());
 		assertNull(argument5.getCollectionType());
 		
-// 		<property name="btw" value="12" type="byte"/>
+		// <property name="btw" value="12" type="byte"/>
 		Argument argument6 = props.get(6);
 		assertEquals(RefType.BYTE, argument6.getType());
 		assertEquals("btw", argument6.getKey());

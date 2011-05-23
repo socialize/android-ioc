@@ -25,8 +25,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.util.Log;
-
 import com.socialize.android.ioc.Argument.CollectionType;
 import com.socialize.android.ioc.Argument.RefType;
 
@@ -115,7 +113,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 				}
 			}
 			else {
-				Log.w(getClass().getSimpleName(), "Orphaned arg [" +
+				Logger.w(getClass().getSimpleName(), "Orphaned arg [" +
 						attributes.getValue("name") +
 						"].. ignoring");
 			}
@@ -127,7 +125,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 					currentArg.addChild(getProperty(attributes));
 				}
 				else {
-					Log.w(getClass().getSimpleName(), "No current property for list or set property.  List/Set types can only be can only be declared within a <property>, <arg> or <constructor-arg> element");
+					Logger.w(getClass().getSimpleName(), "No current property for list or set property.  List/Set types can only be can only be declared within a <property>, <arg> or <constructor-arg> element");
 				}
 			}
 			else {
@@ -142,7 +140,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 					currentArg.addChild(getProperty(attributes));
 				}
 				else {
-					Log.e(getClass().getSimpleName(), "No current argument found upon encountering a bean reference in a list. ");
+					Logger.e(getClass().getSimpleName(), "No current argument found upon encountering a bean reference in a list. ");
 				}
 			}
 			else {
@@ -165,7 +163,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 				setCollectionType(currentArg, attributes);
 			}
 			else {
-				Log.w(getClass().getSimpleName(), "No current argument for list element.  List types can only be can only be declared within a <property>, <arg> or <constructor-arg> element");
+				Logger.w(getClass().getSimpleName(), "No current argument for list element.  List types can only be can only be declared within a <property>, <arg> or <constructor-arg> element");
 			}
 		}
 		else if(localName.equalsIgnoreCase(SET)) {
@@ -175,7 +173,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 				setCollectionType(currentArg, attributes);
 			}
 			else {
-				Log.w(getClass().getSimpleName(), "No current argument for set element.  Set types can only be can only be declared within a <property>, <arg> or <constructor-arg> element");
+				Logger.w(getClass().getSimpleName(), "No current argument for set element.  Set types can only be can only be declared within a <property>, <arg> or <constructor-arg> element");
 			}
 		}
 		else if(localName.equalsIgnoreCase(MAP)) {
@@ -185,7 +183,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 				setCollectionType(currentArg, attributes);
 			}
 			else {
-				Log.w(getClass().getSimpleName(), "No current argument for map element.  Map types can only be can only be declared within a <property>, <arg> or <constructor-arg> element");
+				Logger.w(getClass().getSimpleName(), "No current argument for map element.  Map types can only be can only be declared within a <property>, <arg> or <constructor-arg> element");
 			}
 		}
 		else if(localName.equalsIgnoreCase(MAP_ENTRY)) {
@@ -197,11 +195,11 @@ public class BeanMappingParserHandler extends DefaultHandler {
 					currentArg.addChild(currentMapEntry);
 				}
 				else {
-					Log.w(getClass().getSimpleName(), "No current argument for map property.  Map types can only be declared within a <property>, <arg> or <constructor-arg> element");
+					Logger.w(getClass().getSimpleName(), "No current argument for map property.  Map types can only be declared within a <property>, <arg> or <constructor-arg> element");
 				}
 			}
 			else {
-				Log.w(getClass().getSimpleName(), "No current map element for map entry.  Map entry types can only be declared within a <map> element");
+				Logger.w(getClass().getSimpleName(), "No current map element for map entry.  Map entry types can only be declared within a <map> element");
 			}
 		}
 		else if(localName.equalsIgnoreCase(MAP_KEY)) {
@@ -212,11 +210,11 @@ public class BeanMappingParserHandler extends DefaultHandler {
 					currentMapEntry.addChild(key);
 				}
 				else {
-					Log.w(getClass().getSimpleName(), "No current map entry for key field.  Key types can only be declared within an <entry> element");
+					Logger.w(getClass().getSimpleName(), "No current map entry for key field.  Key types can only be declared within an <entry> element");
 				}
 			}
 			else {
-				Log.w(getClass().getSimpleName(), "No current map element for map entry.  Map entry types can only be declared within a <map> element");
+				Logger.w(getClass().getSimpleName(), "No current map element for map entry.  Map entry types can only be declared within a <map> element");
 			}
 		}
 		else if(localName.equalsIgnoreCase(MAP_VALUE)) {
@@ -227,11 +225,11 @@ public class BeanMappingParserHandler extends DefaultHandler {
 					currentMapEntry.addChild(value);
 				}
 				else {
-					Log.w(getClass().getSimpleName(), "No current map entry for key field.  Key types can only be declared within an <entry> element");
+					Logger.w(getClass().getSimpleName(), "No current map entry for key field.  Key types can only be declared within an <entry> element");
 				}
 			}
 			else {
-				Log.w(getClass().getSimpleName(), "No current map element for map entry.  Map entry types can only be declared within a <map> element");
+				Logger.w(getClass().getSimpleName(), "No current map element for map entry.  Map entry types can only be declared within a <map> element");
 			}
 		}
 	}
@@ -282,7 +280,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 				
 				// Verify
 				if(!isCollectionTypeValid(arg, attributes, cType)) {
-					Log.w(getClass().getSimpleName(), "Invalid collection type [" +
+					Logger.w(getClass().getSimpleName(), "Invalid collection type [" +
 							type +
 							"] for the argument of type [" +
 							arg.getType() +
@@ -291,7 +289,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 				
 			}
 			catch (Exception e) {
-				Log.w(getClass().getSimpleName(), "Invalid collection type [" +
+				Logger.w(getClass().getSimpleName(), "Invalid collection type [" +
 						type +
 						"]", e);
 				
@@ -320,7 +318,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 				
 			default:
 				
-				Log.e(getClass().getSimpleName(), "Current argument [" +
+				Logger.e(getClass().getSimpleName(), "Current argument [" +
 						arg.getType() +
 						"] is not a collection");
 				

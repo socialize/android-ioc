@@ -37,18 +37,18 @@ public class BeanRef {
 	private MethodRef initMethod;
 	private MethodRef destroyMethod;
 	
-	private List<KeyValuePair> properties;
-	private List<KeyValuePair> constructorArgs;
+	private List<Argument> properties;
+	private List<Argument> constructorArgs;
 	
 	private boolean singleton = true;
 	
-	public synchronized void addConstructorArgument(KeyValuePair arg) {
-		if(constructorArgs == null) constructorArgs = new LinkedList<KeyValuePair>();
+	public synchronized void addConstructorArgument(Argument arg) {
+		if(constructorArgs == null) constructorArgs = new LinkedList<Argument>();
 		constructorArgs.add(arg);
 	}
 	
-	public synchronized void addProperty(KeyValuePair arg) {
-		if(properties == null) properties = new LinkedList<KeyValuePair>();
+	public synchronized void addProperty(Argument arg) {
+		if(properties == null) properties = new LinkedList<Argument>();
 		properties.add(arg);
 	}
 
@@ -68,19 +68,19 @@ public class BeanRef {
 		this.className = type;
 	}
 
-	public List<KeyValuePair> getProperties() {
+	public List<Argument> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(List<KeyValuePair> properties) {
+	public void setProperties(List<Argument> properties) {
 		this.properties = properties;
 	}
 
-	public List<KeyValuePair> getConstructorArgs() {
+	public List<Argument> getConstructorArgs() {
 		return constructorArgs;
 	}
 
-	public void setConstructorArgs(List<KeyValuePair> constructorArgs) {
+	public void setConstructorArgs(List<Argument> constructorArgs) {
 		this.constructorArgs = constructorArgs;
 	}
 

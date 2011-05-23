@@ -1,0 +1,6 @@
+<beans>
+	<bean id="bean10" class="com.socialize.android.ioc.sample.TestClassWithInitAndDestroy">
+		<init-method name="init"/>
+		<destroy-method name="destroy"/>
+	</bean>
+</beans>

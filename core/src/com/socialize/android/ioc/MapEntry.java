@@ -21,31 +21,26 @@
  */
 package com.socialize.android.ioc;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * 
  * @author Jason Polites
  *
  */
-public class BeanMapping {
+public class MapEntry {
 
-	private Map<String, BeanRef> beanRefs;
-
-	public Collection<BeanRef> getBeanRefs() {
-		return beanRefs.values();
+	private Object key;
+	private Object value;
+	
+	public Object getKey() {
+		return key;
 	}
-
-	public synchronized void addBeanRef(BeanRef ref) {
-		if(beanRefs == null) {
-			beanRefs = new HashMap<String, BeanRef>();
-		}
-		beanRefs.put(ref.getName(), ref);
+	public void setKey(Object key) {
+		this.key = key;
 	}
-
-	public BeanRef getBeanRef(String name) {
-		return beanRefs.get(name);
+	public Object getValue() {
+		return value;
+	}
+	public void setValue(Object value) {
+		this.value = value;
 	}
 }

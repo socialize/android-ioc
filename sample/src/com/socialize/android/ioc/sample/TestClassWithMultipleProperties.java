@@ -7,6 +7,7 @@ public class TestClassWithMultipleProperties {
 	short shrt;
 	char chr;
 	boolean bool;
+	byte bte;
 	
 	public TestClassWithMultipleProperties() {
 		super();
@@ -59,4 +60,13 @@ public class TestClassWithMultipleProperties {
 	public void setBool(boolean bool) {
 		this.bool = bool;
 	}
+
+	public byte getBte() {
+		return bte;
+	}
+
+	public void setBte(byte bte) {
+		this.bte = bte;
+	}
+	
 }

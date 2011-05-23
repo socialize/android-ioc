@@ -21,33 +21,54 @@
  */
 package com.socialize.android.ioc;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * 
  * @author Jason Polites
  *
  */
-public final class KeyValuePair {
+public final class Argument {
 
 	public static enum RefType {
-			BEAN, 
-			CONTEXT,
-			SHORT, 
-			INTEGER, 
-			LONG, 
-			STRING, 
-			CHAR, 
-			BYTE,
-			BOOLEAN}
+		BEAN, 
+		CONTEXT,
+		SHORT, 
+		INTEGER, 
+		LONG, 
+		STRING, 
+		CHAR, 
+		BYTE,
+		BOOLEAN,
+		LIST,
+		MAP,
+		MAPENTRY,
+		SET};
+			
+	public static enum CollectionType {
+		LINKEDLIST,
+		ARRAYLIST,
+		VECTOR,
+		STACK,
+		HASHMAP,
+		TREEMAP,
+		HASHSET,
+		TREESET
+	}
 	
 	private String key;
 	private String value;
 	private RefType type;
+	private CollectionType collectionType;
 	
-	public KeyValuePair() {
+	private List<Argument> children;
+	
+	public Argument() {
 		super();
 	}
 	
-	public KeyValuePair(String key,String value,RefType type) {
+	public Argument(String key,String value,RefType type) {
 		super();
 		this.key = key;
 		this.value = value;
@@ -72,43 +93,18 @@ public final class KeyValuePair {
 	public void setType(RefType type) {
 		this.type = type;
 	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((key == null) ? 0 : key.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
-		return result;
+	public CollectionType getCollectionType() {
+		return collectionType;
 	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		KeyValuePair other = (KeyValuePair) obj;
-		if (key == null) {
-			if (other.key != null)
-				return false;
-		}
-		else if (!key.equals(other.key))
-			return false;
-		if (type != other.type)
-			return false;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		}
-		else if (!value.equals(other.value))
-			return false;
-		return true;
+	public void setCollectionType(CollectionType collectionType) {
+		this.collectionType = collectionType;
 	}
-	
-	
-	
-	
+	public List<Argument> getChildren() {
+		return children;
+	}
+	public synchronized void addChild(Argument arg) {
+		if(children == null) children = new LinkedList<Argument>();
+		children.add(arg);
+	}
+
 }

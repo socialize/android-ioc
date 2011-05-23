@@ -32,7 +32,7 @@ import java.util.List;
 public class MethodRef {
 
 	private String name;
-	private List<KeyValuePair> arguments;
+	private List<Argument> arguments;
 	
 	public MethodRef() {
 		super();
@@ -51,12 +51,12 @@ public class MethodRef {
 		this.name = name;
 	}
 	
-	public List<KeyValuePair> getArguments() {
+	public List<Argument> getArguments() {
 		return arguments;
 	}
 
-	public synchronized void addArgument(KeyValuePair arg) {
-		if(arguments == null) arguments = new LinkedList<KeyValuePair>();
+	public synchronized void addArgument(Argument arg) {
+		if(arguments == null) arguments = new LinkedList<Argument>();
 		arguments.add(arg);
 	}
 	

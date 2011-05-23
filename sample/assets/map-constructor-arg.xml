@@ -1,0 +1,13 @@
+<beans>
+	<bean id="bean8" class="com.socialize.android.ioc.sample.TestClassWithInitMethod" initMethod="doInit"/>
+	<bean id="bean13" class="com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg">
+		<constructor-arg>
+			<map>
+				<entry>
+					<key value="foo"/>
+					<value ref="bean8"/>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+</beans>

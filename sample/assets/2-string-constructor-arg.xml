@@ -1,0 +1,5 @@
+<beans>
+	<bean id="bean2" class="com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod">
+		<constructor-arg value="foobar" type="string"/>
+	</bean>
+</beans>

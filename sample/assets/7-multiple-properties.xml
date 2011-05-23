@@ -1,0 +1,11 @@
+<beans>
+	<bean id="bean7" class="com.socialize.android.ioc.sample.TestClassWithMultipleProperties">
+		<property name="string" value="foobar" type="string"/>
+		<property name="integer" value="22" type="integer"/>
+		<property name="lng" value="333333" type="long"/>
+		<property name="shrt" value="4" type="short"/>
+		<property name="chr" value="d" type="char"/>
+		<property name="bool" value="true" type="boolean"/>
+		<property name="btw" value="12" type="byte"/>
+	</bean>
+</beans>

@@ -3,17 +3,19 @@ package com.socialize.android.ioc.sample;
 import java.util.List;
 
 
-public class TestClassWithListConstructorArg {
+public class TestClassWithListParam {
 	
 	private List<TestClassWithInitMethod> list = null;
 	
-	public TestClassWithListConstructorArg(List<TestClassWithInitMethod> list) {
+	public TestClassWithListParam() {
 		super();
-		this.list = list;
 	}
 
 	public List<TestClassWithInitMethod> getList() {
 		return list;
 	}
-	
+
+	public void setList(List<TestClassWithInitMethod> list) {
+		this.list = list;
+	}
 }

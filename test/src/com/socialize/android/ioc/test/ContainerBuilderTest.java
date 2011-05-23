@@ -6,8 +6,8 @@ import com.socialize.android.ioc.BeanMapping;
 import com.socialize.android.ioc.BeanRef;
 import com.socialize.android.ioc.Container;
 import com.socialize.android.ioc.ContainerBuilder;
-import com.socialize.android.ioc.KeyValuePair;
-import com.socialize.android.ioc.KeyValuePair.RefType;
+import com.socialize.android.ioc.Argument;
+import com.socialize.android.ioc.Argument.RefType;
 import com.socialize.android.ioc.MethodRef;
 import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg;
@@ -46,7 +46,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		BeanRef ref = new BeanRef();
 		ref.setClassName(TestClassWithIntConstructorArg.class.getName());
 		ref.setName(beanName);
-		ref.addConstructorArgument(new KeyValuePair(null, "69", RefType.INTEGER));
+		ref.addConstructorArgument(new Argument(null, "69", RefType.INTEGER));
 		
 		mapping.addBeanRef(ref);
 		
@@ -71,7 +71,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		BeanRef ref = new BeanRef();
 		ref.setClassName(TestClassWithContextConstuctorArg.class.getName());
 		ref.setName(beanName);
-		ref.addConstructorArgument(new KeyValuePair(null, null, RefType.CONTEXT));
+		ref.addConstructorArgument(new Argument(null, null, RefType.CONTEXT));
 		
 		mapping.addBeanRef(ref);
 		
@@ -98,7 +98,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		BeanRef ref = new BeanRef();
 		ref.setClassName(SubClassOfTestClassWithInitMethod.class.getName());
 		ref.setName(beanName);
-		ref.addProperty(new KeyValuePair("param", prop, RefType.STRING));
+		ref.addProperty(new Argument("param", prop, RefType.STRING));
 		
 		mapping.addBeanRef(ref);
 		
@@ -124,7 +124,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		BeanRef ref = new BeanRef();
 		ref.setClassName(TestClassWithContextConstuctorArg.class.getName());
 		ref.setName(beanName);
-		ref.addProperty(new KeyValuePair("context", null, RefType.CONTEXT));
+		ref.addProperty(new Argument("context", null, RefType.CONTEXT));
 		
 		mapping.addBeanRef(ref);
 		
@@ -156,11 +156,11 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		BeanRef ref = new BeanRef();
 		ref.setClassName(TestClassWithMultipleProperties.class.getName());
 		ref.setName(beanName);
-		ref.addProperty(new KeyValuePair("integer", String.valueOf(i), RefType.INTEGER));
-		ref.addProperty(new KeyValuePair("lng", String.valueOf(l), RefType.LONG));
-		ref.addProperty(new KeyValuePair("shrt", String.valueOf(s), RefType.SHORT));
-		ref.addProperty(new KeyValuePair("chr", String.valueOf(c), RefType.CHAR));
-		ref.addProperty(new KeyValuePair("bool", String.valueOf(b), RefType.BOOLEAN));
+		ref.addProperty(new Argument("integer", String.valueOf(i), RefType.INTEGER));
+		ref.addProperty(new Argument("lng", String.valueOf(l), RefType.LONG));
+		ref.addProperty(new Argument("shrt", String.valueOf(s), RefType.SHORT));
+		ref.addProperty(new Argument("chr", String.valueOf(c), RefType.CHAR));
+		ref.addProperty(new Argument("bool", String.valueOf(b), RefType.BOOLEAN));
 		
 		mapping.addBeanRef(ref);
 		
@@ -191,12 +191,12 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		BeanRef ref = new BeanRef();
 		ref.setClassName(SubClassOfTestClassWithInitMethod.class.getName());
 		ref.setName(bean1Name);
-		ref.addProperty(new KeyValuePair("param", prop, RefType.STRING));
+		ref.addProperty(new Argument("param", prop, RefType.STRING));
 		
 		BeanRef ref2 = new BeanRef();
 		ref2.setClassName(TestClassWithBeanConstructorArg.class.getName());
 		ref2.setName(bean2Name);
-		ref2.addProperty(new KeyValuePair("object", bean1Name, RefType.BEAN));
+		ref2.addProperty(new Argument("object", bean1Name, RefType.BEAN));
 		
 		mapping.addBeanRef(ref);
 		mapping.addBeanRef(ref2);
@@ -230,12 +230,12 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		BeanRef ref = new BeanRef();
 		ref.setClassName(SubClassOfTestClassWithInitMethod.class.getName());
 		ref.setName(bean1Name);
-		ref.addProperty(new KeyValuePair("param", prop, RefType.STRING));
+		ref.addProperty(new Argument("param", prop, RefType.STRING));
 		
 		BeanRef ref2 = new BeanRef();
 		ref2.setClassName(TestClassWithBeanConstructorArg.class.getName());
 		ref2.setName(bean2Name);
-		ref2.addProperty(new KeyValuePair("object", bean1Name, RefType.BEAN));
+		ref2.addProperty(new Argument("object", bean1Name, RefType.BEAN));
 		
 		mapping.addBeanRef(ref2);
 		mapping.addBeanRef(ref);
@@ -269,12 +269,12 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		BeanRef ref = new BeanRef();
 		ref.setClassName(SubClassOfTestClassWithInitMethod.class.getName());
 		ref.setName(bean1Name);
-		ref.addProperty(new KeyValuePair("param", prop, RefType.STRING));
+		ref.addProperty(new Argument("param", prop, RefType.STRING));
 		
 		BeanRef ref2 = new BeanRef();
 		ref2.setClassName(TestClassWithBeanConstructorArg.class.getName());
 		ref2.setName(bean2Name);
-		ref2.addConstructorArgument(new KeyValuePair(null, bean1Name, RefType.BEAN));
+		ref2.addConstructorArgument(new Argument(null, bean1Name, RefType.BEAN));
 		
 		mapping.addBeanRef(ref2);
 		mapping.addBeanRef(ref);
@@ -409,8 +409,8 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref2.setName(beanName2);
 		
 		MethodRef method = new MethodRef("init");
-		method.addArgument(new KeyValuePair(null, null, RefType.CONTEXT));
-		method.addArgument(new KeyValuePair(null, beanName, RefType.BEAN));
+		method.addArgument(new Argument(null, null, RefType.CONTEXT));
+		method.addArgument(new Argument(null, beanName, RefType.BEAN));
 		
 		ref2.setInitMethod(method);
 		
@@ -442,8 +442,8 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref2.setName(beanName2);
 		
 		MethodRef method = new MethodRef("init");
-		method.addArgument(new KeyValuePair(null, null, RefType.CONTEXT));
-		method.addArgument(new KeyValuePair(null, beanName, RefType.BEAN));
+		method.addArgument(new Argument(null, null, RefType.CONTEXT));
+		method.addArgument(new Argument(null, beanName, RefType.BEAN));
 		
 		ref2.setInitMethod(method);
 		

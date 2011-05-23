@@ -3,7 +3,7 @@
 	<property file="local.properties" />
 	<property file="build.properties" />
 	<property file="default.properties" />
-	
+
     <path id="android.antlibs">
         <pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
         <pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
@@ -13,8 +13,11 @@
     <taskdef name="setup"
         classname="com.android.ant.SetupTask"
         classpathref="android.antlibs"/>
-	
+
 	<setup/>
+
+	<path id="android.libraries.src"><path refid="project.libraries.src" /></path>
+	<path id="android.libraries.jars"><path refid="project.libraries.jars" /></path>
 
 	<target name="build" depends="compile">
 		<jar destfile="build/android-ioc-${version}.jar" basedir="${out.dir}/classes">

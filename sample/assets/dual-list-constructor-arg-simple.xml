@@ -1,0 +1,10 @@
+<beans>
+	<bean id="bean13" class="com.socialize.android.ioc.sample.TestClassWithDualListConstructorArg">
+		<constructor-arg>
+			<list>
+				<property value="foo"/>
+				<property value="bar"/>
+			</list>
+		</constructor-arg>
+	</bean>
+</beans>

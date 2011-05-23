@@ -1,5 +1,6 @@
 package com.socialize.android.ioc.test;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,6 +56,26 @@ public class BeanBuilderTest extends AndroidTestCase {
 		builder.setProperty(b, "param", 200);
 		
 		assertEquals(200, b.getParam());
+	}
+	
+	public void testComponentTypeMatch() {
+		BeanBuilder builder = new BeanBuilder();
+		
+		List<TestClassWithInitMethod> linkedObject = new LinkedList<TestClassWithInitMethod>();
+		List<String> linkedString = new LinkedList<String>();
+		List<TestClassWithInitMethod> arrayObject = new ArrayList<TestClassWithInitMethod>();
+		List<String> arrayString = new ArrayList<String>();
+		
+		linkedObject.add(new TestClassWithInitMethod());
+		linkedString.add("foobar");
+		arrayObject.add(new TestClassWithInitMethod());
+		arrayString.add("foobar");
+		
+		assertNotNull(builder.getConstructorFor(TestClassWithListConstructorArg.class, linkedObject));
+		assertNull(builder.getConstructorFor(TestClassWithListConstructorArg.class, linkedString));
+		assertNotNull(builder.getConstructorFor(TestClassWithListConstructorArg.class, arrayObject));
+		assertNull(builder.getConstructorFor(TestClassWithListConstructorArg.class, arrayString));
+		
 	}
 	
 }

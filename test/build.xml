@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="socialize-test">
+<project name="android-ioc-test">
 
 	<property name="verbose" value="false" />
 	<property file="local.properties" />
@@ -19,33 +19,33 @@
 	<property name="test.runner" value="pl.polidea.instrumentation.PolideaInstrumentationTestRunner" />
 
 	<property name="test-output" value="test-output"/>
-	
+
 	<target name="test" depends="run-coverage-with-reports"/>
 	<target name="run-coverage-with-reports" depends="pre-clean,coverage,pull-reports"/>
-	
+
 	<target name="pre-clean">
 		<delete dir="${emma.report.dir}" verbose="true" failonerror="false"/>
 		<delete dir="${test-output}" verbose="true" failonerror="false"/>
 		<delete dir="${instrumentation.absolute.dir}" verbose="true" failonerror="false"/>
-		
+
 		<echo>Removing old installation of com.socialize.android.ioc.sample</echo>
-		
+
 		<exec executable="${adb}" failonerror="true">
 			<arg line="${adb.device.arg}" />
 			<arg value="uninstall" />
 			<arg value="com.socialize.android.ioc.sample" />
 		</exec>
-		
+
 		<echo>Removing old installation of com.socialize.android.ioc.test</echo>
-		
+
 		<exec executable="${adb}" failonerror="true">
 			<arg line="${adb.device.arg}" />
 			<arg value="uninstall" />
 			<arg value="com.socialize.android.ioc.test" />
 		</exec>
-		
+
 		<echo>Removing JUnit path ${junit.dump.path}</echo>
-		
+
 		<exec executable="${adb}" failonerror="true">
 			<arg line="${adb.device.arg}" />
 			<arg value="shell" />
@@ -53,14 +53,14 @@
 			<arg value="-r" />
 			<arg value="${junit.dump.path}" />
 		</exec>
-		
+
 		<exec executable="${adb}" failonerror="true">
 			<arg line="${adb.device.arg}" />
 			<arg value="shell" />
 			<arg value="rmdir" />
 			<arg value="${junit.dump.path}" />
 		</exec>
-		
+
 		<echo>Removing coverage data</echo>
 		<exec executable="${adb}" failonerror="true">
 			<arg line="${adb.device.arg}" />
@@ -68,10 +68,10 @@
 			<arg value="rm" />
 			<arg value="${emma.dump.file}" />
 		</exec>
-		
+
 		<mkdir dir="${emma.report.dir}"/>
 		<mkdir dir="${test-output}"/>
-		
+
 		<echo>Creating JUnit report path on device at ${junit.dump.path}</echo>
 		<exec executable="${adb}" failonerror="true">
 			<arg line="${adb.device.arg}" />
@@ -79,7 +79,7 @@
 			<arg value="mkdir" />
 			<arg value="${junit.dump.path}" />
 		</exec>
-		
+
 		<echo>Clearing logcat buffer</echo>
 		<exec executable="${adb}" failonerror="true">
 			<arg line="${adb.device.arg}" />
@@ -96,14 +96,14 @@
 			<arg value="pull" />
 			<arg value="${junit.dump.path}" />
 		</exec>
-		
+
 		<echo>Dumping logcat buffer</echo>
 		<exec executable="${adb}" failonerror="true">
 			<arg line="${adb.device.arg}" />
 			<arg value="logcat" />
 			<arg value="-d" />
 		</exec>
-		
+
 	</target>
 
 	<target name="-pre-compile" depends="override-extensible-classpath"/>
@@ -133,7 +133,7 @@
 
 	<target name="compile" depends="-pre-build, -aidl, -renderscript, -resource-src, -pre-compile"
             description="Compiles project's .java files into .class files">
-		
+
 		<if condition="${manifest.hasCode}">
 			<then>
 				<condition property="extensible.classpath"
@@ -202,12 +202,12 @@
 			<arg value="${emma.report.dir}/coverage.ec" />
 		</exec>
 		<echo>Extracting coverage report...</echo>
-		
+
 		<path id="emma.report.src.path">
 			<pathelement path="${tested.project.absolute.dir}/${source.dir}" />
 			<pathelement path="${library.project.src}" />
 		</path>
-		
+
 		<emma>
 			<!--
 			<report 
@@ -217,7 +217,7 @@
 			<report 
 				sourcepathref="emma.report.src.path" 
 	            verbosity="verbose">
-				
+
 				<infileset dir="${emma.report.dir}">
 					<include name="coverage.ec" />
 					<include name="coverage.em" />

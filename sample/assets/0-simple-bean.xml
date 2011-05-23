@@ -1,0 +1,3 @@
+<beans>
+	<bean id="bean0" class="com.socialize.android.ioc.sample.TestClassWithInitMethod"/>
+</beans>

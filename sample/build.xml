@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="socialize">
+<project name="android-ioc-sample">
 
 	<property file="local.properties" />
 	<property file="build.properties" />
@@ -27,7 +27,7 @@
                    instrpath="${out.absolute.dir}/classes"
                    outdir="${out.absolute.dir}/classes"
                    metadatafile="${emma.report.dir}/coverage.em"
-            	   filter="-com.socialize.sample.*,-com.socialize.R*"> <!--Don't need coverage for the sample project itself -->
+            	   filter="-com.socialize.android.ioc.sample.*,-com.socialize.android.ioc.R*,-com.socialize.android.ioc.sample.R*"> <!--Don't need coverage for the sample project itself -->
             </instr>
             <!-- TODO: exclusion filters on R*.class and allowing custom exclusion from
                  user defined file -->

@@ -21,19 +21,29 @@
  */
 package com.socialize.android.ioc;
 
-import static com.socialize.android.ioc.KeyValuePair.RefType.BEAN;
-import static com.socialize.android.ioc.KeyValuePair.RefType.CONTEXT;
+import static com.socialize.android.ioc.Argument.RefType.BEAN;
+import static com.socialize.android.ioc.Argument.RefType.CONTEXT;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Vector;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.socialize.android.ioc.Argument.CollectionType;
+import com.socialize.android.ioc.Argument.RefType;
 
 /**
  * 
@@ -71,7 +81,7 @@ public class ContainerBuilder {
 		
 		try {
 			
-			List<KeyValuePair> constructorArgs = beanRef.getConstructorArgs();
+			List<Argument> constructorArgs = beanRef.getConstructorArgs();
 			
 			if(constructorArgs != null && constructorArgs.size() > 0) {
 				Object[] args = getArguments(context, container, constructorArgs);
@@ -96,9 +106,9 @@ public class ContainerBuilder {
 	
 	public void setBeanProperties(Container container, BeanRef ref, Object bean)  {
 		try {
-			List<KeyValuePair> properties = ref.getProperties();
+			List<Argument> properties = ref.getProperties();
 			if(properties != null && properties.size() > 0) {
-				for (KeyValuePair property : properties) {
+				for (Argument property : properties) {
 					if(property.getType().equals(BEAN)) {
 						Object refBean = container.getBean(property.getValue());
 						builder.setProperty(bean, property.getKey(), refBean);
@@ -219,35 +229,12 @@ public class ContainerBuilder {
 		}
 	}
 	
-	public Object[] getArguments(Context context, Container container, List<KeyValuePair> list) {
+	public Object[] getArguments(Context context, Container container, List<Argument> list) {
 		if(list != null) {
 			Object[] args = new Object[list.size()];
 			int argIndex = 0;
-			for (KeyValuePair arg : list) {
-				
-				if(arg.getType() != null) {
-					if(arg.getType().equals(BEAN)) {
-						// Look for the bean
-						if(container.containsBean(arg.getValue())) {
-							args[argIndex] = container.getBean(arg.getValue());
-						}
-						else {
-							// We can't construct this now
-							args = null;
-							break;
-						}
-					}
-					else if(arg.getType().equals(CONTEXT)) {
-						args[argIndex] = context;
-					}
-					else {
-						// Coerce the type based on the typed parameter of the constructor
-						args[argIndex] = builder.coerce(arg);
-					}
-				}
-				else {
-					Log.e(getClass().getSimpleName(), "No argument type specified!");
-				}
+			for (Argument arg : list) {
+				args[argIndex] = getArgumentValue(container, arg);
 				argIndex++;
 			}
 			
@@ -255,6 +242,221 @@ public class ContainerBuilder {
 		}
 		
 		return null;
+	}
+	
+	private Object getArgumentValue(Container container, Argument arg) {
+		Object object = null;
+		if(arg.getType() != null) {
+			
+			switch(arg.getType()) {
+				case BEAN:
+					// Look for the bean
+					if(container.containsBean(arg.getValue())) {
+						object = container.getBean(arg.getValue());
+					}
+					else {
+						// We can't construct this now
+						object = null;
+						break;
+					}
+					break;
+					
+				case CONTEXT:
+					object = context;
+					break;
+					
+				case LIST:
+					object = makeList(container, arg);
+					break;
+					
+				case SET:
+					object = makeSet(container, arg);
+					break;
+					
+				case MAP:
+					object = makeMap(container, arg);
+					break;
+					
+				case MAPENTRY:
+					object = makeMapEntry(container, arg);
+					break;
+					
+				default:
+					// Coerce the type based on the typed parameter of the constructor
+					object = builder.coerce(arg);
+					break;
+			}
+		}
+		else {
+			Log.e(getClass().getSimpleName(), "No argument type specified!");
+		}
+		
+		return object;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Object makeList(Container container, Argument arg) {
+		List<Object> list = null;
+		
+		Collection<Argument> children = arg.getChildren();
+		CollectionType collectionType = arg.getCollectionType();
+		
+		if(collectionType == null) {
+			collectionType = CollectionType.LINKEDLIST;
+		}
+		
+		try {
+			switch (collectionType) {
+				case LINKEDLIST:
+					list = LinkedList.class.newInstance();
+					break;
+					
+				case ARRAYLIST:
+					list = ArrayList.class.newInstance();
+					break;
+					
+				case STACK:
+					list = Stack.class.newInstance();
+					break;
+					
+				case VECTOR:
+					list = Vector.class.newInstance();
+					break;
+					
+				default:
+					throw new IllegalArgumentException("Invalid list type " + collectionType);
+			}
+			
+			if(children != null) {
+				for (Argument child : children) {
+					Object value = getArgumentValue(container, child);
+					
+					if(value != null) {
+						list.add(value);
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			Log.e(getClass().getSimpleName(), "Failed to create list for argument of type[" +
+					arg.getType() +
+					"]", e);
+		}
+		return list;
+	}
+	
+	private Object makeMapEntry(Container container, Argument arg) {
+		MapEntry entry = new MapEntry();
+		List<Argument> children = arg.getChildren();
+		
+		Argument child0 = children.get(0);
+		Argument child1 = children.get(1);
+		
+		if(child0.getKey().equals("key")) {
+			entry.setKey(child0);
+			entry.setValue(child1);
+		}
+		else {
+			entry.setKey(child1);
+			entry.setValue(child0);
+		}
+		
+		return entry;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Object makeMap(Container container, Argument arg) {
+		Map<Object, Object> list = null;
+		
+		Collection<Argument> children = arg.getChildren();
+
+		CollectionType collectionType = arg.getCollectionType();
+		
+		if(collectionType == null) {
+			collectionType = CollectionType.HASHMAP;
+		}
+		
+		try {
+			switch (collectionType) {
+				case HASHMAP:
+					list = HashMap.class.newInstance();
+					break;
+					
+				case TREEMAP:
+					list = TreeMap.class.newInstance();
+					break;
+					
+					
+				default:
+					throw new IllegalArgumentException("Invalid map type " + collectionType);
+			}
+			
+			if(children != null) {
+				for (Argument child : children) {
+					
+					if(child.getType().equals(RefType.MAPENTRY)) {
+						MapEntry entry = (MapEntry) getArgumentValue(container, child);
+						if(entry != null) {
+							list.put(entry.getKey(), entry.getValue());
+						}
+					}
+					else {
+						throw new IllegalArgumentException("Invalid argument type.  Expected " +
+								RefType.MAPENTRY.name() +
+								" but found " + child.getType());
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			Log.e(getClass().getSimpleName(), "Failed to create map for argument of type[" +
+					arg.getType() +
+					"]", e);
+		}
+		return list;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Object makeSet(Container container, Argument arg) {
+		Set<Object> list = null;
+		
+		Collection<Argument> children = arg.getChildren();
+		CollectionType collectionType = arg.getCollectionType();
+		
+		if(collectionType == null) {
+			collectionType = CollectionType.HASHSET;
+		}
+		
+		try {
+			switch (collectionType) {
+				case HASHSET:
+					list = HashSet.class.newInstance();
+					break;
+					
+				case TREESET:
+					list = TreeSet.class.newInstance();
+					break;
+					
+				default:
+					throw new IllegalArgumentException("Invalid set type " + collectionType);
+			}
+			
+			if(children != null) {
+				for (Argument child : children) {
+					Object value = getArgumentValue(container, child);
+					
+					if(value != null) {
+						list.add(value);
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			Log.e(getClass().getSimpleName(), "Failed to create set for argument of type[" +
+					arg.getType() +
+					"]", e);
+		}
+		return list;
 	}
 
 }

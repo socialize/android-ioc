@@ -146,6 +146,34 @@ public class ContainerBuilder {
 		return container;
 	}
 	
+	public void destroyBean(Container container, BeanRef beanRef, Object bean) {
+		if(bean != null && beanRef.getDestroyMethod() != null) {
+			Object[] args = getArguments(context, container, beanRef.getDestroyMethod().getArguments());
+			
+			Method method = builder.getMethodFor(bean.getClass(), beanRef.getDestroyMethod().getName(), args);
+			
+			if(method != null) {
+				try {
+					method.invoke(bean, args);
+				}
+				catch (Exception e) {
+					Logger.e(getClass().getSimpleName(), "Failed to invoke destroy method [" +
+							beanRef.getDestroyMethod() +
+							"] on bean [" +
+							beanRef.getName() +
+							"]", e);
+				}
+			}
+			else {
+				Logger.e(getClass().getSimpleName(), "Could not find method matching [" +
+						beanRef.getDestroyMethod().getName() +
+						"] in bean [" +
+						beanRef.getName()  +
+						"]");
+			}
+		}
+	}
+	
 	public void initBean(Container container, BeanRef beanRef, Object bean) {
 		
 		if(bean != null) {

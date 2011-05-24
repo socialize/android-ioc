@@ -26,6 +26,7 @@ import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg;
 import com.socialize.android.ioc.sample.TestClassWithDualListConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg;
+import com.socialize.android.ioc.sample.TestClassWithInitAndDestroy;
 import com.socialize.android.ioc.sample.TestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassWithInitMethodTakingBean;
 import com.socialize.android.ioc.sample.TestClassWithIntConstructorArg;
@@ -691,6 +692,28 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		TestClassWithInitMethod beanA = container.getBean(beanName);
 		
 		assertTrue(beanA.isInitialized());
+		
+	}
+	
+	public void testContainerBuilderBeanDestroyMethod() {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithInitAndDestroy.class.getName());
+		ref.setName(beanName);
+		ref.setDestroyMethod(new MethodRef("destroy"));
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		TestClassWithInitAndDestroy beanA = container.getBean(beanName);
+		
+		container.destroy();
+		
+		assertTrue(beanA.isDestroy());
 		
 	}
 	

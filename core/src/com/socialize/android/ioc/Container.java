@@ -21,6 +21,7 @@
  */
 package com.socialize.android.ioc;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -58,6 +59,25 @@ public class Container {
 	
 	public final boolean containsBean(String name) {
 		return beans.containsKey(name);
+	}
+	
+	/**
+	 * Destroys the container and calls destroy on any beans with a destroy method.
+	 */
+	public final void destroy() {
+		Collection<BeanRef> beanRefs = mapping.getBeanRefs();
+		for (BeanRef beanRef : beanRefs) {
+			Object bean = beans.get(beanRef.getName());
+			if(bean != null) {
+				builder.destroyBean(this, beanRef, bean);
+			}
+		}
+		
+		beans.clear();
+		beanRefs.clear();
+		
+		beans = null;
+		beanRefs = null;
 	}
 	
 	protected void putBean(String name, Object bean) {

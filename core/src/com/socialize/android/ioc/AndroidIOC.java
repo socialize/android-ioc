@@ -30,6 +30,7 @@ public final class AndroidIOC {
 	private static final AndroidIOC instance = new AndroidIOC();
 	
 	private Container container;
+	private boolean initialized = false;
 	
 	private AndroidIOC() {
 		super();
@@ -40,17 +41,33 @@ public final class AndroidIOC {
 	}
 	
 	public final void init(Context context) throws IOException {
-		ContainerBuilder builder = new ContainerBuilder(context);
-		container = builder.build(context);
+		if(!initialized) {
+			ContainerBuilder builder = new ContainerBuilder(context);
+			container = builder.build(context);
+			initialized = true;
+		}
 	}
 	
 	public final void init(Context context, String filename) throws IOException {
-		ContainerBuilder builder = new ContainerBuilder(context);
-		container = builder.build(context, filename);
+		if(!initialized) {
+			ContainerBuilder builder = new ContainerBuilder(context);
+			container = builder.build(context, filename);
+			initialized = true;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
 	public final <T extends Object> T getBean(String name) {
 		return (T) container.getBean(name);
+	}
+	
+	/**
+	 * Destroys the container.
+	 */
+	public final void destroy() {
+		if(container != null) {
+			container.destroy();	
+		}
+		initialized = false;
 	}
 }

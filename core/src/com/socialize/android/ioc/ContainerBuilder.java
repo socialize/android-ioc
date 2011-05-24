@@ -208,7 +208,7 @@ public class ContainerBuilder {
 	
 	private void buildBeans(Context context, Container container, BeanBuilder builder, BeanMapping mapping, Collection<BeanRef> beanRefs, int iteration) {
 		if(iteration > MAX_ITERATIONS) {
-			throw new StackOverflowError("Too many iterations.  Possible circular reference in bean mapping");
+			throw new StackOverflowError("Too many iterations.  Possible circular reference in bean mapping, or bean construction failed.  Check the logs.");
 		}
 		
 		List<BeanRef> doLaterBeans = new LinkedList<BeanRef>();
@@ -224,6 +224,11 @@ public class ContainerBuilder {
 					
 					if(bean == null) {
 						// We can't construct this now, flag for later.
+						
+						Logger.i(getClass().getSimpleName(), "Cannot create bean [" +
+								beanRef.getName() +
+								"] now due to dependent bean not existing.  Marking for later creation");
+						
 						doLaterBeans.add(beanRef);
 					}
 					else {

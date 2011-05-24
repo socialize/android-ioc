@@ -1,0 +1,22 @@
+<beans>
+	<bean id="bean0" class="com.socialize.android.ioc.sample.TestClassWithInitMethod"/>
+
+	<bean id="bean8" class="com.socialize.android.ioc.sample.TestClassWithInitMethod" initMethod="doInit"/>
+	
+	<bean id="bean9" class="com.socialize.android.ioc.sample.TestClassWithInitMethodTakingBean">
+		<init-method name="init">
+			<arg type="context"/>
+			<arg ref="bean0"/>
+		</init-method>
+	</bean>
+	
+	<bean id="bean12" class="com.socialize.android.ioc.sample.TestClassWithListParam">
+		<property name="list">
+			<list type="arraylist">
+				<ref id="bean8"/>
+				<ref id="bean9"/>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

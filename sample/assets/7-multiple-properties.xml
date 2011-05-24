@@ -6,6 +6,8 @@
 		<property name="shrt" value="4" type="short"/>
 		<property name="chr" value="d" type="char"/>
 		<property name="bool" value="true" type="boolean"/>
-		<property name="btw" value="12" type="byte"/>
+		<property name="bte" value="12" type="byte"/>
+		<property name="flt" value="65.5" type="float"/>
+		<property name="dbl" value="23423.234234" type="double"/>
 	</bean>
 </beans>

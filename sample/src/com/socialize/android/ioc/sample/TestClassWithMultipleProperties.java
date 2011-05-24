@@ -8,6 +8,8 @@ public class TestClassWithMultipleProperties {
 	char chr;
 	boolean bool;
 	byte bte;
+	float flt;
+	double dbl;
 	
 	public TestClassWithMultipleProperties() {
 		super();
@@ -68,5 +70,20 @@ public class TestClassWithMultipleProperties {
 	public void setBte(byte bte) {
 		this.bte = bte;
 	}
-	
+
+	public float getFlt() {
+		return flt;
+	}
+
+	public void setFlt(float flt) {
+		this.flt = flt;
+	}
+
+	public double getDbl() {
+		return dbl;
+	}
+
+	public void setDbl(double dbl) {
+		this.dbl = dbl;
+	}
 }

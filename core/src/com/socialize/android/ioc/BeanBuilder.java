@@ -83,6 +83,14 @@ public class BeanBuilder {
 			case BYTE:
 				coerced = Byte.valueOf(value.getValue());
 				break;
+				
+			case FLOAT:
+				coerced = Float.valueOf(value.getValue());
+				break;
+
+			case DOUBLE:
+				coerced = Double.valueOf(value.getValue());
+				break;
 
 			case CHAR:
 				coerced = Character.valueOf(value.getValue().toString().toCharArray()[0]);
@@ -206,9 +214,9 @@ public class BeanBuilder {
 				else if(Map.class.isAssignableFrom(params[i])) {
 					match &= isMapMatch(genericParams, i, arg);
 				}
-				else if(params[i].isArray()) {
-					match &= isArrayMatch(genericParams, i, arg);
-				}
+//				else if(params[i].isArray()) {
+//					match &= isArrayMatch(genericParams, i, arg);
+//				}
 				else {
 					match &= true;
 				}
@@ -287,15 +295,15 @@ public class BeanBuilder {
 		return false;
 	}
 	
-	private boolean isArrayMatch(Type[] genericParams, int index, Object arg) {
-		ParameterizedType parType = (ParameterizedType) genericParams[index];
-		
-		if(parType.getActualTypeArguments()[0].equals(arg.getClass().getComponentType())) {
-			return true;
-		}
-		
-		return false;
-	}
+//	private boolean isArrayMatch(Type[] genericParams, int index, Object arg) {
+//		ParameterizedType parType = (ParameterizedType) genericParams[index];
+//		
+//		if(parType.getActualTypeArguments()[0].equals(arg.getClass().getComponentType())) {
+//			return true;
+//		}
+//		
+//		return false;
+//	}
 
 	private boolean isUnboxableToPrimitive(Class<?> clazz, Object arg) {
 		if (!clazz.isPrimitive()) {

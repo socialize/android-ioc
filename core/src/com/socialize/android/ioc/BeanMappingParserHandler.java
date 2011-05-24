@@ -279,12 +279,17 @@ public class BeanMappingParserHandler extends DefaultHandler {
 				CollectionType cType = CollectionType.valueOf(type.replaceAll("-", "").toUpperCase());
 				
 				// Verify
-				if(!isCollectionTypeValid(arg, attributes, cType)) {
+				if(isCollectionTypeValid(arg, attributes, cType)) {
+					arg.setCollectionType(cType);
+				}
+				else {
 					Logger.w(getClass().getSimpleName(), "Invalid collection type [" +
 							type +
 							"] for the argument of type [" +
 							arg.getType() +
 							"]");
+					
+					setDefaultCollectionType(arg, attributes);
 				}
 				
 			}

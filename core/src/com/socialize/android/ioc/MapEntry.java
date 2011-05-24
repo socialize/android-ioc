@@ -31,16 +31,6 @@ public class MapEntry {
 	private Object key;
 	private Object value;
 	
-	public MapEntry() {
-		super();
-	}
-	
-	public MapEntry(Object key, Object value) {
-		super();
-		this.key = key;
-		this.value = value;
-	}
-	
 	public Object getKey() {
 		return key;
 	}

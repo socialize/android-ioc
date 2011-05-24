@@ -42,6 +42,8 @@ public final class Argument {
 		STRING, 
 		CHAR, 
 		BYTE,
+		FLOAT,
+		DOUBLE,
 		BOOLEAN,
 		LIST,
 		MAP,

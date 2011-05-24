@@ -206,7 +206,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		
 		List<Argument> props = ref.getProperties();
 		assertNotNull(props);
-		assertEquals(7, props.size());
+		assertEquals(9, props.size());
 		
 		// <property name="string" value="foobar" type="string"/>
 		Argument argument0 = props.get(0);
@@ -256,13 +256,29 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertNull(argument5.getChildren());
 		assertNull(argument5.getCollectionType());
 		
-		// <property name="btw" value="12" type="byte"/>
+		// <property name="bte" value="12" type="byte"/>
 		Argument argument6 = props.get(6);
 		assertEquals(RefType.BYTE, argument6.getType());
-		assertEquals("btw", argument6.getKey());
+		assertEquals("bte", argument6.getKey());
 		assertEquals("12", argument6.getValue());
 		assertNull(argument6.getChildren());
 		assertNull(argument6.getCollectionType());
+		
+		// <property name="flt" value="12" type="float"/>
+		Argument argument7 = props.get(7);
+		assertEquals(RefType.FLOAT, argument7.getType());
+		assertEquals("flt", argument7.getKey());
+		assertEquals("65.5", argument7.getValue());
+		assertNull(argument7.getChildren());
+		assertNull(argument7.getCollectionType());
+		
+		// <property name="dbl" value="23423.234234" type="double"/>
+		Argument argument8 = props.get(8);
+		assertEquals(RefType.DOUBLE, argument8.getType());
+		assertEquals("dbl", argument8.getKey());
+		assertEquals("23423.234234", argument8.getValue());
+		assertNull(argument8.getChildren());
+		assertNull(argument8.getCollectionType());
 	}
 	
 	// 8-simple-init-method.xml
@@ -415,6 +431,48 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		
 		assertEquals(2, argument.getChildren().size());
 		assertEquals(CollectionType.LINKEDLIST, argument.getCollectionType());
+		
+		
+		Argument child0 = argument.getChildren().get(0);
+		Argument child1 = argument.getChildren().get(1);
+		
+		assertEquals(RefType.BEAN, child0.getType());
+		assertEquals("bean8", child0.getValue());
+	
+		
+		assertEquals(RefType.BEAN, child1.getType());
+		assertEquals("bean9", child1.getValue());
+	}
+	
+	// 17-list-property-of-type.xml
+	public void testListPropertyOfType() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"17-list-property-of-type.xml");
+		assertNotNull(mapping);
+		BeanRef ref = mapping.getBeanRef("bean12");
+		assertNotNull(ref);
+		assertEquals(TestClassWithListParam.class.getName(), ref.getClassName());
+		
+		assertNull(ref.getDestroyMethod());
+		assertNull(ref.getInitMethod());
+		assertNull(ref.getConstructorArgs());
+		
+		List<Argument> props = ref.getProperties();
+		assertNotNull(props);
+		assertEquals(1, props.size());
+		
+		Argument argument = props.get(0);
+		
+		assertEquals(RefType.LIST, argument.getType());
+		assertNotNull(argument.getKey());
+		assertEquals("list", argument.getKey());
+		assertNull(argument.getValue());
+		
+		assertNotNull(argument.getChildren());
+		assertNotNull(argument.getCollectionType());
+		
+		assertEquals(2, argument.getChildren().size());
+		assertEquals(CollectionType.ARRAYLIST, argument.getCollectionType());
 		
 		
 		Argument child0 = argument.getChildren().get(0);

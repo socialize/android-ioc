@@ -1,15 +1,20 @@
 package com.socialize.android.ioc.test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
+import java.util.TreeSet;
+import java.util.Vector;
 
 import android.test.AndroidTestCase;
 
 import com.socialize.android.ioc.Argument;
+import com.socialize.android.ioc.Argument.CollectionType;
 import com.socialize.android.ioc.Argument.RefType;
 import com.socialize.android.ioc.BeanMapping;
 import com.socialize.android.ioc.BeanRef;
@@ -26,6 +31,7 @@ import com.socialize.android.ioc.sample.TestClassWithInitMethodTakingBean;
 import com.socialize.android.ioc.sample.TestClassWithIntConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithMultipleProperties;
 import com.socialize.android.ioc.sample.TestClassWithSetConstructorArg;
+import com.socialize.android.ioc.sample.TestClassWithStringListConstructorArg;
 
 
 public class ContainerBuilderTest extends AndroidTestCase {
@@ -74,7 +80,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertEquals(69, bc2.getParam());
 	}
 	
-	public void testContainerBuilderBeanWithStringListConstructorArgs() throws Exception {
+	public void testContainerBuilderBeanWithStringListConstructorArgsOnMultiConstructorClass() throws Exception {
 		String beanName = "bean";
 		
 		BeanMapping mapping = new BeanMapping();
@@ -115,6 +121,69 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		assertEquals("foo", string0);
 		assertEquals("bar", string1);
+	}
+	
+	private void testContainerBuilderBeanWithListConstructorArgs(CollectionType collType, Class<?> collClass) throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithStringListConstructorArg.class.getName());
+		ref.setName(beanName);
+		
+		Argument listElement0 = new Argument(null, "foo", RefType.STRING);
+		Argument listElement1 = new Argument(null, "bar", RefType.STRING);
+		Argument list = new Argument(null, null, RefType.LIST);
+		
+		list.setCollectionType(collType);
+		
+		list.addChild(listElement0);
+		list.addChild(listElement1);
+		
+		ref.addConstructorArgument(list);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		Object bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertTrue(TestClassWithStringListConstructorArg.class.isAssignableFrom(bean.getClass()));
+		
+		TestClassWithStringListConstructorArg typedBean = container.getBean(beanName);
+		
+		List<String> stringList = typedBean.getStringList();
+		
+		assertNotNull(stringList);
+		assertTrue(collClass.isAssignableFrom(stringList.getClass()));
+		assertEquals(2, stringList.size());
+		
+		String string0 = stringList.get(0);
+		String string1 = stringList.get(1);
+		
+		assertEquals("foo", string0);
+		assertEquals("bar", string1);
+	}
+	
+	public void testContainerBuilderBeanWithStringListConstructorArgs() throws Exception {
+		
+		testContainerBuilderBeanWithListConstructorArgs(null, LinkedList.class);
+		
+	}
+	
+	public void testContainerBuilderBeanWithArrayListConstructorArgs() throws Exception {
+		testContainerBuilderBeanWithListConstructorArgs(CollectionType.ARRAYLIST, ArrayList.class);
+	}
+	
+	public void testContainerBuilderBeanWithVectorConstructorArgs() throws Exception {
+		testContainerBuilderBeanWithListConstructorArgs(CollectionType.VECTOR, Vector.class);
+	}
+	
+	public void testContainerBuilderBeanWithStackConstructorArgs() throws Exception {
+		testContainerBuilderBeanWithListConstructorArgs(CollectionType.STACK, Stack.class);
 	}
 	
 	// Tests creating referenced beans and using in a constructor
@@ -175,8 +244,15 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertFalse(bean1.isInitialized());
 	}
 	
-	// Tests creating referenced beans and using in a constructor
-	public void testContainerBuilderBeanWithBeanSetConstructorArgs() throws Exception {
+	// Tests creating referenced beans and using a SET in the constructor
+	public void testContainerBuilderBeanWithHashSetConstructorArgs() throws Exception {
+		testContainerBuilderBeanWithSetConstructorArgs(null, HashSet.class);
+	}
+	public void testContainerBuilderBeanWithTreeSetConstructorArgs() throws Exception {
+		testContainerBuilderBeanWithSetConstructorArgs(CollectionType.TREESET, TreeSet.class);
+	}
+	
+	private void testContainerBuilderBeanWithSetConstructorArgs(CollectionType collType, Class<?> collectionClass) throws Exception {
 		String beanName = "bean";
 		
 		BeanMapping mapping = new BeanMapping();
@@ -205,6 +281,8 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		list.addChild(listElement0);
 		list.addChild(listElement1);
 		
+		list.setCollectionType(collType);
+		
 		ref.addConstructorArgument(list);
 		
 		mapping.addBeanRef(ref);
@@ -223,7 +301,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		Set<TestClassWithInitMethod> beanSet = typedBean.getSet();
 		
 		assertNotNull(beanSet);
-		assertTrue(HashSet.class.isAssignableFrom(beanSet.getClass()));
+		assertTrue(collectionClass.isAssignableFrom(beanSet.getClass()));
 		assertEquals(2, beanSet.size());
 		
 		int inited = 0;
@@ -386,6 +464,10 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		short s = 6;
 		char c = 'c';
 		boolean b = true;
+		byte bt = 5;
+		
+		float fl = 61.5f;
+		double db = 81.345345;
 		
 		BeanMapping mapping = new BeanMapping();
 		BeanRef ref = new BeanRef();
@@ -396,6 +478,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref.addProperty(new Argument("shrt", String.valueOf(s), RefType.SHORT));
 		ref.addProperty(new Argument("chr", String.valueOf(c), RefType.CHAR));
 		ref.addProperty(new Argument("bool", String.valueOf(b), RefType.BOOLEAN));
+		ref.addProperty(new Argument("bte", String.valueOf(bt), RefType.BYTE));
+		ref.addProperty(new Argument("dbl", String.valueOf(db), RefType.DOUBLE));
+		ref.addProperty(new Argument("flt", String.valueOf(fl), RefType.FLOAT));
 		
 		mapping.addBeanRef(ref);
 		
@@ -414,7 +499,10 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertEquals(l, multi.getLng());
 		assertEquals(s, multi.getShrt());
 		assertEquals(c, multi.getChr());
-		assertEquals(b, multi.isBool());		
+		assertEquals(b, multi.isBool());
+		assertEquals(bt, multi.getBte());
+		assertEquals(fl, multi.getFlt());	
+		assertEquals(db, multi.getDbl());	
 	}
 	
 	public void testContainerBuilderBeanWithBeanProperty() throws Exception {

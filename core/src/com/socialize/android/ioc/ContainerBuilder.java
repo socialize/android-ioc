@@ -102,6 +102,7 @@ public class ContainerBuilder {
 	public void setBeanProperties(Container container, BeanRef ref, Object bean)  {
 		try {
 			List<Argument> properties = ref.getProperties();
+			
 			if(properties != null && properties.size() > 0) {
 				for (Argument property : properties) {
 					if(property.getType().equals(BEAN)) {
@@ -483,7 +484,7 @@ public class ContainerBuilder {
 			}
 		}
 		catch (Exception e) {
-			Logger.e(getClass().getSimpleName(), "Failed to create set for argument of type[" +
+			Logger.e(getClass().getSimpleName(), "Failed to create set for argument of type [" +
 					arg.getType() +
 					"]", e);
 		}

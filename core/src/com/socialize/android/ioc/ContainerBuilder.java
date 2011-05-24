@@ -62,16 +62,6 @@ public class ContainerBuilder {
 		this.context = context;
 	}
 	
-	public ContainerBuilder(Context context, BeanBuilder builder) {
-		this(context);
-		this.builder = builder;
-	}
-	
-	public ContainerBuilder(Context context, BeanBuilder builder, BeanMappingParser parser) {
-		this(context, builder);
-		this.parser = parser;
-	}
-
 	@SuppressWarnings("unchecked")
 	public <T extends Object> T buildBean(Container container, BeanRef beanRef)  {
 		Object bean = null;

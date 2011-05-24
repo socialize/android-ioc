@@ -72,16 +72,8 @@ public class BeanRef {
 		return properties;
 	}
 
-	public void setProperties(List<Argument> properties) {
-		this.properties = properties;
-	}
-
 	public List<Argument> getConstructorArgs() {
 		return constructorArgs;
-	}
-
-	public void setConstructorArgs(List<Argument> constructorArgs) {
-		this.constructorArgs = constructorArgs;
 	}
 
 	public boolean isSingleton() {

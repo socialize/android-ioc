@@ -1,0 +1,7 @@
+gen
+bin
+coverage
+test-output
+**/coverage.em
+.settings
+build

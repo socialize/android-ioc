@@ -6,21 +6,39 @@
 	<property file="build.properties" />
 	<property file="default.properties" />
 
+	<property name="test.runner" value="pl.polidea.instrumentation.PolideaInstrumentationTestRunner" />
+	<property name="test-output" value="test-output"/>
+
 	<path id="android.antlibs">
 		<pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
 		<pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
 		<pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
 	</path>
 
+	<path id="findbugs.libs">
+		<pathelement path="${findbugs.home}/lib/findbugs-ant.jar" />
+	</path>
+
 	<taskdef name="setup"
         classname="com.android.ant.SetupTask"
         classpathref="android.antlibs" />
 
-	<property name="test.runner" value="pl.polidea.instrumentation.PolideaInstrumentationTestRunner" />
+	<taskdef name="findbugs" 
+		classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
+		classpathref="findbugs.libs"/>
 
-	<property name="test-output" value="test-output"/>
+	<target name="findbugs">
+		<mkdir dir="findbugs-output"/>
+		<property name="sdkdir" refid="android.target.classpath"/>
+		<echo> SDK Dir ${sdkdir} </echo>
+		<findbugs home="${findbugs.home}" output="xml" outputFile="findbugs-output/bcel-fb.xml">
+			<sourcePath path="${library.project.src}" />
+			<auxClasspath path="${sdkdir}"/>
+			<class location="${library.project.build}/android-ioc-0.0.1.jar" />
+		</findbugs>
+	</target>
 
-	<target name="test" depends="run-coverage-with-reports"/>
+	<target name="test" depends="run-coverage-with-reports" />
 	<target name="run-coverage-with-reports" depends="pre-clean,coverage,pull-reports"/>
 
 	<target name="pre-clean">

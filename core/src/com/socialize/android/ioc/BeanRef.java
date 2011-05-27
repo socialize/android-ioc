@@ -40,18 +40,26 @@ public class BeanRef {
 	private List<Argument> properties;
 	private List<Argument> constructorArgs;
 	
+	private String extendsBean = null;
+	
 	private boolean singleton = true;
 	
 	public synchronized void addConstructorArgument(Argument arg) {
 		if(constructorArgs == null) constructorArgs = new LinkedList<Argument>();
-		constructorArgs.add(arg);
+		
+		if(!constructorArgs.contains(arg)) {
+			constructorArgs.add(arg);
+		}
 	}
 	
 	public synchronized void addProperty(Argument arg) {
 		if(properties == null) properties = new LinkedList<Argument>();
-		properties.add(arg);
+		
+		if(!properties.contains(arg)) {
+			properties.add(arg);
+		}
 	}
-
+	
 	public String getName() {
 		return name;
 	}
@@ -99,6 +107,48 @@ public class BeanRef {
 	public void setDestroyMethod(MethodRef destroyMethod) {
 		this.destroyMethod = destroyMethod;
 	}
+
+	public String getExtendsBean() {
+		return extendsBean;
+	}
+
+	public void setExtendsBean(String extendsBean) {
+		this.extendsBean = extendsBean;
+	}
 	
+	/**
+	 * Merges the config of the given bean into this one.
+	 * Does NOT overwrite discrete values, but will merge collections
+	 * @param ref
+	 */
+	public void merge(BeanRef ref) {
+		List<Argument> props = ref.getProperties();
+		
+		if(props != null) {
+			for (Argument arg : props) {
+				addProperty(arg);
+			}
+		}
+		
+		List<Argument> args = ref.getConstructorArgs();
+		
+		if(props != null) {
+			for (Argument arg : args) {
+				addConstructorArgument(arg);
+			}
+		}
+		
+		if(this.className == null) {
+			this.className = ref.getClassName();
+		}
+		
+		if(this.initMethod == null) {
+			this.initMethod = ref.getInitMethod();
+		}
+		
+		if(this.destroyMethod == null) {
+			this.destroyMethod = ref.getDestroyMethod();
+		}
 	
+	}
 }

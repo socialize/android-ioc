@@ -59,7 +59,6 @@ public class BeanMappingParserHandler extends DefaultHandler {
 	
 	private boolean inInitMethod = false;
 	private boolean inDestroyMethod = false;
-//	private boolean inConstructor = false;
 	
 	private boolean inList = false;
 	private boolean inSet = false;
@@ -75,6 +74,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 			currentBean = new BeanRef();
 			currentBean.setClassName(attributes.getValue("class"));
 			currentBean.setName(attributes.getValue("id"));
+			currentBean.setExtendsBean(attributes.getValue("extends"));
 			
 			String initMethod = attributes.getValue("initMethod");
 			if(initMethod != null && initMethod.trim().length() > 0) {
@@ -95,7 +95,6 @@ public class BeanMappingParserHandler extends DefaultHandler {
 			beanMapping.addBeanRef(currentBean);
 		}
 		else if(localName.equalsIgnoreCase(CONSTRUCTOR_ARG)) {
-//			inConstructor = true;
 			currentArg = getProperty(attributes);
 			currentBean.addConstructorArgument(currentArg);
 		}
@@ -237,10 +236,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		
-		if(localName.equalsIgnoreCase(CONSTRUCTOR_ARG)) {
-//			inConstructor = false;
-		}
-		else if(localName.equalsIgnoreCase(INIT_METHOD)) {
+		if(localName.equalsIgnoreCase(INIT_METHOD)) {
 			inInitMethod = false;
 		}
 		else if(localName.equalsIgnoreCase(DESTROY_METHOD)) {

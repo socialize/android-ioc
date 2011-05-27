@@ -24,6 +24,7 @@ package com.socialize.android.ioc;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -84,6 +85,29 @@ public class BeanMappingParser {
 			BeanMappingParserHandler handler = new BeanMappingParserHandler();
 			parser.parse(in, handler);
 			mapping = handler.getBeanMapping();
+			
+			// Check for extends
+			Collection<BeanRef> beanRefs = mapping.getBeanRefs();
+			
+			for (BeanRef beanRef : beanRefs) {
+				if(beanRef.getExtendsBean() != null && beanRef.getExtendsBean().trim().length() > 0) {
+					
+					// Copy props without overwriting
+					BeanRef extended = mapping.getBeanRef(beanRef.getExtendsBean());
+					
+					if(extended != null) {
+						beanRef.merge(extended);
+					}
+					else {
+						Logger.w("BeanMappingParser", "No such bean [" +
+								beanRef.getExtendsBean() +
+								"] found in extends reference for bean [" +
+								beanRef.getName() +
+								"]");
+					}
+					
+				}
+			}
 		}
 		catch (Exception e) {
 			Logger.e("BeanMappingParser", "IOC Parse error", e);

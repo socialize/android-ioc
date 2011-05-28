@@ -57,12 +57,16 @@ public class ContainerBuilder {
 	private Context context;
 	
 	public ContainerBuilder(Context context) {
-		super();
-		builder = new BeanBuilder();
-		parser = new BeanMappingParser();
-		this.context = context;
+		this(context, new BeanMappingParser());
 	}
 	
+	public ContainerBuilder(Context context, BeanMappingParser parser) {
+		super();
+		builder = new BeanBuilder();
+		this.parser = parser;
+		this.context = context;
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T extends Object> T buildBean(Container container, BeanRef beanRef)  {
 		Object bean = null;

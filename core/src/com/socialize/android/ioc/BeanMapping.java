@@ -48,10 +48,4 @@ public class BeanMapping {
 	public BeanRef getBeanRef(String name) {
 		return beanRefs.get(name);
 	}
-	
-	protected void clear() {
-		if(beanRefs != null) {
-			beanRefs.clear();
-		}
-	}
 }

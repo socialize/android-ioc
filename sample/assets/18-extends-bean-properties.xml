@@ -1,0 +1,27 @@
+<beans>
+	
+	<bean id="bean7" class="com.socialize.android.ioc.sample.TestClassWithMultipleProperties">
+		<property name="string" value="foobar" type="string"/>
+		<property name="integer" value="22" type="integer"/>
+		<property name="lng" value="333333" type="long"/>
+		<property name="shrt" value="4" type="short"/>
+		<property name="chr" value="d" type="char"/>
+		<property name="bool" value="true" type="boolean"/>
+		<property name="bte" value="12" type="byte"/>
+		<property name="flt" value="65.5" type="float"/>
+		<property name="dbl" value="23423.234234" type="double"/>
+	</bean>
+	
+	<bean id="bean18" extends="bean7">
+		<property name="integer" value="99" type="integer"/>
+		<property name="lng" value="99999" type="long"/>
+	</bean>
+	
+	<bean id="bean19" extends="bean7" class="com.socialize.android.ioc.sample.TestClassWithMultiplePropertiesExtended">
+		<property name="integer" value="123" type="integer"/>
+		<property name="lng" value="123456789" type="long"/>
+		<property name="extended" value="foobar_extended"/>
+	</bean>
+	
+	<bean id="bean20" extends="bean19"/>
+</beans>

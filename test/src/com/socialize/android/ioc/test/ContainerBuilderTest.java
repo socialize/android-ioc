@@ -11,12 +11,16 @@ import java.util.Stack;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import android.content.Context;
 import android.test.AndroidTestCase;
 
+import com.google.android.testing.mocking.AndroidMock;
+import com.google.android.testing.mocking.UsesMocks;
 import com.socialize.android.ioc.Argument;
 import com.socialize.android.ioc.Argument.CollectionType;
 import com.socialize.android.ioc.Argument.RefType;
 import com.socialize.android.ioc.BeanMapping;
+import com.socialize.android.ioc.BeanMappingParser;
 import com.socialize.android.ioc.BeanRef;
 import com.socialize.android.ioc.Container;
 import com.socialize.android.ioc.ContainerBuilder;
@@ -805,6 +809,34 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertNotNull(beanA.getContext());
 		assertNotNull(beanA.getObject());
 		assertTrue(TestClassWithInitMethod.class.isAssignableFrom(beanA.getObject().getClass()));
+	}
+	
+	@UsesMocks ({BeanMappingParser.class})
+	public void testContainerBuilderBuildWithFilename() throws Exception {
+		final Set<String> set = new HashSet<String>();
+		
+		BeanMappingParser parser = AndroidMock.createMock(BeanMappingParser.class);
+		
+		String filename = "foobar";
+		
+		AndroidMock.expect(parser.parse(getContext(), filename)).andReturn(null);
+		AndroidMock.replay(parser);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext(), parser) {
+			@Override
+			public Container build(Context context, BeanMapping mapping) {
+				set.add("ContainerBuilt");
+				return null;
+			}
+		};
+		
+		builder.build(getContext(), filename);
+		
+		assertEquals(1, set.size());
+		assertEquals("ContainerBuilt", set.iterator().next());
+		
+		AndroidMock.verify(parser);
+		
 	}
 	
 }

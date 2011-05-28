@@ -40,6 +40,8 @@ public class BeanMappingParser {
 	
 	public static final String DEFAULT_FILENAME = "android-beans.xml";
 	
+	private ParserUtils utils = null;
+	
 	public BeanMapping parse(Context context) throws IOException {
 		return parse(context, DEFAULT_FILENAME);
 	}
@@ -96,7 +98,8 @@ public class BeanMappingParser {
 					BeanRef extended = mapping.getBeanRef(beanRef.getExtendsBean());
 					
 					if(extended != null) {
-						beanRef.merge(extended);
+						if(utils == null) utils = new ParserUtils();
+						utils.merge(extended, beanRef);
 					}
 					else {
 						Logger.w("BeanMappingParser", "No such bean [" +

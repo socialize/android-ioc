@@ -79,6 +79,14 @@ public class BeanRef {
 	public List<Argument> getProperties() {
 		return properties;
 	}
+	
+	protected void setProperties(List<Argument> properties) {
+		this.properties = properties;
+	}
+
+	protected void setConstructorArgs(List<Argument> constructorArgs) {
+		this.constructorArgs = constructorArgs;
+	}
 
 	public List<Argument> getConstructorArgs() {
 		return constructorArgs;
@@ -114,41 +122,5 @@ public class BeanRef {
 
 	public void setExtendsBean(String extendsBean) {
 		this.extendsBean = extendsBean;
-	}
-	
-	/**
-	 * Merges the config of the given bean into this one.
-	 * Does NOT overwrite discrete values, but will merge collections
-	 * @param ref
-	 */
-	public void merge(BeanRef ref) {
-		List<Argument> props = ref.getProperties();
-		
-		if(props != null) {
-			for (Argument arg : props) {
-				addProperty(arg);
-			}
-		}
-		
-		List<Argument> args = ref.getConstructorArgs();
-		
-		if(props != null) {
-			for (Argument arg : args) {
-				addConstructorArgument(arg);
-			}
-		}
-		
-		if(this.className == null) {
-			this.className = ref.getClassName();
-		}
-		
-		if(this.initMethod == null) {
-			this.initMethod = ref.getInitMethod();
-		}
-		
-		if(this.destroyMethod == null) {
-			this.destroyMethod = ref.getDestroyMethod();
-		}
-	
 	}
 }

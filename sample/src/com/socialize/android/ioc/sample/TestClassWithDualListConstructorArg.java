@@ -8,6 +8,10 @@ public class TestClassWithDualListConstructorArg {
 	private List<TestClassWithInitMethod> beanList = null;
 	private List<String> stringList = null;
 	
+	public TestClassWithDualListConstructorArg() {
+		super();
+	}
+
 	public TestClassWithDualListConstructorArg(List<TestClassWithInitMethod> list) {
 		super();
 		this.beanList = list;

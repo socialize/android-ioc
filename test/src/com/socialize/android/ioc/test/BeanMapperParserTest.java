@@ -27,6 +27,7 @@ import com.socialize.android.ioc.sample.TestClassWithListConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithListInit;
 import com.socialize.android.ioc.sample.TestClassWithListParam;
 import com.socialize.android.ioc.sample.TestClassWithMultipleProperties;
+import com.socialize.android.ioc.sample.TestClassWithMultiplePropertiesExtended;
 import com.socialize.android.ioc.sample.TestClassWithSetConstructorArg;
 
 public class BeanMapperParserTest extends AndroidTestCase {
@@ -619,6 +620,185 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertEquals(RefType.BEAN, child1.getType());
 		assertEquals("bean0", child1.getValue());
 	}
+	
+	public void testBeanExtends() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"18-extends-bean-properties.xml");
+		assertNotNull(mapping);
+		
+		BeanRef bean7 = mapping.getBeanRef("bean7");
+		assertNotNull(bean7);
+		assertEquals(TestClassWithMultipleProperties.class.getName(), bean7.getClassName());
+		
+		BeanRef bean18 = mapping.getBeanRef("bean18");
+		assertNotNull(bean18);
+		assertEquals(TestClassWithMultipleProperties.class.getName(), bean18.getClassName());
+		
+		BeanRef bean19 = mapping.getBeanRef("bean19");
+		assertNotNull(bean19);
+		assertEquals(TestClassWithMultiplePropertiesExtended.class.getName(), bean19.getClassName());
+		
+		
+		List<Argument> props = bean18.getProperties();
+		assertNotNull(props);
+		assertEquals(9, props.size());
+		
+		// <property name="string" value="foobar" type="string"/>
+		Argument argument0 = props.get(0);
+		assertEquals(RefType.STRING, argument0.getType());
+		assertEquals("string", argument0.getKey());
+		assertEquals("foobar", argument0.getValue());
+		assertNull(argument0.getChildren());
+		assertNull(argument0.getCollectionType());
+		
+		// <property name="integer" value="22" type="integer"/>
+		Argument argument1 = props.get(1);
+		assertEquals(RefType.INTEGER, argument1.getType());
+		assertEquals("integer", argument1.getKey());
+		assertEquals("99", argument1.getValue());
+		assertNull(argument1.getChildren());
+		assertNull(argument1.getCollectionType());
+		
+		// <property name="lng" value="333333" type="long"/>
+		Argument argument2 = props.get(2);
+		assertEquals(RefType.LONG, argument2.getType());
+		assertEquals("lng", argument2.getKey());
+		assertEquals("99999", argument2.getValue());
+		assertNull(argument2.getChildren());
+		assertNull(argument2.getCollectionType());
+		
+		// <property name="shrt" value="4" type="short"/>
+		Argument argument3 = props.get(3);
+		assertEquals(RefType.SHORT, argument3.getType());
+		assertEquals("shrt", argument3.getKey());
+		assertEquals("4", argument3.getValue());
+		assertNull(argument3.getChildren());
+		assertNull(argument3.getCollectionType());
+		
+		// <property name="chr" value="d" type="char"/>
+		Argument argument4 = props.get(4);
+		assertEquals(RefType.CHAR, argument4.getType());
+		assertEquals("chr", argument4.getKey());
+		assertEquals("d", argument4.getValue());
+		assertNull(argument4.getChildren());
+		assertNull(argument4.getCollectionType());
+		
+		// <property name="bool" value="true" type="boolean"/>
+		Argument argument5 = props.get(5);
+		assertEquals(RefType.BOOLEAN, argument5.getType());
+		assertEquals("bool", argument5.getKey());
+		assertEquals("true", argument5.getValue());
+		assertNull(argument5.getChildren());
+		assertNull(argument5.getCollectionType());
+		
+		// <property name="bte" value="12" type="byte"/>
+		Argument argument6 = props.get(6);
+		assertEquals(RefType.BYTE, argument6.getType());
+		assertEquals("bte", argument6.getKey());
+		assertEquals("12", argument6.getValue());
+		assertNull(argument6.getChildren());
+		assertNull(argument6.getCollectionType());
+		
+		// <property name="flt" value="12" type="float"/>
+		Argument argument7 = props.get(7);
+		assertEquals(RefType.FLOAT, argument7.getType());
+		assertEquals("flt", argument7.getKey());
+		assertEquals("65.5", argument7.getValue());
+		assertNull(argument7.getChildren());
+		assertNull(argument7.getCollectionType());
+		
+		// <property name="dbl" value="23423.234234" type="double"/>
+		Argument argument8 = props.get(8);
+		assertEquals(RefType.DOUBLE, argument8.getType());
+		assertEquals("dbl", argument8.getKey());
+		assertEquals("23423.234234", argument8.getValue());
+		assertNull(argument8.getChildren());
+		assertNull(argument8.getCollectionType());
+		
+		List<Argument> props19 = bean19.getProperties();
+		assertNotNull(props19);
+		assertEquals(10, props19.size());
+		
+		// <property name="string" value="foobar" type="string"/>
+		argument0 = props19.get(0);
+		assertEquals(RefType.STRING, argument0.getType());
+		assertEquals("string", argument0.getKey());
+		assertEquals("foobar", argument0.getValue());
+		assertNull(argument0.getChildren());
+		assertNull(argument0.getCollectionType());
+		
+		// <property name="integer" value="22" type="integer"/>
+		argument1 = props19.get(1);
+		assertEquals(RefType.INTEGER, argument1.getType());
+		assertEquals("integer", argument1.getKey());
+		assertEquals("123", argument1.getValue());
+		assertNull(argument1.getChildren());
+		assertNull(argument1.getCollectionType());
+		
+		// <property name="lng" value="333333" type="long"/>
+		argument2 = props19.get(2);
+		assertEquals(RefType.LONG, argument2.getType());
+		assertEquals("lng", argument2.getKey());
+		assertEquals("123456789", argument2.getValue());
+		assertNull(argument2.getChildren());
+		assertNull(argument2.getCollectionType());
+		
+		// <property name="shrt" value="4" type="short"/>
+		argument3 = props19.get(3);
+		assertEquals(RefType.SHORT, argument3.getType());
+		assertEquals("shrt", argument3.getKey());
+		assertEquals("4", argument3.getValue());
+		assertNull(argument3.getChildren());
+		assertNull(argument3.getCollectionType());
+		
+		// <property name="chr" value="d" type="char"/>
+		argument4 = props19.get(4);
+		assertEquals(RefType.CHAR, argument4.getType());
+		assertEquals("chr", argument4.getKey());
+		assertEquals("d", argument4.getValue());
+		assertNull(argument4.getChildren());
+		assertNull(argument4.getCollectionType());
+		
+		// <property name="bool" value="true" type="boolean"/>
+		argument5 = props19.get(5);
+		assertEquals(RefType.BOOLEAN, argument5.getType());
+		assertEquals("bool", argument5.getKey());
+		assertEquals("true", argument5.getValue());
+		assertNull(argument5.getChildren());
+		assertNull(argument5.getCollectionType());
+		
+		// <property name="bte" value="12" type="byte"/>
+		argument6 = props19.get(6);
+		assertEquals(RefType.BYTE, argument6.getType());
+		assertEquals("bte", argument6.getKey());
+		assertEquals("12", argument6.getValue());
+		assertNull(argument6.getChildren());
+		assertNull(argument6.getCollectionType());
+		
+		// <property name="flt" value="12" type="float"/>
+		argument7 = props19.get(7);
+		assertEquals(RefType.FLOAT, argument7.getType());
+		assertEquals("flt", argument7.getKey());
+		assertEquals("65.5", argument7.getValue());
+		assertNull(argument7.getChildren());
+		assertNull(argument7.getCollectionType());
+		
+		// <property name="dbl" value="23423.234234" type="double"/>
+		argument8 = props19.get(8);
+		assertEquals(RefType.DOUBLE, argument8.getType());
+		assertEquals("dbl", argument8.getKey());
+		assertEquals("23423.234234", argument8.getValue());
+		assertNull(argument8.getChildren());
+		assertNull(argument8.getCollectionType());
+		
+		Argument argument9 = props19.get(9);
+		assertEquals(RefType.STRING, argument9.getType());
+		assertEquals("extended", argument9.getKey());
+		assertEquals("foobar_extended", argument9.getValue());
+		assertNull(argument9.getChildren());
+		assertNull(argument9.getCollectionType());
+	}
+	
 	
 	public void testBeanMapperParser() throws IOException {
 		

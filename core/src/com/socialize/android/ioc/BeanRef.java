@@ -44,7 +44,7 @@ public class BeanRef {
 	
 	private boolean singleton = true;
 	
-	public synchronized void addConstructorArgument(Argument arg) {
+	public void addConstructorArgument(Argument arg) {
 		if(constructorArgs == null) constructorArgs = new LinkedList<Argument>();
 		
 		if(!constructorArgs.contains(arg)) {
@@ -52,7 +52,7 @@ public class BeanRef {
 		}
 	}
 	
-	public synchronized void addProperty(Argument arg) {
+	public void addProperty(Argument arg) {
 		if(properties == null) properties = new LinkedList<Argument>();
 		
 		if(!properties.contains(arg)) {

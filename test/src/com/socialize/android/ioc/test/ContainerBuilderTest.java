@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -325,7 +326,20 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertEquals(1, notInited);
 	}
 	
-	public void testContainerBuilderBeanWithBeanMapConstructorArgs() throws Exception {
+	public void testContainerBuilderBeanWithBeanDefaultMapConstructorArgs() throws Exception {
+		testContainerBuilderBeanWithBeanMapConstructorArgs(null, HashMap.class);
+	}
+	
+	public void testContainerBuilderBeanWithBeanTreeMapConstructorArgs() throws Exception {
+		testContainerBuilderBeanWithBeanMapConstructorArgs(CollectionType.TREEMAP, TreeMap.class);
+	}
+	
+	
+	public void testContainerBuilderBeanWithBeanHashMapConstructorArgs() throws Exception {
+		testContainerBuilderBeanWithBeanMapConstructorArgs(CollectionType.HASHMAP, HashMap.class);
+	}
+	
+	private void testContainerBuilderBeanWithBeanMapConstructorArgs(CollectionType collType, Class<?> collectionClass) throws Exception {
 		String beanName = "bean";
 		
 		BeanMapping mapping = new BeanMapping();
@@ -352,6 +366,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		Argument mapElement = new Argument(null, null, RefType.MAP);
 		
 		mapElement.addChild(entryElement);
+		mapElement.setCollectionType(collType);
 		
 		ref.addConstructorArgument(mapElement);
 		
@@ -371,7 +386,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		Map<String, TestClassWithInitMethod> beanMap = typedBean.getBeanMap();
 		
 		assertNotNull(beanMap);
-		assertTrue(HashMap.class.isAssignableFrom(beanMap.getClass()));
+		assertTrue(collectionClass.isAssignableFrom(beanMap.getClass()));
 		assertEquals(1, beanMap.size());
 		
 		TestClassWithInitMethod entry = beanMap.get("foo");

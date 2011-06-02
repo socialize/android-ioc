@@ -3,9 +3,9 @@ package com.socialize.android.ioc.sample;
 
 public class TestClassWithInitAndDestroy {
 
-
 	private boolean init = false;
 	private boolean destroy = false;
+	private String destroyValue = null;
 
 	public TestClassWithInitAndDestroy() {
 		super();
@@ -19,6 +19,11 @@ public class TestClassWithInitAndDestroy {
 		destroy = true;
 	}
 
+	public void destroy(String value) {
+		destroy();
+		destroyValue = value;
+	}
+	
 	public boolean isInit() {
 		return init;
 	}
@@ -33,5 +38,13 @@ public class TestClassWithInitAndDestroy {
 
 	public void setDestroy(boolean destroy) {
 		this.destroy = destroy;
+	}
+
+	public String getDestroyValue() {
+		return destroyValue;
+	}
+
+	public void setDestroyValue(String destroyValue) {
+		this.destroyValue = destroyValue;
 	}
 }

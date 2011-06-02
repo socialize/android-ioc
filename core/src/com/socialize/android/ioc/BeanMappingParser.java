@@ -59,7 +59,7 @@ public class BeanMappingParser {
 				return parse(context, in);
 			}
 			else {
-				throw new FileNotFoundException("Faile to locate bean config [" +
+				throw new FileNotFoundException("Failed to locate bean config [" +
 						filename +
 						"] in either classpath or asset folder");
 			}

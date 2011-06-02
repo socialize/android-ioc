@@ -1,5 +1,6 @@
 package com.socialize.android.ioc.test;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -31,6 +32,21 @@ import com.socialize.android.ioc.sample.TestClassWithMultiplePropertiesExtended;
 import com.socialize.android.ioc.sample.TestClassWithSetConstructorArg;
 
 public class BeanMapperParserTest extends AndroidTestCase {
+	
+	
+	public void testLoadFileNotFound() {
+		
+		BeanMappingParser parser = new BeanMappingParser();
+		
+		try {
+			parser.parse(getContext(),"NO-SUCH-FILE.xml");
+			fail();
+		}
+		catch (IOException e) {
+			assertTrue((e instanceof FileNotFoundException));
+		}
+	
+	}
 	
 	public void testSimpleBean() throws Exception {
 		BeanMappingParser parser = new BeanMappingParser();
@@ -340,7 +356,7 @@ public class BeanMapperParserTest extends AndroidTestCase {
 	}
 	
 	// 10-init-and-destroy.xml
-	public void setInitAndDestroy() throws Exception {
+	public void testInitAndDestroy() throws Exception {
 		BeanMappingParser parser = new BeanMappingParser();
 		BeanMapping mapping = parser.parse(getContext(),"10-init-and-destroy.xml");
 		assertNotNull(mapping);
@@ -797,6 +813,35 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertEquals("foobar_extended", argument9.getValue());
 		assertNull(argument9.getChildren());
 		assertNull(argument9.getCollectionType());
+	}
+	
+	public void testDestroyWithArgs() throws Exception {
+		
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"19-destroy-with-args.xml");
+		assertNotNull(mapping);
+		BeanRef ref = mapping.getBeanRef("bean29");
+		assertNotNull(ref);
+		assertEquals(TestClassWithInitAndDestroy.class.getName(), ref.getClassName());
+		
+		assertNull(ref.getConstructorArgs());
+		assertNull(ref.getProperties());
+		
+		assertNotNull(ref.getDestroyMethod());
+		assertNotNull(ref.getDestroyMethod().getName());
+		assertEquals("destroy", ref.getDestroyMethod().getName());
+		assertNotNull(ref.getDestroyMethod().getArguments());
+		
+		List<Argument> arguments = ref.getDestroyMethod().getArguments();
+		
+		assertEquals(1, arguments.size());
+		
+		Argument argument = arguments.get(0);
+		
+		assertNotNull(argument);
+		assertNull(argument.getKey());
+		assertNull(argument.getChildren());
+		assertEquals("foobar", argument.getValue());
 	}
 	
 	

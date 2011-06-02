@@ -1,0 +1,7 @@
+<beans>
+	<bean id="bean29" class="com.socialize.android.ioc.sample.TestClassWithInitAndDestroy">
+		<destroy-method name="destroy">
+			<arg value="foobar"/>
+		</destroy-method>
+	</bean>
+</beans>

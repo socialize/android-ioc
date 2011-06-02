@@ -121,11 +121,6 @@ public class ContainerBuilder {
 		}
 	}
 	
-	public Container build(Context context) throws IOException {
-		BeanMapping mapping = this.parser.parse(context);
-		return build(context, mapping);
-	}
-	
 	public Container build(Context context, String filename) throws IOException {
 		BeanMapping mapping = this.parser.parse(context, filename);
 		return build(context, mapping);

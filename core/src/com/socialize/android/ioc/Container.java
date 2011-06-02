@@ -26,9 +26,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * 
  * @author Jason Polites
- *
  */
 public class Container {
 
@@ -91,21 +89,5 @@ public class Container {
 	
 	protected Map<String, Object> getBeans() {
 		return beans;
-	}
-
-	protected BeanMapping getMapping() {
-		return mapping;
-	}
-
-	protected void setMapping(BeanMapping mapping) {
-		this.mapping = mapping;
-	}
-
-	protected ContainerBuilder getBuilder() {
-		return builder;
-	}
-
-	protected void setBuilder(ContainerBuilder builder) {
-		this.builder = builder;
 	}
 }

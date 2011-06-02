@@ -41,16 +41,19 @@ public final class AndroidIOC {
 	}
 	
 	public final void init(Context context) throws IOException {
-		if(!initialized) {
-			ContainerBuilder builder = new ContainerBuilder(context);
-			container = builder.build(context);
-			initialized = true;
-		}
+		init(context, null, new ContainerBuilder(context));
 	}
 	
 	public final void init(Context context, String filename) throws IOException {
+		init(context, filename, new ContainerBuilder(context));
+	}
+	
+	public final void init(Context context, ContainerBuilder builder) throws IOException {
+		init(context, null, builder);
+	}
+	
+	public final void init(Context context, String filename, ContainerBuilder builder) throws IOException {
 		if(!initialized) {
-			ContainerBuilder builder = new ContainerBuilder(context);
 			container = builder.build(context, filename);
 			initialized = true;
 		}

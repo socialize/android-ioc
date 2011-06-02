@@ -49,6 +49,10 @@ public class BeanMappingParser {
 	public BeanMapping parse(Context context, String filename) throws IOException {
 		InputStream in = null;
 		
+		if(filename == null) {
+			filename = DEFAULT_FILENAME;
+		}
+		
 		try {
 			in = findFile(context, filename);
 			if(in != null) {

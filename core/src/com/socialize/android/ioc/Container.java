@@ -36,15 +36,20 @@ public class Container {
 	private BeanMapping mapping;
 	private ContainerBuilder builder;
 	
-	protected Container(BeanMapping mapping, ContainerBuilder builder) {
+	// Parameterless constructor so it can be mocked.
+	protected Container() {
 		super();
 		beans = new TreeMap<String, Object>();
+	}
+
+	protected Container(BeanMapping mapping, ContainerBuilder builder) {
+		this();
 		this.mapping = mapping;
 		this.builder = builder;
 	}
 
 	@SuppressWarnings("unchecked")
-	public final <T extends Object> T getBean(String name) {
+	public <T extends Object> T getBean(String name) {
 		Object bean = beans.get(name);
 		if(bean == null) {
 			BeanRef beanRef = mapping.getBeanRef(name);
@@ -57,14 +62,14 @@ public class Container {
 		return (T) bean;
 	}
 	
-	public final boolean containsBean(String name) {
+	public boolean containsBean(String name) {
 		return beans.containsKey(name);
 	}
 	
 	/**
 	 * Destroys the container and calls destroy on any beans with a destroy method.
 	 */
-	public final void destroy() {
+	public void destroy() {
 		Collection<BeanRef> beanRefs = mapping.getBeanRefs();
 		for (BeanRef beanRef : beanRefs) {
 			Object bean = beans.get(beanRef.getName());
@@ -86,5 +91,21 @@ public class Container {
 	
 	protected Map<String, Object> getBeans() {
 		return beans;
+	}
+
+	protected BeanMapping getMapping() {
+		return mapping;
+	}
+
+	protected void setMapping(BeanMapping mapping) {
+		this.mapping = mapping;
+	}
+
+	protected ContainerBuilder getBuilder() {
+		return builder;
+	}
+
+	protected void setBuilder(ContainerBuilder builder) {
+		this.builder = builder;
 	}
 }

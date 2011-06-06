@@ -30,10 +30,6 @@ public class AndroidIOC implements IOCContainer {
 	private Container container;
 	private boolean initialized = false;
 	
-	private AndroidIOC() {
-		super();
-	}
-	
 	public static AndroidIOC getInstance() {
 		return instance;
 	}

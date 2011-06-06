@@ -12,12 +12,12 @@ import com.socialize.android.ioc.ContainerBuilder;
 public class AndroidIOCTest extends AndroidTestCase {
 
 	public void testAndroidIOCInit() throws Exception {
-        AndroidIOC ioc = AndroidIOC.getInstance();
+        AndroidIOC ioc = new AndroidIOC();
 		ioc.init(getContext());
 	}
 	
 	public void testAndroidIOCInitWithName() throws Exception {
-        AndroidIOC ioc = AndroidIOC.getInstance();
+        AndroidIOC ioc = new AndroidIOC();
 		ioc.init(getContext(), "android-beans.xml");
 	}
 	
@@ -30,13 +30,13 @@ public class AndroidIOCTest extends AndroidTestCase {
 		
 		MockContext mockContext = new MockContext();
 		
-		AndroidMock.expect(builder.build(mockContext, filename)).andReturn(container);
+		AndroidIOC ioc = new AndroidIOC();
+		
+		AndroidMock.expect(builder.build(AndroidMock.eq(mockContext), AndroidMock.eq(filename))).andReturn(container);
 		container.destroy();
 		
 		AndroidMock.replay(builder);
 		AndroidMock.replay(container);
-		
-		AndroidIOC ioc = AndroidIOC.getInstance();
 		
 		ioc.init(mockContext, filename, builder);
 		ioc.destroy();

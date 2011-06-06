@@ -89,6 +89,11 @@ public class ContainerBuilder {
 					beanRef.getName() +
 					"]", e);
 		}
+		
+		if(bean != null && bean instanceof ContainerAware) {
+			ContainerAware aware = (ContainerAware) bean;
+			aware.setContainer(container);
+		}
 
 		return (T) bean;
 

@@ -24,15 +24,9 @@ package com.socialize.android.ioc;
 import android.content.Context;
 
 public class AndroidIOC implements IOCContainer {
-
-	private static AndroidIOC instance = new AndroidIOC();
 	
 	private Container container;
 	private boolean initialized = false;
-	
-	public static AndroidIOC getInstance() {
-		return instance;
-	}
 	
 	@Override
 	public void init(Context context) throws Exception {

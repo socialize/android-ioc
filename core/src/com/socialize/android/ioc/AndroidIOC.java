@@ -21,13 +21,11 @@
  */
 package com.socialize.android.ioc;
 
-import java.io.IOException;
-
 import android.content.Context;
 
-public final class AndroidIOC {
+public class AndroidIOC implements IOCContainer {
 
-	private static final AndroidIOC instance = new AndroidIOC();
+	private static AndroidIOC instance = new AndroidIOC();
 	
 	private Container container;
 	private boolean initialized = false;
@@ -36,38 +34,47 @@ public final class AndroidIOC {
 		super();
 	}
 	
-	public static final AndroidIOC getInstance() {
+	public static AndroidIOC getInstance() {
 		return instance;
 	}
 	
-	public final void init(Context context) throws IOException {
+	@Override
+	public void init(Context context) throws Exception {
 		init(context, null, new ContainerBuilder(context));
 	}
 	
-	public final void init(Context context, String filename) throws IOException {
+	@Override
+	public void init(Context context, String filename) throws Exception {
 		init(context, filename, new ContainerBuilder(context));
 	}
 	
-	public final void init(Context context, ContainerBuilder builder) throws IOException {
+	@Override
+	public void init(Context context, ContainerBuilder builder) throws Exception {
 		init(context, null, builder);
 	}
 	
-	public final void init(Context context, String filename, ContainerBuilder builder) throws IOException {
+	@Override
+	public void init(Context context, String filename, ContainerBuilder builder) throws Exception {
 		if(!initialized) {
 			container = builder.build(context, filename);
 			initialized = true;
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.socialize.android.ioc.IOCContainer#getBean(java.lang.String)
+	 */
+	@Override
 	@SuppressWarnings("unchecked")
-	public final <T extends Object> T getBean(String name) {
+	public <T extends Object> T getBean(String name) {
 		return (T) container.getBean(name);
 	}
 	
-	/**
-	 * Destroys the container.
+	/* (non-Javadoc)
+	 * @see com.socialize.android.ioc.IOCContainer#destroy()
 	 */
-	public final void destroy() {
+	@Override
+	public void destroy() {
 		if(container != null) {
 			container.destroy();	
 		}

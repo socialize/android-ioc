@@ -5,6 +5,7 @@ public class TestClassWithInitMethod implements Comparable<TestClassWithInitMeth
 	
 	private boolean initialized = false;
 	private double rnd;
+	private TestClassWithInitMethod other;
 	
 	public TestClassWithInitMethod() {
 		super();
@@ -13,6 +14,19 @@ public class TestClassWithInitMethod implements Comparable<TestClassWithInitMeth
 	
 	public void doInit() {
 		initialized = true;
+	}
+	
+	public void doInitDepends(TestClassWithInitMethod other) {
+		doInit();
+		this.other = other;
+		
+		if(!other.isInitialized()) {
+			throw new RuntimeException("Other bean not intialized");
+		}
+	}
+	
+	public TestClassWithInitMethod getOther() {
+		return other;
 	}
 
 	public boolean isInitialized() {

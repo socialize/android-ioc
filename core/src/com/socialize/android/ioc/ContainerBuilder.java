@@ -72,9 +72,11 @@ public class ContainerBuilder {
 		Object bean = null;
 		
 		try {
+			Logger.i(getClass().getSimpleName(), "Creating bean " + beanRef.getName());
+			
 			List<Argument> constructorArgs = beanRef.getConstructorArgs();
 			if(constructorArgs != null && constructorArgs.size() > 0) {
-				Object[] args = getArguments(context, container, constructorArgs);
+				Object[] args = getArguments(context, container, constructorArgs, false);
 				if(args != null && args.length > 0) {
 					bean = builder.construct(beanRef.getClassName(), args);
 				}
@@ -82,6 +84,11 @@ public class ContainerBuilder {
 			else {
 				bean = builder.construct(beanRef.getClassName());
 			}
+			
+			if(bean != null) {
+				Logger.i(getClass().getSimpleName(), "Bean " + beanRef.getName() + " created");
+			}
+			
 			
 		}
 		catch (Exception e) {
@@ -101,6 +108,8 @@ public class ContainerBuilder {
 	
 	public void setBeanProperties(Container container, BeanRef ref, Object bean)  {
 		try {
+			Logger.i(getClass().getSimpleName(), "Setting properties on bean " + ref.getName());
+			
 			List<Argument> properties = ref.getProperties();
 			
 			if(properties != null && properties.size() > 0) {
@@ -118,6 +127,8 @@ public class ContainerBuilder {
 					}
 				}
 			}
+			
+			Logger.i(getClass().getSimpleName(), "Properties set on bean " + ref.getName());
 		}
 		catch (Exception e) {
 			Logger.e(getClass().getSimpleName(), "Failed to set properties on bean [" +
@@ -146,15 +157,49 @@ public class ContainerBuilder {
 			BeanRef ref = mapping.getBeanRef(entry.getKey());
 			Object bean = entry.getValue();
 			setBeanProperties(container, ref, bean);
-			initBean(container, ref, bean);
 		}
+		
+		initBeans(container, mapping, beans, 0);
 
 		return container;
 	}
 	
+	private void initBeans(Container container, BeanMapping mapping, Map<String, Object> beans, int iteration) {
+		if(iteration > MAX_ITERATIONS) {
+			throw new StackOverflowError("Too many iterations during init.  Possible circular reference in bean mapping, or bean init failed.  Check the logs.");
+		}
+		
+		Map<String, Object> doLaterBeans = new HashMap<String, Object>();
+		
+		Set<Entry<String, Object>> entrySet = beans.entrySet();
+		
+		for (Entry<String, Object> entry : entrySet) {
+			BeanRef ref = mapping.getBeanRef(entry.getKey());
+			Object bean = entry.getValue();
+			if(!initBean(container, ref, bean)) {
+				Logger.i(getClass().getSimpleName(), "Cannot init bean [" +
+						ref.getName() +
+						"] now.  Marking for later init...");
+				
+				doLaterBeans.put(entry.getKey(), entry.getValue());
+			}
+			else {
+				ref.setInitCalled(true);
+				
+				Logger.i(getClass().getSimpleName(), "Bean [" +
+						ref.getName() +
+						"] initialized.");
+			}
+		}
+		
+		if(!doLaterBeans.isEmpty()) {
+			initBeans(container, mapping, doLaterBeans, ++iteration);
+		}
+	}
+	
 	public void destroyBean(Container container, BeanRef beanRef, Object bean) {
 		if(bean != null && beanRef.getDestroyMethod() != null) {
-			Object[] args = getArguments(context, container, beanRef.getDestroyMethod().getArguments());
+			Object[] args = getArguments(context, container, beanRef.getDestroyMethod().getArguments(), false);
 			
 			Method method = builder.getMethodFor(bean.getClass(), beanRef.getDestroyMethod().getName(), args);
 			
@@ -164,9 +209,11 @@ public class ContainerBuilder {
 				}
 				catch (Exception e) {
 					Logger.e(getClass().getSimpleName(), "Failed to invoke destroy method [" +
-							beanRef.getDestroyMethod() +
+							beanRef.getDestroyMethod().getName() +
 							"] on bean [" +
 							beanRef.getName() +
+							": " +
+							beanRef.getClassName() +
 							"]", e);
 				}
 			}
@@ -174,42 +221,63 @@ public class ContainerBuilder {
 				Logger.e(getClass().getSimpleName(), "Could not find method matching [" +
 						beanRef.getDestroyMethod().getName() +
 						"] in bean [" +
-						beanRef.getName()  +
+						beanRef.getName() +
+						": " +
+						beanRef.getClassName() +
 						"]");
 			}
 		}
 	}
 	
-	public void initBean(Container container, BeanRef beanRef, Object bean) {
+	public boolean initBean(Container container, BeanRef beanRef, Object bean) {
 		
 		if(bean != null) {
-			if(beanRef.getInitMethod() != null) {
+			MethodRef initMethod = beanRef.getInitMethod();
+			if(initMethod != null) {
+				Object[] args = null;
+				List<Argument> arguments = initMethod.getArguments();
+				if(arguments != null && arguments.size() > 0) {
+					args = getArguments(context, container, arguments, true);
+					if(args == null) {
+						return false;
+					}
+				}
 				
-				Object[] args = getArguments(context, container, beanRef.getInitMethod().getArguments());
-				
-				Method method = builder.getMethodFor(bean.getClass(), beanRef.getInitMethod().getName(), args);
+				Method method = builder.getMethodFor(bean.getClass(), initMethod.getName(), args);
 				
 				if(method != null) {
 					try {
 						method.invoke(bean, args);
+						
+						return true;
 					}
 					catch (Exception e) {
 						Logger.e(getClass().getSimpleName(), "Failed to invoke init method [" +
-								beanRef.getInitMethod() +
+								initMethod.getName() +
 								"] on bean [" +
 								beanRef.getName() +
+								": " +
+								beanRef.getClassName() +
 								"]", e);
 					}
 				}
 				else {
 					Logger.e(getClass().getSimpleName(), "Could not find method matching [" +
-							beanRef.getInitMethod().getName() +
+							initMethod.getName() +
 							"] in bean [" +
-							beanRef.getName()  +
+							beanRef.getName() +
+							": " +
+							beanRef.getClassName() +
 							"]");
 				}
 			}
+			else {
+				// no need to init, ok to go
+				return true;
+			}
 		}
+		
+		return false;
 	}
 	
 	private void buildBeans(Context context, Container container, BeanBuilder builder, BeanMapping mapping, Collection<BeanRef> beanRefs, int iteration) {
@@ -221,7 +289,7 @@ public class ContainerBuilder {
 
 		for (BeanRef beanRef : beanRefs) {
 
-			if(beanRef.isSingleton() && !container.containsBean(beanRef.getName())) {
+			if(!beanRef.isAbstractBean() && beanRef.isSingleton() && !container.containsBean(beanRef.getName())) {
 
 				Object bean = null;
 
@@ -254,13 +322,13 @@ public class ContainerBuilder {
 		}
 	}
 	
-	public Object[] getArguments(Context context, Container container, List<Argument> list) {
+	public Object[] getArguments(Context context, Container container, List<Argument> list, boolean forInit) {
 		if(list != null) {
 			Object[] args = new Object[list.size()];
 			int argIndex = 0;
 			for (Argument arg : list) {
 				
-				Object argumentValue = getArgumentValue(container, arg);
+				Object argumentValue = getArgumentValue(container, arg, forInit);
 				
 				if(argumentValue == null && !arg.getType().equals(RefType.NULL)) {
 					// Bail
@@ -277,7 +345,7 @@ public class ContainerBuilder {
 		return null;
 	}
 	
-	private Object getArgumentValue(Container container, Argument arg) {
+	private Object getArgumentValue(Container container, Argument arg, boolean forInit) {
 		Object object = null;
 		if(arg.getType() != null) {
 			
@@ -286,6 +354,20 @@ public class ContainerBuilder {
 					// Look for the bean
 					if(container.containsBean(arg.getValue())) {
 						object = container.getBean(arg.getValue());
+						
+						if(forInit && object != null) {
+							BeanRef beanRef = container.getBeanRef(arg.getValue());
+							if(beanRef.getInitMethod() != null) {
+								// Make sure this bean has been initialized
+								if(!beanRef.isInitCalled()) {
+									// We can't init this now
+									Logger.i(getClass().getSimpleName(), "Bean argument [" +
+											beanRef.getName() +
+											"] has not been initialized yet so cannot be used as an argument for another init method");
+									object = null;
+								}
+							}
+						}
 					}
 					else {
 						// We can't construct this now
@@ -362,7 +444,7 @@ public class ContainerBuilder {
 			
 			if(children != null) {
 				for (Argument child : children) {
-					Object value = getArgumentValue(container, child);
+					Object value = getArgumentValue(container, child, false);
 					
 					if(value == null && !child.getType().equals(RefType.NULL)) {
 						// Can't complete so just abort
@@ -397,8 +479,8 @@ public class ContainerBuilder {
 			valArg = tmp;
 		}
 		
-		Object key = getArgumentValue(container, keyArg);
-		Object value = getArgumentValue(container, valArg);
+		Object key = getArgumentValue(container, keyArg, false);
+		Object value = getArgumentValue(container, valArg, false);
 		
 		if(key == null) {
 			// No bueno.. return here (must be dependency failure)
@@ -446,7 +528,7 @@ public class ContainerBuilder {
 				for (Argument child : children) {
 					
 					if(child.getType().equals(RefType.MAPENTRY)) {
-						MapEntry entry = (MapEntry) getArgumentValue(container, child);
+						MapEntry entry = (MapEntry) getArgumentValue(container, child, false);
 						
 						if(entry == null) {
 							// Can't complete so just abort
@@ -499,7 +581,7 @@ public class ContainerBuilder {
 			
 			if(children != null) {
 				for (Argument child : children) {
-					Object value = getArgumentValue(container, child);
+					Object value = getArgumentValue(container, child, false);
 					
 					if(value == null && !child.getType().equals(RefType.NULL)) {
 						// Can't complete so just abort

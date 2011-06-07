@@ -22,7 +22,7 @@
 package com.socialize.android.ioc;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -40,7 +40,7 @@ public class BeanMapping {
 
 	public synchronized void addBeanRef(BeanRef ref) {
 		if(beanRefs == null) {
-			beanRefs = new HashMap<String, BeanRef>();
+			beanRefs = new LinkedHashMap<String, BeanRef>();
 		}
 		beanRefs.put(ref.getName(), ref);
 	}

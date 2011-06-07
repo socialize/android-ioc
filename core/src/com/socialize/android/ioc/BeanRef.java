@@ -43,6 +43,9 @@ public class BeanRef {
 	private String extendsBean = null;
 	
 	private boolean singleton = true;
+	private boolean abstractBean = false;
+	
+	private boolean initCalled = false;
 	
 	public void addConstructorArgument(Argument arg) {
 		if(constructorArgs == null) constructorArgs = new LinkedList<Argument>();
@@ -123,4 +126,20 @@ public class BeanRef {
 	public void setExtendsBean(String extendsBean) {
 		this.extendsBean = extendsBean;
 	}
+	
+	public boolean isAbstractBean() {
+		return abstractBean;
+	}
+	public void setAbstractBean(boolean abstractBean) {
+		this.abstractBean = abstractBean;
+	}
+
+	protected boolean isInitCalled() {
+		return initCalled;
+	}
+
+	protected void setInitCalled(boolean initCalled) {
+		this.initCalled = initCalled;
+	}
+	
 }

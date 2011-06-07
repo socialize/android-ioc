@@ -22,8 +22,8 @@
 package com.socialize.android.ioc;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author Jason Polites
@@ -37,13 +37,17 @@ public class Container {
 	// Parameterless constructor so it can be mocked.
 	protected Container() {
 		super();
-		beans = new TreeMap<String, Object>();
+		beans = new LinkedHashMap<String, Object>();
 	}
 
 	protected Container(BeanMapping mapping, ContainerBuilder builder) {
 		this();
 		this.mapping = mapping;
 		this.builder = builder;
+	}
+	
+	protected BeanRef getBeanRef(String name) {
+		return this.mapping.getBeanRef(name);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -92,6 +92,15 @@ public class BeanMappingParserHandler extends DefaultHandler {
 				currentBean.setSingleton(true);
 			}
 			
+			String abstractBean = attributes.getValue("abstract");
+			
+			if(abstractBean != null && abstractBean.trim().length() > 0) {
+				currentBean.setAbstractBean(Boolean.parseBoolean(abstractBean));
+			}
+			else {
+				currentBean.setAbstractBean(false);
+			}
+			
 			beanMapping.addBeanRef(currentBean);
 		}
 		else if(localName.equalsIgnoreCase(CONSTRUCTOR_ARG)) {

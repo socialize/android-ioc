@@ -18,4 +18,22 @@
 			</set>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="beanTreeSet" class="com.socialize.android.ioc.sample.TestClassWithSetConstructorArg">
+		<constructor-arg>
+			<set type="treeset">
+				<ref id="bean8"/>
+				<ref id="bean0"/>
+			</set>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="beanHashSet" class="com.socialize.android.ioc.sample.TestClassWithSetConstructorArg">
+		<constructor-arg>
+			<set type="hashset">
+				<ref id="bean8"/>
+				<ref id="bean0"/>
+			</set>
+		</constructor-arg>
+	</bean>
 </beans>

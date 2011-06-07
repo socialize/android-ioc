@@ -637,6 +637,88 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertEquals("bean0", child1.getValue());
 	}
 	
+	// 16-set-constructor-arg.xml
+	public void testTreeSetConstructor() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"16-set-constructor-arg.xml");
+		assertNotNull(mapping);
+		BeanRef ref = mapping.getBeanRef("beanTreeSet");
+		assertNotNull(ref);
+		assertEquals(TestClassWithSetConstructorArg.class.getName(), ref.getClassName());
+		
+		assertNull(ref.getDestroyMethod());
+		assertNull(ref.getInitMethod());
+		assertNull(ref.getProperties());
+		
+		List<Argument> constructorArgs = ref.getConstructorArgs();
+		assertNotNull(constructorArgs);
+		assertEquals(1, constructorArgs.size());
+		
+		Argument argument = constructorArgs.get(0);
+		
+		assertEquals(RefType.SET, argument.getType());
+		assertNull(argument.getValue());
+		assertNull(argument.getKey());
+		
+		assertNotNull(argument.getChildren());
+		assertNotNull(argument.getCollectionType());
+		
+		assertEquals(2, argument.getChildren().size());
+		assertEquals(CollectionType.TREESET, argument.getCollectionType());
+		
+		
+		Argument child0 = argument.getChildren().get(0);
+		Argument child1 = argument.getChildren().get(1);
+		
+		assertEquals(RefType.BEAN, child0.getType());
+		assertEquals("bean8", child0.getValue());
+	
+		
+		assertEquals(RefType.BEAN, child1.getType());
+		assertEquals("bean0", child1.getValue());
+	}
+	
+	// 16-set-constructor-arg.xml
+	public void testHashSetConstructor() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"16-set-constructor-arg.xml");
+		assertNotNull(mapping);
+		BeanRef ref = mapping.getBeanRef("beanHashSet");
+		assertNotNull(ref);
+		assertEquals(TestClassWithSetConstructorArg.class.getName(), ref.getClassName());
+		
+		assertNull(ref.getDestroyMethod());
+		assertNull(ref.getInitMethod());
+		assertNull(ref.getProperties());
+		
+		List<Argument> constructorArgs = ref.getConstructorArgs();
+		assertNotNull(constructorArgs);
+		assertEquals(1, constructorArgs.size());
+		
+		Argument argument = constructorArgs.get(0);
+		
+		assertEquals(RefType.SET, argument.getType());
+		assertNull(argument.getValue());
+		assertNull(argument.getKey());
+		
+		assertNotNull(argument.getChildren());
+		assertNotNull(argument.getCollectionType());
+		
+		assertEquals(2, argument.getChildren().size());
+		assertEquals(CollectionType.HASHSET, argument.getCollectionType());
+		
+		
+		Argument child0 = argument.getChildren().get(0);
+		Argument child1 = argument.getChildren().get(1);
+		
+		assertEquals(RefType.BEAN, child0.getType());
+		assertEquals("bean8", child0.getValue());
+	
+		
+		assertEquals(RefType.BEAN, child1.getType());
+		assertEquals("bean0", child1.getValue());
+	}
+	
 	public void testBeanExtends() throws Exception {
 		BeanMappingParser parser = new BeanMappingParser();
 		BeanMapping mapping = parser.parse(getContext(),"18-extends-bean-properties.xml");
@@ -843,6 +925,24 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertNull(argument.getChildren());
 		assertEquals("foobar", argument.getValue());
 	}
+	
+	public void testSingletonAndAbstract() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"20-singleton-and-abstract.xml");
+		assertNotNull(mapping);
+		BeanRef ref = mapping.getBeanRef("bean30");
+		BeanRef ref1 = mapping.getBeanRef("bean31");
+		
+		assertNotNull(ref);
+		assertNotNull(ref1);
+		
+		assertFalse(ref.isSingleton());
+		assertFalse(ref.isAbstractBean());
+		
+		assertTrue(ref1.isSingleton());
+		assertTrue(ref1.isAbstractBean());
+	}
+	
 	
 	
 	public void testBeanMapperParser() throws IOException {

@@ -27,6 +27,7 @@ import com.socialize.android.ioc.Container;
 import com.socialize.android.ioc.ContainerBuilder;
 import com.socialize.android.ioc.MethodRef;
 import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
+import com.socialize.android.ioc.sample.TestClassContainerAware;
 import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg;
 import com.socialize.android.ioc.sample.TestClassWithDualListConstructorArg;
@@ -59,6 +60,30 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		assertNotNull(bean);
 		assertTrue(TestClassWithInitMethod.class.isAssignableFrom(bean.getClass()));
+	}
+	
+	public void testContainerAware() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassContainerAware.class.getName());
+		ref.setName(beanName);
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		Object bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertTrue(TestClassContainerAware.class.isAssignableFrom(bean.getClass()));
+		
+		TestClassContainerAware aware = (TestClassContainerAware) bean;
+		
+		assertNotNull(aware.getContainer());
+		assertSame(container, aware.getContainer());
 	}
 	
 	public void testContainerSize() {
@@ -726,6 +751,25 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertFalse(beanA == beanB);
 	}
 	
+	public void testContainerBuilderAbstractBean() {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithInitMethod.class.getName());
+		ref.setName(beanName);
+		ref.setAbstractBean(true);
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		Object beanA = container.getBean(beanName);
+		
+		assertNull(beanA);
+	}
+	
 	public void testContainerBuilderSingletonBeanInitMethod() {
 		String beanName = "bean";
 		
@@ -887,4 +931,52 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 	}
 	
+
+	public void testInitMethodDependency() {
+		
+		String beanName = "initWithCount";
+		String beanName2 = "initWithCount2";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRefWithMethodCount ref = new BeanRefWithMethodCount();
+		ref.setClassName(TestClassWithInitMethod.class.getName());
+		ref.setName(beanName);
+		ref.setInitMethod(new MethodRef("doInit"));
+		
+		BeanRefWithMethodCount ref2 = new BeanRefWithMethodCount();
+		ref2.setClassName(TestClassWithInitMethod.class.getName());
+		ref2.setName(beanName2);
+		
+		MethodRef initMethod = new MethodRef("doInitDepends");
+		initMethod.addArgument(new Argument(null, beanName, RefType.BEAN));
+		
+		ref2.setInitMethod(initMethod);
+		
+		mapping.addBeanRef(ref2);
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		TestClassWithInitMethod beanA = container.getBean(beanName);
+		TestClassWithInitMethod beanB = container.getBean(beanName2);
+		
+		assertTrue(beanA.isInitialized());
+		assertTrue(beanB.isInitialized());
+		
+		assertNotNull(beanB.getOther());
+		assertSame(beanA, beanB.getOther());
+	}
+	
+	
+	private class BeanRefWithMethodCount extends BeanRef {
+
+		int callCount = 0;
+		@Override
+		public MethodRef getInitMethod() {
+			callCount++;
+			return super.getInitMethod();
+		}
+	}
 }

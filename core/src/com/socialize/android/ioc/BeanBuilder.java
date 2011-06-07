@@ -63,7 +63,27 @@ public class BeanBuilder {
 		}
 		else {
 			// No constructor found.
-			Logger.e(getClass().getSimpleName(), "No valid constructor found for class [" + clazz.getName() + "]");
+			StringBuilder builder = new StringBuilder();
+			builder.append("No valid constructor found for class [");
+			builder.append( clazz.getName() );
+			builder.append( "] with args [" );
+			
+			if(args != null) {
+				for (Object arg : args) {
+					if(arg != null) {
+						builder.append(arg.getClass().getSimpleName());
+					}
+					else {
+						builder.append("null");
+					}
+					builder.append(",");
+				}
+			}
+			else {
+				builder.append( "null]" );
+			}
+			
+			Logger.w(getClass().getSimpleName(), builder.toString());
 		}
 
 		return object;

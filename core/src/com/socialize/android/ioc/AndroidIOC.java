@@ -51,6 +51,11 @@ public class AndroidIOC implements IOCContainer {
 		}
 	}
 	
+	@Override
+	public int size() {
+		return container.size();
+	}
+
 	/* (non-Javadoc)
 	 * @see com.socialize.android.ioc.IOCContainer#getBean(java.lang.String)
 	 */

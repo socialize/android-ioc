@@ -44,5 +44,7 @@ public interface IOCContainer {
 	public void init(Context context, ContainerBuilder builder) throws Exception;
 
 	public void init(Context context, String filename) throws Exception;
+	
+	public int size();
 
 }

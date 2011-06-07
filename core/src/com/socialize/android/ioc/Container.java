@@ -64,6 +64,10 @@ public class Container {
 		return beans.containsKey(name);
 	}
 	
+	public int size() {
+		return (beans == null) ? 0 : beans.size();
+	}
+	
 	/**
 	 * Destroys the container and calls destroy on any beans with a destroy method.
 	 */

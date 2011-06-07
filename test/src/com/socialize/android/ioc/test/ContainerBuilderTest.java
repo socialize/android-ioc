@@ -61,6 +61,39 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertTrue(TestClassWithInitMethod.class.isAssignableFrom(bean.getClass()));
 	}
 	
+	public void testContainerSize() {
+		
+		String beanName0 = "bean0";
+		String beanName1 = "bean1";
+		String beanName2 = "bean2";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		BeanRef ref0 = new BeanRef();
+		BeanRef ref1 = new BeanRef();
+		BeanRef ref2 = new BeanRef();
+		
+		ref0.setClassName(TestClassWithInitMethod.class.getName());
+		ref0.setName(beanName0);
+		
+		ref1.setClassName(TestClassWithInitMethod.class.getName());
+		ref1.setName(beanName1);
+		
+		ref2.setClassName(TestClassWithInitMethod.class.getName());
+		ref2.setName(beanName2);
+		
+		
+		mapping.addBeanRef(ref0);
+		mapping.addBeanRef(ref1);
+		mapping.addBeanRef(ref2);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		assertEquals(3, container.size());
+	}
+	
 	public void testContainerBuilderBeanWithIntConstructorArgs() throws Exception {
 		String beanName = "bean";
 		

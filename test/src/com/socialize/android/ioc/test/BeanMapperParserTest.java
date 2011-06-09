@@ -27,6 +27,7 @@ import com.socialize.android.ioc.sample.TestClassWithIntConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithListConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithListInit;
 import com.socialize.android.ioc.sample.TestClassWithListParam;
+import com.socialize.android.ioc.sample.TestClassWithMapProperty;
 import com.socialize.android.ioc.sample.TestClassWithMultipleProperties;
 import com.socialize.android.ioc.sample.TestClassWithMultiplePropertiesExtended;
 import com.socialize.android.ioc.sample.TestClassWithSetConstructorArg;
@@ -419,6 +420,82 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertEquals("bean9", child1.getValue());
 	}
 	
+	// 22-list-property-invalid-type.xml
+	public void testListConstructorInvalidType() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"22-list-property-invalid-type.xml");
+		assertNotNull(mapping);
+		
+		BeanRef ref = mapping.getBeanRef("bean41");
+		assertNotNull(ref);
+		assertEquals(TestClassWithListParam.class.getName(), ref.getClassName());
+		
+		assertNull(ref.getDestroyMethod());
+		assertNull(ref.getInitMethod());
+		assertNull(ref.getConstructorArgs());
+		
+		List<Argument> properties = ref.getProperties();
+		assertNotNull(properties);
+		assertEquals(1, properties.size());
+		
+		Argument argument = properties.get(0);
+		
+		assertEquals(RefType.LIST, argument.getType());
+		assertNull(argument.getValue());
+		assertNotNull(argument.getKey());
+		
+		assertNotNull(argument.getChildren());
+		assertNotNull(argument.getCollectionType());
+		
+		assertEquals(2, argument.getChildren().size());
+		assertEquals(CollectionType.LINKEDLIST, argument.getCollectionType());
+		
+		
+		Argument child0 = argument.getChildren().get(0);
+		Argument child1 = argument.getChildren().get(1);
+		
+		assertEquals(RefType.BEAN, child0.getType());
+		assertEquals("bean8", child0.getValue());
+	
+		assertEquals(RefType.BEAN, child1.getType());
+		assertEquals("bean9", child1.getValue());
+		
+		// SECOND BEAN
+		
+		ref = mapping.getBeanRef("bean42");
+		assertNotNull(ref);
+		assertEquals(TestClassWithListParam.class.getName(), ref.getClassName());
+		
+		assertNull(ref.getDestroyMethod());
+		assertNull(ref.getInitMethod());
+		assertNull(ref.getConstructorArgs());
+		
+		properties = ref.getProperties();
+		assertNotNull(properties);
+		assertEquals(1, properties.size());
+		
+		argument = properties.get(0);
+		
+		assertEquals(RefType.LIST, argument.getType());
+		assertNull(argument.getValue());
+		assertNotNull(argument.getKey());
+		
+		assertNotNull(argument.getChildren());
+		assertNotNull(argument.getCollectionType());
+		
+		assertEquals(2, argument.getChildren().size());
+		assertEquals(CollectionType.LINKEDLIST, argument.getCollectionType());
+		
+		
+		child0 = argument.getChildren().get(0);
+		child1 = argument.getChildren().get(1);
+		
+		assertEquals(RefType.BEAN, child0.getType());
+		assertEquals("bean8", child0.getValue());
+	
+		assertEquals(RefType.BEAN, child1.getType());
+		assertEquals("bean9", child1.getValue());
+	}
 	// 12-list-property.xml
 	public void testListProperty() throws Exception {
 		BeanMappingParser parser = new BeanMappingParser();
@@ -579,6 +656,53 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertEquals(1, argument.getChildren().size());
 		
 		Argument entry = argument.getChildren().get(0);
+		
+		assertEquals(RefType.MAPENTRY, entry.getType());
+		
+		assertNotNull(entry.getChildren());
+		assertEquals(2, entry.getChildren().size());
+		
+		Argument child0 = entry.getChildren().get(0);
+		Argument child1 = entry.getChildren().get(1);
+		
+		assertEquals("key", child0.getKey());
+		assertEquals("foo", child0.getValue());
+		assertEquals(RefType.STRING, child0.getType());
+		
+		assertEquals(RefType.BEAN, child1.getType());
+		assertEquals("bean8", child1.getValue());
+	}
+	// 21-map-property.xml
+	public void testMapProperty() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"21-map-property.xml");
+		assertNotNull(mapping);
+		BeanRef ref = mapping.getBeanRef("bean32");
+		assertNotNull(ref);
+		assertEquals(TestClassWithMapProperty.class.getName(), ref.getClassName());
+		
+		assertNull(ref.getDestroyMethod());
+		assertNull(ref.getInitMethod());
+		assertNull(ref.getConstructorArgs());
+		
+		List<Argument> properties = ref.getProperties();
+		assertNotNull(properties);
+		assertEquals(1, properties.size());
+		
+		Argument property = properties.get(0);
+		
+		assertEquals(RefType.MAP, property.getType());
+		assertNull(property.getValue());
+		assertNotNull(property.getKey());
+		
+		assertNotNull(property.getChildren());
+		assertNotNull(property.getCollectionType());
+		assertEquals(CollectionType.HASHMAP, property.getCollectionType());
+		
+		// 1 child with two sub-childen
+		assertEquals(1, property.getChildren().size());
+		
+		Argument entry = property.getChildren().get(0);
 		
 		assertEquals(RefType.MAPENTRY, entry.getType());
 		

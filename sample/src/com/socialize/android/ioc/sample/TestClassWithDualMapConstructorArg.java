@@ -31,5 +31,12 @@ public class TestClassWithDualMapConstructorArg {
 	public Map<String, Integer> getStringMap() {
 		return stringMap;
 	}
-	
+
+	public void setBeanMap(Map<String, TestClassWithInitMethod> beanMap) {
+		this.beanMap = beanMap;
+	}
+
+	public void setStringMap(Map<String, Integer> stringMap) {
+		this.stringMap = stringMap;
+	}
 }

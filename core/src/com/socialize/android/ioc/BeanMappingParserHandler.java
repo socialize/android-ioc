@@ -152,8 +152,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 				}
 			}
 			else {
-				currentArg = getProperty(attributes);
-				currentBean.addProperty(currentArg);
+				Logger.w(getClass().getSimpleName(), "No current list or set.  Ref types can only be can only be declared within a <list>, <set> element");
 			}
 		}
 		else if(localName.equalsIgnoreCase(INIT_METHOD)) {

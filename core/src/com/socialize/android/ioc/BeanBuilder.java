@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class BeanBuilder {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Object> T construct(String className, Object... args) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException,
+	public <T extends Object> T construct(String className, Object...args) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException,
 			ClassNotFoundException {
 		return (T) construct((Class<T>) Class.forName(className), args);
 	}
@@ -52,7 +53,7 @@ public class BeanBuilder {
 		return (T) construct(clazz, (Object[]) null);
 	}
 
-	public <T extends Object> T construct(Class<T> clazz, Object... args) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public <T extends Object> T construct(Class<T> clazz, Object...args) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
 
 		T object = null;
 
@@ -148,6 +149,8 @@ public class BeanBuilder {
 		String setterName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1, name.length());
 
 		Method[] methods = cls.getMethods();
+		
+		boolean methodMatched = false;
 
 		for (Method method : methods) {
 
@@ -157,15 +160,29 @@ public class BeanBuilder {
 				if (types != null && types.length == 1) {
 					if(isMethodMatched(paramTypes, types, value)) {
 						method.invoke(instance, value);
+						methodMatched = true;
 						break;
 					}
 				}
 			}
 		}
+		
+		if(!methodMatched) {
+				// No method found.
+				StringBuilder builder = new StringBuilder();
+				builder.append("No public method found called [");
+				builder.append(setterName);
+				builder.append("] of class [");
+				builder.append( cls.getName() );
+				builder.append( "] with args [" );
+				builder.append( value.getClass().getName() );
+				builder.append( "]");
+				Logger.w(getClass().getSimpleName(), builder.toString());
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> Constructor<T> getConstructorFor(Class<T> clazz, Object... args) throws SecurityException {
+	public <T> Constructor<T> getConstructorFor(Class<T> clazz, Object...args) throws SecurityException {
 		Constructor<T>[] constructors = (Constructor<T>[]) clazz.getConstructors();
 		Constructor<T> compatibleConstructor = null;
 		for (Constructor<T> constructor : constructors) {
@@ -184,7 +201,7 @@ public class BeanBuilder {
 		return null;
 	}
 
-	public Method getMethodFor(Class<?> clazz, String name, Object... args) {
+	public Method getMethodFor(Class<?> clazz, String name, Object...args) {
 		Method[] methods = clazz.getMethods();
 		Method compatibleMethod = null;
 		for (Method method : methods) {
@@ -234,9 +251,6 @@ public class BeanBuilder {
 				else if(Map.class.isAssignableFrom(params[i])) {
 					match &= isMapMatch(genericParams, i, arg);
 				}
-//				else if(params[i].isArray()) {
-//					match &= isArrayMatch(genericParams, i, arg);
-//				}
 				else {
 					match &= true;
 				}
@@ -259,15 +273,14 @@ public class BeanBuilder {
 
 		if(asColl.size() > 0) {
 			ParameterizedType parType = (ParameterizedType) genericParams[index];
-			if(parType.getActualTypeArguments()[0].equals(asColl.get(0).getClass())) {
-				return true;
-			}
+			
+			Class<?> actualClass = getGenericParameterClass(parType);
+
+			return actualClass.isAssignableFrom(asColl.get(0).getClass());
 		}
 		else {
 			return true;
 		}
-			
-		return false;
 	}
 	
 	private boolean isSetMatch(Type[] genericParams, int index, Object arg) {
@@ -279,15 +292,13 @@ public class BeanBuilder {
 			Type actualType = parType.getActualTypeArguments()[0];
 			Class<?> componentType = asColl.iterator().next().getClass();
 			
-			if(actualType.equals(componentType)) {
-				return true;
-			}
+			Class<?> actualClass = getGenericParameterClass(actualType);
+
+			return actualClass.isAssignableFrom(componentType);
 		}
 		else {
 			return true;
 		}
-			
-		return false;
 	}
 	
 	private boolean isMapMatch(Type[] genericParams, int index, Object arg) {
@@ -301,30 +312,47 @@ public class BeanBuilder {
 			Type keyType = parType.getActualTypeArguments()[0];
 			Type valType = parType.getActualTypeArguments()[1];
 			
+			Class<?> keyClass = getGenericParameterClass(keyType);
+			Class<?> valClass = getGenericParameterClass(valType);
+			
 			Object key = asMap.keySet().iterator().next();
 			Object value = asMap.get(key);
 			
-			if(keyType.equals(key.getClass()) && valType.equals(value.getClass())) {
-				return true;
+			if(keyClass != null && valClass != null) {
+				return (keyClass.isAssignableFrom(key.getClass()) && valClass.isAssignableFrom(value.getClass()));
+			}
+			else {
+				return (keyType.equals(key.getClass()) && valType.equals(value.getClass())) ;
 			}
 		}
 		else {
 			return true;
 		}
-		
-		return false;
 	}
 	
-//	private boolean isArrayMatch(Type[] genericParams, int index, Object arg) {
-//		ParameterizedType parType = (ParameterizedType) genericParams[index];
-//		
-//		if(parType.getActualTypeArguments()[0].equals(arg.getClass().getComponentType())) {
-//			return true;
-//		}
-//		
-//		return false;
-//	}
-
+	private Class<?> getGenericParameterClass(Type type) {
+		if(type instanceof Class) {
+			return (Class<?>) type;
+		}
+		else if(type instanceof ParameterizedType) {
+			return getGenericParameterClass(((ParameterizedType)type).getActualTypeArguments()[0]);
+		}
+		else if(type instanceof WildcardType) {
+			// Use upper bound
+			WildcardType wType = (WildcardType) type;
+			
+			Type[] upperBounds = wType.getUpperBounds();
+			
+			for (Type bound : upperBounds) {
+				Class<?> cls = getGenericParameterClass(bound);
+				if(cls != null) {
+					return cls;
+				}
+			}
+		}
+		return null;
+	}
+	
 	private boolean isUnboxableToPrimitive(Class<?> clazz, Object arg) {
 		if (!clazz.isPrimitive()) {
 			throw new IllegalArgumentException("Internal Error - The class to test against is not a primitive");

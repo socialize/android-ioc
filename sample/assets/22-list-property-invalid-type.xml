@@ -1,0 +1,21 @@
+<beans>
+
+	<bean id="bean41" class="com.socialize.android.ioc.sample.TestClassWithListParam">
+		<property name="list">
+			<list type="treemap">
+				<ref id="bean8"/>
+				<ref id="bean9"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="bean42" class="com.socialize.android.ioc.sample.TestClassWithListParam">
+		<property name="list">
+			<list type="foobar">
+				<ref id="bean8"/>
+				<ref id="bean9"/>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

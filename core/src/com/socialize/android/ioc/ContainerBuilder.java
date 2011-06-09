@@ -21,9 +21,6 @@
  */
 package com.socialize.android.ioc;
 
-import static com.socialize.android.ioc.Argument.RefType.BEAN;
-import static com.socialize.android.ioc.Argument.RefType.CONTEXT;
-
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -114,16 +111,23 @@ public class ContainerBuilder {
 			
 			if(properties != null && properties.size() > 0) {
 				for (Argument property : properties) {
-					if(property.getType().equals(BEAN)) {
-						Object refBean = container.getBean(property.getValue());
-						builder.setProperty(bean, property.getKey(), refBean);
-					}
-					else if(property.getType().equals(CONTEXT)) {
-						builder.setProperty(bean, property.getKey(), context);
+					if(property.getKey() != null) {
+						Object value = getArgumentValue(container, property, false);
+						if(value == null) {
+							Logger.w(getClass().getSimpleName(), "Failed to locate property value with key [" +
+									property.getKey() +
+									"] for bean [" +
+									ref.getName() +
+									"].  The bean may be incomplete as a result!");
+						}
+						else {
+							builder.setProperty(bean, property.getKey(), value);
+						}
 					}
 					else {
-						Object value = builder.coerce(property);
-						builder.setProperty(bean, property.getKey(), value);
+						Logger.e(getClass().getSimpleName(), "Cannot set property on bean [" +
+								ref.getName() +
+								"] with null name");
 					}
 				}
 			}
@@ -371,9 +375,11 @@ public class ContainerBuilder {
 					}
 					else {
 						// We can't construct this now
-						object = null;
-						break;
+						Logger.w(getClass().getSimpleName(), "No bean found with name [" +
+								arg.getValue() +
+								"].  May not have been created yet");
 					}
+					
 					break;
 					
 				case CONTEXT:
@@ -448,6 +454,11 @@ public class ContainerBuilder {
 					
 					if(value == null && !child.getType().equals(RefType.NULL)) {
 						// Can't complete so just abort
+						
+						Logger.i(getClass().getSimpleName(), "Cannot create list for argument [" +
+								arg.getKey() +
+								"] now due to dependent bean not existing.  Marking for later creation");
+						
 						return null;
 					}
 					
@@ -473,7 +484,6 @@ public class ContainerBuilder {
 		Argument valArg = children.get(1);
 
 		if(valArg.getKey() != null && valArg.getKey().equals("key")) {
-			
 			Argument tmp = keyArg;
 			keyArg = valArg;
 			valArg = tmp;

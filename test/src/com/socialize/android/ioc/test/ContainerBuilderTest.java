@@ -36,6 +36,7 @@ import com.socialize.android.ioc.sample.TestClassWithInitAndDestroy;
 import com.socialize.android.ioc.sample.TestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassWithInitMethodTakingBean;
 import com.socialize.android.ioc.sample.TestClassWithIntConstructorArg;
+import com.socialize.android.ioc.sample.TestClassWithMapProperty;
 import com.socialize.android.ioc.sample.TestClassWithMultipleProperties;
 import com.socialize.android.ioc.sample.TestClassWithSetConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithStringListConstructorArg;
@@ -445,6 +446,61 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		assertNotNull(beanMap);
 		assertTrue(collectionClass.isAssignableFrom(beanMap.getClass()));
+		assertEquals(1, beanMap.size());
+		
+		TestClassWithInitMethod entry = beanMap.get("foo");
+		
+		assertNotNull(entry);
+		
+		assertTrue(entry.isInitialized());
+	}
+	
+	public void testContainerBuilderBeanWithBeanMapProperty() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithMapProperty.class.getName());
+		ref.setName(beanName);
+		
+		BeanRef refBean0 = new BeanRef();
+		refBean0.setClassName(TestClassWithInitMethod.class.getName());
+		refBean0.setName("refBean0");
+		refBean0.setInitMethod(new MethodRef("doInit"));
+
+		mapping.addBeanRef(refBean0);
+		
+		Argument key = new Argument("key", "foo", RefType.STRING); // This is the key
+		Argument value = new Argument(null, "refBean0", RefType.BEAN);
+	
+		Argument entryElement = new Argument(null, null, RefType.MAPENTRY);
+		
+		entryElement.addChild(key);
+		entryElement.addChild(value);
+		
+		Argument mapElement = new Argument("beanMap", null, RefType.MAP);
+		
+		mapElement.addChild(entryElement);
+		
+		ref.addProperty(mapElement);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(getContext(), mapping);
+		
+		Object bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertTrue(TestClassWithMapProperty.class.isAssignableFrom(bean.getClass()));
+		
+		TestClassWithMapProperty typedBean = container.getBean(beanName);
+		
+		Map<String, TestClassWithInitMethod> beanMap = typedBean.getBeanMap();
+		
+		assertNotNull(beanMap);
 		assertEquals(1, beanMap.size());
 		
 		TestClassWithInitMethod entry = beanMap.get("foo");

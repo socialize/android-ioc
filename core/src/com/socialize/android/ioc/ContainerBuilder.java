@@ -22,6 +22,7 @@
 package com.socialize.android.ioc;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -143,6 +144,11 @@ public class ContainerBuilder {
 	
 	public Container build(Context context, String filename) throws IOException {
 		BeanMapping mapping = this.parser.parse(context, filename);
+		return build(context, mapping);
+	}
+	
+	public Container build(Context context, InputStream in) throws IOException {
+		BeanMapping mapping = this.parser.parse(context, in);
 		return build(context, mapping);
 	}
 

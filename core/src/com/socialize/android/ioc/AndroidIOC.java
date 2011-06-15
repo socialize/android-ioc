@@ -21,6 +21,8 @@
  */
 package com.socialize.android.ioc;
 
+import java.io.InputStream;
+
 import android.content.Context;
 
 public class AndroidIOC implements IOCContainer {
@@ -29,24 +31,14 @@ public class AndroidIOC implements IOCContainer {
 	private boolean initialized = false;
 	
 	@Override
-	public void init(Context context) throws Exception {
-		init(context, null, new ContainerBuilder(context));
+	public void init(Context context, InputStream in) throws Exception {
+		init(context, in, new ContainerBuilder(context));
 	}
 	
 	@Override
-	public void init(Context context, String filename) throws Exception {
-		init(context, filename, new ContainerBuilder(context));
-	}
-	
-	@Override
-	public void init(Context context, ContainerBuilder builder) throws Exception {
-		init(context, null, builder);
-	}
-	
-	@Override
-	public void init(Context context, String filename, ContainerBuilder builder) throws Exception {
+	public void init(Context context, InputStream in, ContainerBuilder builder) throws Exception {
 		if(!initialized) {
-			container = builder.build(context, filename);
+			container = builder.build(context, in);
 			initialized = true;
 		}
 	}

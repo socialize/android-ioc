@@ -21,6 +21,8 @@
  */
 package com.socialize.android.ioc;
 
+import java.io.InputStream;
+
 import android.content.Context;
 
 /**
@@ -37,13 +39,9 @@ public interface IOCContainer {
 	 */
 	public void destroy();
 
-	public void init(Context context) throws Exception;
+	public void init(Context context, InputStream in, ContainerBuilder builder) throws Exception;
 
-	public void init(Context context, String filename, ContainerBuilder builder) throws Exception;
-
-	public void init(Context context, ContainerBuilder builder) throws Exception;
-
-	public void init(Context context, String filename) throws Exception;
+	public void init(Context context, InputStream in) throws Exception;
 	
 	public int size();
 

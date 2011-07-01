@@ -11,6 +11,7 @@ import java.util.Map;
 import android.test.AndroidTestCase;
 
 import com.socialize.android.ioc.BeanBuilder;
+import com.socialize.android.ioc.BeanRef;
 import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithInitMethod;
@@ -55,10 +56,11 @@ public class BeanBuilderTest extends AndroidTestCase {
 		int val = 69;
 		
 		TestClassWithIntConstructorArg b = new TestClassWithIntConstructorArg(val);
+		BeanRef dummy = new BeanRef();
 		
 		assertEquals(val, b.getParam());
 		
-		builder.setProperty(b, "param", 200);
+		builder.setProperty(dummy, b, "param", 200);
 		
 		assertEquals(200, b.getParam());
 	}

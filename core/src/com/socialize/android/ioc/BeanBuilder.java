@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011 Socialize Inc.
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -142,7 +142,7 @@ public class BeanBuilder {
 		return coerced;
 	}
 
-	public void setProperty(Object instance, String name, Object value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+	public void setProperty(BeanRef ref, Object instance, String name, Object value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 
 		Class<?> cls = instance.getClass();
 
@@ -176,7 +176,10 @@ public class BeanBuilder {
 				builder.append( cls.getName() );
 				builder.append( "] with args [" );
 				builder.append( value.getClass().getName() );
-				builder.append( "]");
+				builder.append( "] when setting properties on bean [");
+				builder.append( ref.getName() );
+				builder.append("]");
+				
 				Logger.w(getClass().getSimpleName(), builder.toString());
 		}
 	}

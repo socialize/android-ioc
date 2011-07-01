@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011 Socialize Inc.
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -55,11 +55,17 @@ public class Container {
 		Object bean = beans.get(name);
 		if(bean == null) {
 			BeanRef beanRef = mapping.getBeanRef(name);
-			if(!beanRef.isSingleton()) {
-				bean = builder.buildBean(this, beanRef);
-				builder.setBeanProperties(this, beanRef, bean);
-				builder.initBean(this, beanRef, bean);
+			if(beanRef != null) {
+				if(!beanRef.isSingleton()) {
+					bean = builder.buildBean(this, beanRef);
+					builder.setBeanProperties(this, beanRef, bean);
+					builder.initBean(this, beanRef, bean);
+				}
 			}
+			else {
+				Logger.e(getClass().getSimpleName(), "No such bean with name " + name);
+			}
+			
 		}
 		return (T) bean;
 	}
@@ -76,19 +82,26 @@ public class Container {
 	 * Destroys the container and calls destroy on any beans with a destroy method.
 	 */
 	public void destroy() {
-		Collection<BeanRef> beanRefs = mapping.getBeanRefs();
-		for (BeanRef beanRef : beanRefs) {
-			Object bean = beans.get(beanRef.getName());
-			if(bean != null) {
-				builder.destroyBean(this, beanRef, bean);
+		if(mapping != null) {
+			Collection<BeanRef> beanRefs = mapping.getBeanRefs();
+
+			if(beanRefs != null) {
+				for (BeanRef beanRef : beanRefs) {
+					Object bean = beans.get(beanRef.getName());
+					if(bean != null) {
+						builder.destroyBean(this, beanRef, bean);
+					}
+				}
+				
+				beanRefs.clear();
+				beanRefs = null;
 			}
 		}
 		
-		beans.clear();
-		beanRefs.clear();
-		
-		beans = null;
-		beanRefs = null;
+		if(beans != null) {
+			beans.clear();
+			beans = null;
+		}
 	}
 	
 	protected void putBean(String name, Object bean) {

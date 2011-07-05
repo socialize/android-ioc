@@ -46,8 +46,9 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		catch (IOException e) {
 			assertTrue((e instanceof FileNotFoundException));
 		}
-	
 	}
+	
+	
 	
 	public void testSimpleBean() throws Exception {
 		BeanMappingParser parser = new BeanMappingParser();

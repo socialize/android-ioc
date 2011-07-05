@@ -31,14 +31,14 @@ public class AndroidIOC implements IOCContainer {
 	private boolean initialized = false;
 	
 	@Override
-	public void init(Context context, InputStream in) throws Exception {
-		init(context, in, new ContainerBuilder(context));
+	public void init(Context context, InputStream...in) throws Exception {
+		init(context, new ContainerBuilder(context), in);
 	}
 	
 	@Override
-	public void init(Context context, InputStream in, ContainerBuilder builder) throws Exception {
+	public void init(Context context, ContainerBuilder builder, InputStream...in) throws Exception {
 		if(!initialized) {
-			container = builder.build(context, in);
+			container = builder.build(in);
 			initialized = true;
 		}
 	}

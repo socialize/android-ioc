@@ -70,6 +70,7 @@ public class BeanBuilder {
 			builder.append( "] with args [" );
 			
 			if(args != null) {
+				int index = 0;
 				for (Object arg : args) {
 					if(arg != null) {
 						builder.append(arg.getClass().getSimpleName());
@@ -77,12 +78,18 @@ public class BeanBuilder {
 					else {
 						builder.append("null");
 					}
-					builder.append(",");
+					
+					if(index > 0) {
+						builder.append(",");
+					}
+					index++;
 				}
 			}
 			else {
-				builder.append( "null]" );
+				builder.append( "null" );
 			}
+			
+			builder.append( "]" );
 			
 			Logger.w(getClass().getSimpleName(), builder.toString());
 		}

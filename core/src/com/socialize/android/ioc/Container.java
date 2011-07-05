@@ -111,4 +111,8 @@ public class Container {
 	protected Map<String, Object> getBeans() {
 		return beans;
 	}
+	
+	protected BeanMapping getBeanMapping() {
+		return mapping;
+	}
 }

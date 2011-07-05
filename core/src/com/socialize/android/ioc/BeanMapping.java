@@ -48,4 +48,15 @@ public class BeanMapping {
 	public BeanRef getBeanRef(String name) {
 		return beanRefs.get(name);
 	}
+	
+	/**
+	 * Replaces any beans matching those in the provided map
+	 * @param beanRefs
+	 */
+	public void merge(BeanMapping mapping) {
+		Collection<BeanRef> other = mapping.getBeanRefs();
+		for (BeanRef beanRef : other) {
+			addBeanRef(beanRef);
+		}
+	}
 }

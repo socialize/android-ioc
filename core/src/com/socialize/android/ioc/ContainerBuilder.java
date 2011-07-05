@@ -74,7 +74,7 @@ public class ContainerBuilder {
 			
 			List<Argument> constructorArgs = beanRef.getConstructorArgs();
 			if(constructorArgs != null && constructorArgs.size() > 0) {
-				Object[] args = getArguments(context, container, constructorArgs, false);
+				Object[] args = getArguments(container, constructorArgs, false);
 				if(args != null && args.length > 0) {
 					bean = builder.construct(beanRef.getClassName(), args);
 				}
@@ -142,21 +142,33 @@ public class ContainerBuilder {
 		}
 	}
 	
-	public Container build(Context context, String filename) throws IOException {
+
+	public Container build(String filename) throws IOException {
 		BeanMapping mapping = this.parser.parse(context, filename);
-		return build(context, mapping);
+		return build(mapping);
 	}
 	
-	public Container build(Context context, InputStream in) throws IOException {
-		BeanMapping mapping = this.parser.parse(context, in);
-		return build(context, mapping);
+	public Container build(InputStream...streams) throws IOException {
+		BeanMapping primary = null;
+		for (InputStream in : streams) {
+			if(in != null) {
+				if(primary == null) {
+					primary = this.parser.parse(context, in);
+				}
+				else {
+					BeanMapping mapping = this.parser.parse(context, in);
+					primary.merge(mapping);
+				}
+			}
+		}
+		return build(primary);
 	}
-
-	public Container build(Context context, BeanMapping mapping) {
+	
+	public Container build(BeanMapping mapping) {
 		Container container = new Container(mapping, this);
 
 		// Build beans
-		buildBeans(context, container, builder, mapping, mapping.getBeanRefs(), 0);
+		buildBeans(container, builder, mapping, mapping.getBeanRefs(), 0);
 		
 		// Set properties
 		Map<String, Object> beans = container.getBeans();
@@ -209,7 +221,7 @@ public class ContainerBuilder {
 	
 	public void destroyBean(Container container, BeanRef beanRef, Object bean) {
 		if(bean != null && beanRef.getDestroyMethod() != null) {
-			Object[] args = getArguments(context, container, beanRef.getDestroyMethod().getArguments(), false);
+			Object[] args = getArguments(container, beanRef.getDestroyMethod().getArguments(), false);
 			
 			Method method = builder.getMethodFor(bean.getClass(), beanRef.getDestroyMethod().getName(), args);
 			
@@ -247,7 +259,7 @@ public class ContainerBuilder {
 				Object[] args = null;
 				List<Argument> arguments = initMethod.getArguments();
 				if(arguments != null && arguments.size() > 0) {
-					args = getArguments(context, container, arguments, true);
+					args = getArguments(container, arguments, true);
 					if(args == null) {
 						return false;
 					}
@@ -290,7 +302,7 @@ public class ContainerBuilder {
 		return false;
 	}
 	
-	private void buildBeans(Context context, Container container, BeanBuilder builder, BeanMapping mapping, Collection<BeanRef> beanRefs, int iteration) {
+	private void buildBeans(Container container, BeanBuilder builder, BeanMapping mapping, Collection<BeanRef> beanRefs, int iteration) {
 		if(iteration > MAX_ITERATIONS) {
 			throw new StackOverflowError("Too many iterations.  Possible circular reference in bean mapping, or bean construction failed.  Check the logs.");
 		}
@@ -328,11 +340,11 @@ public class ContainerBuilder {
 		}
 		
 		if(!doLaterBeans.isEmpty()) {
-			buildBeans(context, container, builder, mapping, doLaterBeans, ++iteration);
+			buildBeans(container, builder, mapping, doLaterBeans, ++iteration);
 		}
 	}
 	
-	public Object[] getArguments(Context context, Container container, List<Argument> list, boolean forInit) {
+	public Object[] getArguments(Container container, List<Argument> list, boolean forInit) {
 		if(list != null) {
 			Object[] args = new Object[list.size()];
 			int argIndex = 0;

@@ -39,9 +39,16 @@ public interface IOCContainer {
 	 */
 	public void destroy();
 
-	public void init(Context context, InputStream in, ContainerBuilder builder) throws Exception;
+	/**
+	 * Initializes the container.
+	 * @param context The current context.
+	 * @param builder
+	 * @param in
+	 * @throws Exception
+	 */
+	public void init(Context context, ContainerBuilder builder, InputStream...in) throws Exception;
 
-	public void init(Context context, InputStream in) throws Exception;
+	public void init(Context context, InputStream...in) throws Exception;
 	
 	public int size();
 

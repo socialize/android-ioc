@@ -83,14 +83,30 @@ public class BeanMappingParser {
 		return in;
 	}
 	
-	public BeanMapping parse(Context context, InputStream in) {
+	public BeanMapping parse(Context context, InputStream...streams) {
 		BeanMapping mapping = null;
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		try {
 			SAXParser parser = factory.newSAXParser();
 			BeanMappingParserHandler handler = new BeanMappingParserHandler();
-			parser.parse(in, handler);
-			mapping = handler.getBeanMapping();
+			
+			if(streams.length > 1) {
+				BeanMapping secondary = null;
+				for (InputStream in : streams) {
+					parser.parse(in, handler);
+					if(mapping == null) {
+						mapping = handler.getBeanMapping();
+					}
+					else {
+						secondary = handler.getBeanMapping();
+						mapping.merge(secondary);
+					}
+				}
+			}
+			else {
+				parser.parse(streams[0], handler);
+				mapping = handler.getBeanMapping();
+			}
 			
 			// Check for extends
 			Collection<BeanRef> beanRefs = mapping.getBeanRefs();

@@ -141,5 +141,4 @@ public class BeanRef {
 	protected void setInitCalled(boolean initCalled) {
 		this.initCalled = initCalled;
 	}
-	
 }

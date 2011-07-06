@@ -149,18 +149,7 @@ public class ContainerBuilder {
 	}
 	
 	public Container build(InputStream...streams) throws IOException {
-		BeanMapping primary = null;
-		for (InputStream in : streams) {
-			if(in != null) {
-				if(primary == null) {
-					primary = this.parser.parse(context, in);
-				}
-				else {
-					BeanMapping mapping = this.parser.parse(context, in);
-					primary.merge(mapping);
-				}
-			}
-		}
+		BeanMapping primary = this.parser.parse(context, streams);
 		return build(primary);
 	}
 	

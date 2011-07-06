@@ -1,5 +1,6 @@
 package com.socialize.android.ioc.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +14,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import android.content.Context;
 import android.test.AndroidTestCase;
+import android.test.mock.MockContext;
 
 import com.google.android.testing.mocking.AndroidMock;
 import com.google.android.testing.mocking.UsesMocks;
@@ -22,10 +28,12 @@ import com.socialize.android.ioc.Argument.CollectionType;
 import com.socialize.android.ioc.Argument.RefType;
 import com.socialize.android.ioc.BeanMapping;
 import com.socialize.android.ioc.BeanMappingParser;
+import com.socialize.android.ioc.BeanMappingParserHandler;
 import com.socialize.android.ioc.BeanRef;
 import com.socialize.android.ioc.Container;
 import com.socialize.android.ioc.ContainerBuilder;
 import com.socialize.android.ioc.MethodRef;
+import com.socialize.android.ioc.ParserHandlerFactory;
 import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassContainerAware;
 import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
@@ -44,43 +52,61 @@ import com.socialize.android.ioc.sample.TestClassWithStringListConstructorArg;
 
 public class ContainerBuilderTest extends AndroidTestCase {
 	
-	@UsesMocks ({BeanMappingParser.class, InputStream.class, BeanMapping.class})
-//	public void testContainerBuilderMultipleConfig() throws Exception {
-//		BeanMappingParser parser = AndroidMock.createMock(BeanMappingParser.class);
-//		BeanMapping mapping0 = AndroidMock.createMock(BeanMapping.class);
-//		BeanMapping mapping1 = AndroidMock.createMock(BeanMapping.class);
-//		
-//		InputStream in0 = AndroidMock.createMock(InputStream.class);
-//		InputStream in1 = AndroidMock.createMock(InputStream.class);
-//		Context context = new MockContext();
-//		
-//		AndroidMock.expect(parser.parse(context, in0, in1)).andReturn(mapping0);
-//		AndroidMock.expect(parser.parse(context, in1)).andReturn(mapping1);
-//		
-//		// Expect merge
-//		mapping0.merge(mapping1);
-//		
-//		AndroidMock.replay(parser);
-//		AndroidMock.replay(mapping0);
-//		AndroidMock.replay(mapping1);
-//		
-//		ContainerBuilder builder = new ContainerBuilder(context, parser) {
-//			@Override
-//			public Container build(BeanMapping mapping) {
-//				// Don't want this to be tested in this test.
-//				// We will verify the actual build process in a more detailed integration test.
-//				return null;
-//			}
-//		};
-//		
-//		builder.build(in0, in1);
-//		
-//		AndroidMock.verify(parser);
-//		AndroidMock.verify(mapping0);
-//		AndroidMock.verify(mapping1);
-//	}
-	
-	
+	@UsesMocks ({BeanMappingParserHandler.class, BeanMapping.class, ParserHandlerFactory.class, SAXParserFactory.class, SAXParser.class})
+	public void testContainerBuilderMultipleConfig() throws Exception {
+		
+		BeanMappingParserHandler handler = AndroidMock.createNiceMock(BeanMappingParserHandler.class);
+		final BeanMapping mapping0 = AndroidMock.createMock(BeanMapping.class);
+		BeanMapping mapping1 = AndroidMock.createMock(BeanMapping.class);
+		ParserHandlerFactory factory = AndroidMock.createMock(ParserHandlerFactory.class);
+		SAXParserFactory saxFactory = AndroidMock.createMock(SAXParserFactory.class);
+		SAXParser saxParser = AndroidMock.createMock(SAXParser.class);
+		
+		InputStream in0 = new ByteArrayInputStream(new byte[]{});
+		InputStream in1 = new ByteArrayInputStream(new byte[]{});
+		
+		InputStream[] streams = {in0, in1};
+		
+		Context context = new MockContext();
+		
+		BeanMappingParser parser = new BeanMappingParser(factory, saxFactory);
+		
+		AndroidMock.expect(saxFactory.newSAXParser()).andReturn(saxParser);
+		
+		saxParser.parse(in0, handler);
+		saxParser.parse(in1, handler);
+		
+		AndroidMock.expect(factory.newInstance()).andReturn(handler).times(streams.length);
+		AndroidMock.expect(handler.getBeanMapping()).andReturn(mapping0);
+		AndroidMock.expect(handler.getBeanMapping()).andReturn(mapping1);
+		AndroidMock.expect(mapping0.getBeanRefs()).andReturn(null);
+		
+		// Expect merge
+		mapping0.merge(mapping1);
+
+		AndroidMock.replay(saxFactory);
+		AndroidMock.replay(saxParser);
+		AndroidMock.replay(factory);
+		AndroidMock.replay(handler);
+		AndroidMock.replay(mapping0);
+		AndroidMock.replay(mapping1);
+		
+		ContainerBuilder builder = new ContainerBuilder(context, parser) {
+			@Override
+			public Container build(BeanMapping mapping) {
+				// Don't want this to be tested in this test.
+				// We will verify the actual build process in a more detailed integration test.
+				return null;
+			}
+		};
+		
+		builder.build(streams);
+		
+		AndroidMock.verify(factory);
+		AndroidMock.verify(handler);
+		AndroidMock.verify(mapping0);
+		AndroidMock.verify(mapping1);
+	}
 
 	public void testContainerBuilderSimpleBean() throws Exception {
 		String beanName = "bean";

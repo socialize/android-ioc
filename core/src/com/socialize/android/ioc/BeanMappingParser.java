@@ -26,8 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.SAXException;
 
 import android.content.Context;
 
@@ -41,7 +44,19 @@ public class BeanMappingParser {
 	public static final String DEFAULT_FILENAME = "android-beans.xml";
 	
 	private ParserUtils utils = null;
+	private ParserHandlerFactory parserHandlerFactory;
+	private SAXParserFactory saxParserFactory;
 	
+	public BeanMappingParser() {
+		super();
+	}
+	
+	public BeanMappingParser(ParserHandlerFactory parserHandlerFactory, SAXParserFactory saxParserFactory) {
+		this();
+		this.parserHandlerFactory = parserHandlerFactory;
+		this.saxParserFactory = saxParserFactory;
+	}
+
 	public BeanMapping parse(Context context) throws IOException {
 		return parse(context, DEFAULT_FILENAME);
 	}
@@ -85,15 +100,16 @@ public class BeanMappingParser {
 	
 	public BeanMapping parse(Context context, InputStream...streams) {
 		BeanMapping mapping = null;
-		SAXParserFactory factory = SAXParserFactory.newInstance();
 		try {
-			SAXParser parser = factory.newSAXParser();
-			BeanMappingParserHandler handler = new BeanMappingParserHandler();
+			SAXParser parser = getNewSAXParser();
 			
 			if(streams.length > 1) {
 				BeanMapping secondary = null;
 				for (InputStream in : streams) {
+					BeanMappingParserHandler handler = getNewHandler();
+					
 					parser.parse(in, handler);
+					
 					if(mapping == null) {
 						mapping = handler.getBeanMapping();
 					}
@@ -104,6 +120,7 @@ public class BeanMappingParser {
 				}
 			}
 			else {
+				BeanMappingParserHandler handler = getNewHandler();
 				parser.parse(streams[0], handler);
 				mapping = handler.getBeanMapping();
 			}
@@ -111,25 +128,27 @@ public class BeanMappingParser {
 			// Check for extends
 			Collection<BeanRef> beanRefs = mapping.getBeanRefs();
 			
-			for (BeanRef beanRef : beanRefs) {
-				if(beanRef.getExtendsBean() != null && beanRef.getExtendsBean().trim().length() > 0) {
-					
-					// Copy props without overwriting
-					BeanRef extended = mapping.getBeanRef(beanRef.getExtendsBean());
-					
-					if(extended != null) {
-						if(utils == null) utils = new ParserUtils();
-						utils.merge(extended, beanRef);
+			if(beanRefs != null) {
+				for (BeanRef beanRef : beanRefs) {
+					if(beanRef.getExtendsBean() != null && beanRef.getExtendsBean().trim().length() > 0) {
+						
+						// Copy props without overwriting
+						BeanRef extended = mapping.getBeanRef(beanRef.getExtendsBean());
+						
+						if(extended != null) {
+							if(utils == null) utils = new ParserUtils();
+							utils.merge(extended, beanRef);
+						}
+						else {
+							Logger.w("BeanMappingParser", "No such bean [" +
+									beanRef.getExtendsBean() +
+									"] found in extends reference for bean [" +
+									beanRef.getName() +
+									"]");
+						}
+						
 					}
-					else {
-						Logger.w("BeanMappingParser", "No such bean [" +
-								beanRef.getExtendsBean() +
-								"] found in extends reference for bean [" +
-								beanRef.getName() +
-								"]");
-					}
-					
-				}
+				}	
 			}
 		}
 		catch (Exception e) {
@@ -138,4 +157,17 @@ public class BeanMappingParser {
 		return mapping;
 	}
 	
+	private SAXParser getNewSAXParser() throws ParserConfigurationException, SAXException {
+		if(saxParserFactory == null) {
+			saxParserFactory = SAXParserFactory.newInstance();
+		}
+		return saxParserFactory.newSAXParser();
+	}
+	
+	private BeanMappingParserHandler getNewHandler() {
+		if(parserHandlerFactory != null) {
+			return parserHandlerFactory.newInstance();
+		}
+		return new BeanMappingParserHandler();
+	}
 }

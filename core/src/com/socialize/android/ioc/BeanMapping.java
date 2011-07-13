@@ -51,7 +51,7 @@ public class BeanMapping {
 	
 	/**
 	 * Replaces any beans matching those in the provided map
-	 * @param beanRefs
+	 * @param mapping
 	 */
 	public void merge(BeanMapping mapping) {
 		Collection<BeanRef> other = mapping.getBeanRefs();

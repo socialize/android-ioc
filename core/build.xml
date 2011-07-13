@@ -15,6 +15,10 @@
         classpathref="android.antlibs"/>
 
 	<setup/>
+	
+	<path id="javadoc.classpath">
+		<path refid="android.target.classpath" />
+	</path>
 
 	<path id="android.libraries.src"><path refid="project.libraries.src" /></path>
 	<path id="android.libraries.jars"><path refid="project.libraries.jars" /></path>
@@ -28,5 +32,28 @@
 				<attribute name="Implementation-Version" value="${version}" />
 			</manifest>
 		</jar>
+	</target>
+	
+	<target name="javadoc">
+		<javadoc 
+			sourcepath="src"
+			classpathref="javadoc.classpath"
+			destdir="build/docs/javadoc" 
+			doctitle="${title} Documentation">
+			
+			<header>
+				<![CDATA[${title} Documentation<br/>Copyright ${year} ${vendor}<br/>${website}]]>
+			</header>
+			
+			<footer>
+				<![CDATA[Copyright ${year} ${vendor}<br/>${website}]]>
+			</footer>
+			
+			<link 
+				href="http://developer.android.com/reference/" 
+				offline="true"
+				packagelistloc="${sdk.dir}/docs/reference"/>
+			
+		</javadoc>
 	</target>
 </project>

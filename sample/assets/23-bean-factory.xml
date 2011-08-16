@@ -1,0 +1,22 @@
+<beans>
+
+	<factory id="factory0" makes="bean2"/>
+	<factory id="factory1" makes="bean4"/>
+
+	<bean id="bean2" class="com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod" singleton="false">
+		<constructor-arg value="foobar" type="string"/>
+	</bean>
+
+	<bean id="bean4" class="com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg" singleton="false">
+		<constructor-arg ref="bean2"/>
+	</bean>
+	
+	<bean id="bean_with_factory_param" class="com.socialize.android.ioc.sample.TestClassWithBeanFactoryParam">
+		<property name="factory" ref="factory0"/>
+	</bean>
+	
+	<bean id="bean_with_factory_arg" class="com.socialize.android.ioc.sample.TestClassWithBeanFactoryParam">
+		<constructor-arg ref="factory0"/>
+	</bean>
+	
+</beans>

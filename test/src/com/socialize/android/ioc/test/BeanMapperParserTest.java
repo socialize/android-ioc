@@ -36,6 +36,7 @@ import com.socialize.android.ioc.Argument.RefType;
 import com.socialize.android.ioc.BeanMapping;
 import com.socialize.android.ioc.BeanMappingParser;
 import com.socialize.android.ioc.BeanRef;
+import com.socialize.android.ioc.FactoryRef;
 import com.socialize.android.ioc.MethodRef;
 import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
@@ -1089,7 +1090,28 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertTrue(ref1.isAbstractBean());
 	}
 	
-	
+	public void testFactoryBean() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"23-bean-factory.xml");
+		assertNotNull(mapping);
+		BeanRef ref = mapping.getBeanRef("bean2");
+		BeanRef ref1 = mapping.getBeanRef("bean4");
+		
+		FactoryRef fref = mapping.getFactoryRef("factory0");
+		FactoryRef fref1 = mapping.getFactoryRef("factory1");
+		
+		assertNotNull(ref);
+		assertNotNull(ref1);
+		
+		assertNotNull(fref);
+		assertNotNull(fref1);
+		
+		assertFalse(ref.isSingleton());
+		assertFalse(ref1.isSingleton());
+		
+		assertEquals("bean2", fref.getMakes());
+		assertEquals("bean4", fref1.getMakes());
+	}
 	
 	public void testBeanMapperParser() throws IOException {
 		

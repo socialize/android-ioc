@@ -36,6 +36,7 @@ public final class Argument {
 		NULL,
 		BEAN, 
 		CONTEXT,
+		ACTIVITY,
 		SHORT, 
 		INTEGER, 
 		LONG, 

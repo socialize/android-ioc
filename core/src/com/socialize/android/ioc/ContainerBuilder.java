@@ -38,6 +38,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.socialize.android.ioc.Argument.CollectionType;
@@ -67,6 +68,11 @@ public class ContainerBuilder {
 
 	@SuppressWarnings("unchecked")
 	public <T extends Object> T buildBean(Container container, BeanRef beanRef)  {
+		return (T) buildBean(container, beanRef, (Object[]) null);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends Object> T buildBean(Container container, BeanRef beanRef, Object...args)  {
 		Object bean = null;
 		
 		try {
@@ -74,10 +80,26 @@ public class ContainerBuilder {
 			
 			List<Argument> constructorArgs = beanRef.getConstructorArgs();
 			if(constructorArgs != null && constructorArgs.size() > 0) {
-				Object[] args = getArguments(container, constructorArgs, false);
-				if(args != null && args.length > 0) {
-					bean = builder.construct(beanRef.getClassName(), args);
+				Object[] cargs = getArguments(container, constructorArgs, false);
+				if(cargs != null && cargs.length > 0) {
+					if(args != null && args.length > 0) {
+						// Concat
+						Object[] concat = new Object[cargs.length + args.length];
+						System.arraycopy(cargs, 0, concat, 0, cargs.length);
+						System.arraycopy(args, 0, concat, cargs.length, args.length);
+						cargs = concat;
+					}
 				}
+				else {
+					cargs = args;
+				}
+				
+				if(cargs != null && cargs.length > 0) {
+					bean = builder.construct(beanRef.getClassName(), cargs);
+				}
+			}
+			else if(args != null && args.length > 0) {
+				bean = builder.construct(beanRef.getClassName(), args);
 			}
 			else {
 				bean = builder.construct(beanRef.getClassName());
@@ -156,6 +178,9 @@ public class ContainerBuilder {
 	public Container build(BeanMapping mapping) {
 		Container container = new Container(mapping, this);
 
+		// Build factories
+		buildFactories(container, mapping.getFactoryRefs());
+		
 		// Build beans
 		buildBeans(container, builder, mapping, mapping.getBeanRefs(), 0);
 		
@@ -166,8 +191,11 @@ public class ContainerBuilder {
 		
 		for (Entry<String, Object> entry : entrySet) {
 			BeanRef ref = mapping.getBeanRef(entry.getKey());
-			Object bean = entry.getValue();
-			setBeanProperties(container, ref, bean);
+			
+			if(ref != null) { // Might be a factory
+				Object bean = entry.getValue();
+				setBeanProperties(container, ref, bean);
+			}
 		}
 		
 		initBeans(container, mapping, beans, 0);
@@ -186,20 +214,23 @@ public class ContainerBuilder {
 		
 		for (Entry<String, Object> entry : entrySet) {
 			BeanRef ref = mapping.getBeanRef(entry.getKey());
-			Object bean = entry.getValue();
-			if(!initBean(container, ref, bean)) {
-				Logger.i(getClass().getSimpleName(), "Cannot init bean [" +
-						ref.getName() +
-						"] now.  Marking for later init...");
-				
-				doLaterBeans.put(entry.getKey(), entry.getValue());
-			}
-			else {
-				ref.setInitCalled(true);
-				
-				Logger.i(getClass().getSimpleName(), "Bean [" +
-						ref.getName() +
-						"] initialized.");
+			
+			if(ref != null) {
+				Object bean = entry.getValue();
+				if(!initBean(container, ref, bean)) {
+					Logger.i(getClass().getSimpleName(), "Cannot init bean [" +
+							ref.getName() +
+							"] now.  Marking for later init...");
+					
+					doLaterBeans.put(entry.getKey(), entry.getValue());
+				}
+				else {
+					ref.setInitCalled(true);
+					
+					Logger.i(getClass().getSimpleName(), "Bean [" +
+							ref.getName() +
+							"] initialized.");
+				}
 			}
 		}
 		
@@ -291,6 +322,24 @@ public class ContainerBuilder {
 		return false;
 	}
 	
+	private void buildFactories(Container container, Collection<FactoryRef> factoryRefs) {
+		if(factoryRefs != null) {
+			for (FactoryRef factoryRef : factoryRefs) {
+				try {
+					BeanFactory<?> factory = BeanFactory.class.newInstance();
+					factory.setBeanName(factoryRef.getMakes());
+					factory.setContainer(container);
+					container.putBean(factoryRef.getName(), factory);
+				}
+				catch (Exception e) {
+					Logger.e(getClass().getSimpleName(), "Failed to create bean [" +
+							factoryRef.getName() +
+							"]", e);
+				}
+			}
+		}
+	}
+	
 	private void buildBeans(Container container, BeanBuilder builder, BeanMapping mapping, Collection<BeanRef> beanRefs, int iteration) {
 		if(iteration > MAX_ITERATIONS) {
 			throw new StackOverflowError("Too many iterations.  Possible circular reference in bean mapping, or bean construction failed.  Check the logs.");
@@ -368,7 +417,7 @@ public class ContainerBuilder {
 						
 						if(forInit && object != null) {
 							BeanRef beanRef = container.getBeanRef(arg.getValue());
-							if(beanRef.getInitMethod() != null) {
+							if(beanRef != null && beanRef.getInitMethod() != null) {
 								// Make sure this bean has been initialized
 								if(!beanRef.isInitCalled()) {
 									// We can't init this now
@@ -391,6 +440,16 @@ public class ContainerBuilder {
 					
 				case CONTEXT:
 					object = context;
+					break;
+					
+				case ACTIVITY:
+					
+					if(!(context instanceof Activity)) {
+						Logger.e(getClass().getSimpleName(), "Argument of type activity found but current context is not an Activity.  The container MUST be initialized from an Actvity for activity type arguments.");
+					}
+					
+					object = context;
+					
 					break;
 					
 				case LIST:

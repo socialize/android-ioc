@@ -53,11 +53,14 @@ import com.socialize.android.ioc.BeanMappingParserHandler;
 import com.socialize.android.ioc.BeanRef;
 import com.socialize.android.ioc.Container;
 import com.socialize.android.ioc.ContainerBuilder;
+import com.socialize.android.ioc.FactoryRef;
+import com.socialize.android.ioc.IBeanFactory;
 import com.socialize.android.ioc.MethodRef;
 import com.socialize.android.ioc.ParserHandlerFactory;
 import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassContainerAware;
 import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
+import com.socialize.android.ioc.sample.TestClassWithBeanFactoryParam;
 import com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg;
 import com.socialize.android.ioc.sample.TestClassWithDualListConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg;
@@ -66,6 +69,7 @@ import com.socialize.android.ioc.sample.TestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassWithInitMethodTakingBean;
 import com.socialize.android.ioc.sample.TestClassWithIntConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithMapProperty;
+import com.socialize.android.ioc.sample.TestClassWithMultipleConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithMultipleProperties;
 import com.socialize.android.ioc.sample.TestClassWithSetConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithStringListConstructorArg;
@@ -77,7 +81,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 	public void testContainerBuilderMultipleConfig() throws Exception {
 		
 		BeanMappingParserHandler handler = AndroidMock.createNiceMock(BeanMappingParserHandler.class);
-		final BeanMapping mapping0 = AndroidMock.createMock(BeanMapping.class);
+		BeanMapping mapping0 = AndroidMock.createMock(BeanMapping.class);
 		BeanMapping mapping1 = AndroidMock.createMock(BeanMapping.class);
 		ParserHandlerFactory factory = AndroidMock.createMock(ParserHandlerFactory.class);
 		SAXParserFactory saxFactory = AndroidMock.createMock(SAXParserFactory.class);
@@ -230,6 +234,126 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertEquals(69, bc2.getParam());
 	}
 	
+	public void testExtraConstructorArgsInt() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithMultipleConstructorArg.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(false);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+		
+		TestClassWithMultipleConstructorArg bean = null;
+		
+		bean = container.getBean(beanName, 69);
+		assertNotNull(bean);
+		assertEquals(69, bean.getInteger());
+	}
+	
+	public void testExtraConstructorArgsString() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithMultipleConstructorArg.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(false);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+		
+		TestClassWithMultipleConstructorArg bean = null;
+		
+		bean = container.getBean(beanName, "foobar");
+		assertNotNull(bean);
+		assertEquals("foobar", bean.getString());
+	}
+	
+	public void testExtraConstructorArgsObject() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithMultipleConstructorArg.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(false);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+		
+		TestClassWithMultipleConstructorArg bean = null;
+		
+		Object value = new Long(23);
+		bean = container.getBean(beanName, value);
+		assertNotNull(bean);
+		assertEquals(value, bean.getObject());
+	}
+	
+	public void testExtraConstructorArgsList() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithMultipleConstructorArg.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(false);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+		
+		TestClassWithMultipleConstructorArg bean = null;
+		
+		List<String> strings = new LinkedList<String>();
+		bean = container.getBean(beanName, strings);
+		assertNotNull(bean);
+		assertSame(strings, bean.getStringList());
+	}
+	
+	public void testExtraConstructorArgsMultiList() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithMultipleConstructorArg.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(false);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+		
+		TestClassWithMultipleConstructorArg bean = null;
+		
+		List<Integer> ints = new LinkedList<Integer>();
+		List<String> strings = new LinkedList<String>();
+		
+		bean = container.getBean(beanName, strings, ints);
+		assertNotNull(bean);
+		assertSame(strings, bean.getStringList());
+		assertSame(ints, bean.getIntList());
+	}
+	
+	
+	
+	
+	
 	public void testContainerBuilderBeanWithStringListConstructorArgsOnMultiConstructorClass() throws Exception {
 		String beanName = "bean";
 		
@@ -271,6 +395,45 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		assertEquals("foo", string0);
 		assertEquals("bar", string1);
+	}
+	
+	public void testExtraConstructorArgsMergedArgs() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithMultipleConstructorArg.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(false);
+		
+		Argument listElement0 = new Argument(null, "foo", RefType.STRING);
+		Argument listElement1 = new Argument(null, "bar", RefType.STRING);
+		Argument list = new Argument(null, null, RefType.LIST);
+		
+		list.setCollectionType(CollectionType.LINKEDLIST);
+		list.addChild(listElement0);
+		list.addChild(listElement1);
+		
+		ref.addConstructorArgument(list);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+		
+		TestClassWithMultipleConstructorArg bean = null;
+		
+		List<Integer> ints = new LinkedList<Integer>();
+		
+		bean = container.getBean(beanName, ints);
+		
+		assertNotNull(bean);
+		assertSame(ints, bean.getIntList());
+		assertNotNull(bean.getStringList());
+		
+		assertEquals("foo", bean.getStringList().get(0));
+		assertEquals("bar", bean.getStringList().get(1));
 	}
 	
 	private void testContainerBuilderBeanWithListConstructorArgs(CollectionType collType, Class<?> collClass) throws Exception {
@@ -891,6 +1054,107 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		assertFalse(beanA == beanB);
 	}
+	
+	public void testContainerBuilderFactoryBean() {
+		String beanName = "bean";
+		String factoryName = "factory";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithInitMethod.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(false);
+		mapping.addBeanRef(ref);
+		
+		FactoryRef fRef = new FactoryRef();
+		fRef.setName(factoryName);
+		fRef.setMakes(beanName);
+		
+		mapping.addFactoryRef(fRef);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+		
+		Object beanA = container.getBean(beanName);
+		
+		assertNotNull(beanA);
+		assertTrue(TestClassWithInitMethod.class.isAssignableFrom(beanA.getClass()));
+		
+		IBeanFactory<Object> factory = container.getBean(factoryName);
+		
+		assertNotNull(factory);
+		
+		Object beanB = factory.getBean();
+		
+		assertNotNull(beanA);
+		assertTrue(TestClassWithInitMethod.class.isAssignableFrom(beanB.getClass()));
+		
+		assertFalse(beanA == beanB);
+	}
+	
+	public void testContainerBuilderFactoryBeanProperty() {
+		String beanName = "bean";
+		String factoryName = "factory";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		FactoryRef fRef = new FactoryRef();
+		fRef.setName(factoryName);
+		fRef.setMakes(beanName);
+		
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithBeanFactoryParam.class.getName());
+		ref.setName(beanName);
+		ref.addProperty(new Argument("factory", "factory", RefType.BEAN));
+		
+		mapping.addBeanRef(ref);
+		mapping.addFactoryRef(fRef);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+		
+		TestClassWithBeanFactoryParam beanA = container.getBean(beanName);
+		
+		assertNotNull(beanA);
+		assertNotNull(beanA.getFactory());
+		assertTrue(IBeanFactory.class.isAssignableFrom(beanA.getFactory().getClass()));
+
+	}
+	
+	public void testContainerBuilderFactoryBeanConstructorArg() {
+		String beanName = "bean";
+		String factoryName = "factory";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		FactoryRef fRef = new FactoryRef();
+		fRef.setName(factoryName);
+		fRef.setMakes(beanName);
+		
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithBeanFactoryParam.class.getName());
+		ref.setName(beanName);
+		ref.addConstructorArgument(new Argument("factory", "factory", RefType.BEAN));
+		
+		mapping.addBeanRef(ref);
+		mapping.addFactoryRef(fRef);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+		
+		TestClassWithBeanFactoryParam beanA = container.getBean(beanName);
+		
+		assertNotNull(beanA);
+		assertNotNull(beanA.getFactory());
+		assertTrue(IBeanFactory.class.isAssignableFrom(beanA.getFactory().getClass()));
+
+	}
+	
+	
 	
 	public void testContainerBuilderAbstractBean() {
 		String beanName = "bean";

@@ -67,8 +67,14 @@ public class Container {
 			if(beanRef != null) {
 				if(!beanRef.isSingleton()) {
 					bean = builder.buildBean(this, beanRef, args);
-					builder.setBeanProperties(this, beanRef, bean);
-					builder.initBean(this, beanRef, bean);
+					
+					if(bean == null) {
+						Logger.e(getClass().getSimpleName(), "Failed to instantiate non-singleton bean with name " + name);
+					}
+					else {
+						builder.setBeanProperties(this, beanRef, bean);
+						builder.initBean(this, beanRef, bean);
+					}
 				}
 			}
 			else {
@@ -135,12 +141,20 @@ public class Container {
 			Collection<BeanRef> beanRefs = this.mapping.getBeanRefs();
 			
 			for (BeanRef ref : beanRefs) {
-				if(ref.isSingleton() && ref.isContextSensitive()) {
-					// We have a new context, so we need to rebuild this bean
-					Object bean = builder.buildBean(this, ref);
-					builder.setBeanProperties(this, ref, bean);
-					builder.initBean(this, ref, bean);
-					beans.put(ref.getName(), bean);
+				if(ref.isSingleton() ) {
+					if(ref.isContextSensitiveConstructor()) {
+						// We have a new context, so we need to rebuild this bean
+						Object bean = builder.buildBean(this, ref);
+						builder.setBeanProperties(this, ref, bean);
+						builder.initBean(this, ref, bean);
+						beans.put(ref.getName(), bean);
+					}
+					else if(ref.isContextSensitiveInitMethod()) {
+						// Re-call init
+						Object bean = getBean(ref.getName());
+						builder.initBean(this, ref, bean);
+						beans.put(ref.getName(), bean);
+					}
 				}
 			}
 		}

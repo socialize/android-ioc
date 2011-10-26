@@ -38,6 +38,8 @@ public class Container {
 	
 	private Context context; // Used only to track the current context.
 	
+	private boolean destroyed = false;
+	
 	// Parameterless constructor so it can be mocked.
 	protected Container() {
 		super();
@@ -125,6 +127,12 @@ public class Container {
 			beans.clear();
 			beans = null;
 		}
+		
+		destroyed = true;
+	}
+	
+	public boolean isDestroyed() {
+		return destroyed;
 	}
 	
 	protected void putBean(String name, Object bean) {

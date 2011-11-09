@@ -29,7 +29,12 @@ public class TestClassContainerAware implements ContainerAware {
 	private Container container;
 	
 	@Override
-	public void setContainer(Container container) {
+	public void onCreate(Container container) {
+		this.container = container;
+	}
+
+	@Override
+	public void onDestroy(Container container) {
 		this.container = container;
 	}
 

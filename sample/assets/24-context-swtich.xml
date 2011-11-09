@@ -1,0 +1,9 @@
+<beans>
+	<bean id="bean24" class="com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg">
+		<constructor-arg type="context"/>
+	</bean>
+	
+	<bean id="bean25" class="com.socialize.android.ioc.sample.TestClassWithBeanProperty">
+		<property name="bean" ref="bean24"/>
+	</bean>
+</beans>

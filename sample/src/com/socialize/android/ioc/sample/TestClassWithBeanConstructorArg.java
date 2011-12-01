@@ -24,7 +24,6 @@ package com.socialize.android.ioc.sample;
 public class TestClassWithBeanConstructorArg {
 	SubClassOfTestClassWithInitMethod object;
 	
-	
 	public TestClassWithBeanConstructorArg() {
 		super();
 	}

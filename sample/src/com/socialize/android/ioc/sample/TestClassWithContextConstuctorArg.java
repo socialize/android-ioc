@@ -25,6 +25,7 @@ import android.content.Context;
 
 public class TestClassWithContextConstuctorArg {
 	Context context;
+	private int intValue = 0;
 	
 	public TestClassWithContextConstuctorArg() {
 		super();
@@ -39,5 +40,10 @@ public class TestClassWithContextConstuctorArg {
 	public void setContext(Context context) {
 		this.context = context;
 	}
-	
+	public int getIntValue() {
+		return intValue;
+	}
+	public void setIntValue(int intValue) {
+		this.intValue = intValue;
+	}
 }

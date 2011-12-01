@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="android-ioc" default="build">
+
 	<property file="local.properties" />
-	<property file="build.properties" />
-	<property file="default.properties" />
+    <property file="ant.properties" />
+    <loadproperties srcFile="project.properties" />
+    <fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project'" unless="sdk.dir"/>
 
-    <path id="android.antlibs">
-        <pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
-    </path>
-
-    <taskdef name="setup"
-        classname="com.android.ant.SetupTask"
-        classpathref="android.antlibs"/>
-
-	<setup/>
+	<!-- version-tag: custom -->
+	<import file="${sdk.dir}/tools/ant/build.xml" />
 	
-	<path id="javadoc.classpath">
-		<path refid="android.target.classpath" />
-	</path>
+	<target name="build">
+		<antcall target="clean"/>
+		<antcall target="jar"/>
+		<antcall target="javadoc"/>
+	</target>
+	
+	<target name="jar" depends="compile-for-build, -jar"/>
 
-	<path id="android.libraries.src"><path refid="project.libraries.src" /></path>
-	<path id="android.libraries.jars"><path refid="project.libraries.jars" /></path>
+	<target name="-jar">
+		
+		<property name="build.path" value="build"/>
+		
+		<!-- Manually copy config files -->
+		<echo>Out dir is [${out.dir}]</echo>
 
-	<target name="build" depends="compile">
+		<delete dir="${build.path}"/>
+		<mkdir dir="${build.path}"/>
+
+
 		<jar destfile="build/android-ioc-${version}.jar" basedir="${out.dir}/classes">
 			<manifest>
 				<attribute name="Built-By" value="${vendor}" />
@@ -32,9 +36,25 @@
 				<attribute name="Implementation-Version" value="${version}" />
 			</manifest>
 		</jar>
+		
 	</target>
-	
-	<target name="javadoc">
+		
+	<target name="javadoc" depends="-setup">
+		<path id="javadoc.classpath">
+			<path refid="android.target.classpath" />
+		</path>
+		
+		<path id="javadoc.sourcepath">
+			<pathelement path="src"/>
+			<pathelement path="../ui/src"/>
+		</path>		
+		
+		<mkdir dir="build/docs/javadoc"/>
+
+		<tstamp>
+			<format property="year" pattern="yyyy" locale="en,UK" />
+		</tstamp>
+
 		<javadoc 
 			sourcepath="src"
 			classpathref="javadoc.classpath"
@@ -55,5 +75,14 @@
 				packagelistloc="${sdk.dir}/docs/reference"/>
 			
 		</javadoc>
+
 	</target>
+	
+	<target name="compile-for-build">
+		<property name="build.is.instrumented" value="false" />
+		<property name="emma.enabled" value="false" />
+		<antcall target="-compile" inheritall="true" inheritrefs="true"/>
+	</target>	
+
 </project>
+

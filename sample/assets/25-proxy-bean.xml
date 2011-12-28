@@ -1,0 +1,4 @@
+<beans>
+	<bean id="beanWithProxy" class="com.socialize.android.ioc.sample.TestClassWithPrintMethod"/>
+	<proxy ref="beanWithProxy"/>
+</beans>

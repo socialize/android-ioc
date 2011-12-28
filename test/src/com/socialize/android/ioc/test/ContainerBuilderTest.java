@@ -23,6 +23,7 @@ package com.socialize.android.ioc.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,10 +58,13 @@ import com.socialize.android.ioc.FactoryRef;
 import com.socialize.android.ioc.IBeanFactory;
 import com.socialize.android.ioc.MethodRef;
 import com.socialize.android.ioc.ParserHandlerFactory;
+import com.socialize.android.ioc.ProxyObject;
+import com.socialize.android.ioc.sample.ITestClassWithPrintMethod;
 import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassContainerAware;
 import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithBeanFactoryParam;
+import com.socialize.android.ioc.sample.TestClassWithBeanProperty;
 import com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg;
 import com.socialize.android.ioc.sample.TestClassWithDualListConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg;
@@ -71,6 +75,7 @@ import com.socialize.android.ioc.sample.TestClassWithIntConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithMapProperty;
 import com.socialize.android.ioc.sample.TestClassWithMultipleConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithMultipleProperties;
+import com.socialize.android.ioc.sample.TestClassWithPrintMethod;
 import com.socialize.android.ioc.sample.TestClassWithSetConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithStringListConstructorArg;
 
@@ -151,6 +156,151 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertNotNull(bean);
 		assertTrue(TestClassWithInitMethod.class.isAssignableFrom(bean.getClass()));
 	}
+	
+	public void testContainerBuilderProxyFailsWithNonInterfaceClass() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithBeanProperty.class.getName());
+		ref.setName(beanName);
+		
+		mapping.addBeanRef(ref);
+		mapping.addProxyRef(beanName);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+		
+		Object bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertFalse(Proxy.isProxyClass(bean.getClass()));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void testContainerBuilderProxy() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithPrintMethod.class.getName());
+		ref.setName(beanName);
+		
+		mapping.addBeanRef(ref);
+		mapping.addProxyRef(beanName);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+		
+		ProxyObject<TestClassWithPrintMethod> proxy = container.getProxy(beanName);
+		
+		assertNotNull(proxy);
+		
+		Object bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertTrue(Proxy.isProxyClass(bean.getClass()));
+
+		ProxyObject<TestClassWithPrintMethod> proxy2 = (ProxyObject<TestClassWithPrintMethod>) Proxy.getInvocationHandler(bean);
+		
+		assertNotNull(proxy2.getDelegate());
+		
+		TestClassWithPrintMethod newBean = new  TestClassWithPrintMethod();
+		
+		// Now change the proxy delegate
+		proxy2.setDelegate(newBean);
+		
+		bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertTrue(Proxy.isProxyClass(bean.getClass()));
+		
+		ProxyObject<TestClassWithPrintMethod> proxy3 = (ProxyObject<TestClassWithPrintMethod>) Proxy.getInvocationHandler(bean);
+		
+		assertNotNull(proxy3.getDelegate());
+		assertSame(newBean, proxy3.getDelegate());
+		
+		ProxyObject<TestClassWithPrintMethod> proxy4 = container.getProxy(beanName);
+		
+		assertNotNull(proxy4.getDelegate());
+		assertSame(newBean, proxy4.getDelegate());
+		
+	}	
+	
+	public void testContainerBuilderProxyUsesDelegate() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithPrintMethod.class.getName());
+		ref.setName(beanName);
+		
+		mapping.addBeanRef(ref);
+		mapping.addProxyRef(beanName);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+	
+		ITestClassWithPrintMethod bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertEquals("Hello World", bean.print());
+		
+		ProxyObject<TestClassWithPrintMethod> proxy = container.getProxy(beanName);
+		
+		proxy.setDelegate(new TestClassWithPrintMethod(){
+			@Override
+			public String print() {
+				return "foobar";
+			}
+		});
+		
+		bean = container.getBean(beanName);
+
+		assertNotNull(bean);
+		assertEquals("foobar", bean.print());
+		
+	}	
+	
+	public void testContainerBuilderProxyDoesNOTUseDelegateOnNonSingleton() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithPrintMethod.class.getName());
+		ref.setName(beanName);
+		ref.setSingleton(false);
+		
+		mapping.addBeanRef(ref);
+		mapping.addProxyRef(beanName);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+	
+		ITestClassWithPrintMethod bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertEquals("Hello World", bean.print());
+		
+		ProxyObject<TestClassWithPrintMethod> proxy = container.getProxy(beanName);
+		
+		proxy.setDelegate(new TestClassWithPrintMethod(){
+			@Override
+			public String print() {
+				return "foobar";
+			}
+		});
+		
+		bean = container.getBean(beanName);
+
+		assertNotNull(bean);
+		assertEquals("Hello World", bean.print());
+		
+	}	
 	
 	public void testContainerAware() throws Exception {
 		String beanName = "bean";
@@ -1374,10 +1524,8 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertSame(beanA, beanB.getOther());
 	}
 	
-	
-	private class BeanRefWithMethodCount extends BeanRef {
-
-		int callCount = 0;
+	public class BeanRefWithMethodCount extends BeanRef {
+		public int callCount = 0;
 		@Override
 		public MethodRef getInitMethod() {
 			callCount++;

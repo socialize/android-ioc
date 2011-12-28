@@ -25,7 +25,7 @@ import android.util.Log;
 
 public class Logger {
 
-	public static final String LOG_KEY = "AndroidIOC";
+	public static String LOG_KEY = "AndroidIOC";
 	
 	public static final void d(String tag, String msg) {
 		Log.d(LOG_KEY, tag + ": " + msg);

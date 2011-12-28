@@ -52,6 +52,7 @@ import com.socialize.android.ioc.sample.TestClassWithListParam;
 import com.socialize.android.ioc.sample.TestClassWithMapProperty;
 import com.socialize.android.ioc.sample.TestClassWithMultipleProperties;
 import com.socialize.android.ioc.sample.TestClassWithMultiplePropertiesExtended;
+import com.socialize.android.ioc.sample.TestClassWithPrintMethod;
 import com.socialize.android.ioc.sample.TestClassWithSetConstructorArg;
 
 public class BeanMapperParserTest extends AndroidTestCase {
@@ -1089,6 +1090,17 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertTrue(ref1.isSingleton());
 		assertTrue(ref1.isAbstractBean());
 	}
+	
+	
+	public void testProxyElement() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"25-proxy-bean.xml");
+		assertNotNull(mapping);
+		BeanRef ref = mapping.getBeanRef("beanWithProxy");
+		assertNotNull(ref);
+		assertEquals(TestClassWithPrintMethod.class.getName(), ref.getClassName());
+		assertTrue(mapping.hasProxy("beanWithProxy"));
+	}	
 	
 	public void testFactoryBean() throws Exception {
 		BeanMappingParser parser = new BeanMappingParser();

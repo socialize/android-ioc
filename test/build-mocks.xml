@@ -2,7 +2,7 @@
 <project name="android-ioc-mock-builder" default="build-mocks" >
 
 	<property file="local.properties" />
-	<property file="build.properties" />
+	<property file="ant.properties" />
 	<property file="project.properties" />
 	
 	

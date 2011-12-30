@@ -47,6 +47,10 @@ public class BeanMapping {
 		this.importRefs = new LinkedHashMap<String, ImportRef>();
 	}
 
+	public boolean containsBean(String name) {
+		return beanRefs.containsKey(name) || factoryRefs.containsKey(name);
+	}
+	
 	public Collection<BeanRef> getBeanRefs() {
 		return beanRefs.values();
 	}
@@ -97,6 +101,10 @@ public class BeanMapping {
 	
 	public boolean hasProxy(String name) {
 		return proxyRefs.contains(name);
+	}
+	
+	public boolean isEmpty() {
+		return beanRefs.isEmpty() && factoryRefs.isEmpty() && proxyRefs.isEmpty();
 	}
 	
 	/**

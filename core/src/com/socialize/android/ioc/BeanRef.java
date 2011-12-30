@@ -50,7 +50,7 @@ public class BeanRef {
 	private boolean initCalled = false;
 	private boolean lazyInit = false;
 	
-	private boolean imported = false;
+	private boolean resolved = false;
 	
 	private boolean contextSensitive = false;
 	
@@ -151,6 +151,14 @@ public class BeanRef {
 	protected void setInitCalled(boolean initCalled) {
 		this.initCalled = initCalled;
 	}
+	
+	protected boolean isResolved() {
+		return resolved;
+	}
+
+	protected void setResolved(boolean resolved) {
+		this.resolved = resolved;
+	}
 
 	/**
 	 * @deprecated
@@ -192,14 +200,6 @@ public class BeanRef {
 		this.lazyInit = lazyInit;
 	}
 	
-	public boolean isImported() {
-		return imported;
-	}
-
-	public void setImported(boolean imported) {
-		this.imported = imported;
-	}
-	
 	public Set<Argument> getAllArguments() {
 		
 		Set<Argument> all = new HashSet<Argument>();
@@ -219,16 +219,21 @@ public class BeanRef {
 			}
 		}
 		
+		
+		Set<Argument> allChildren = new HashSet<Argument>();
+		
 		for (Argument argument : all) {
 			List<Argument> children = argument.getChildren();
 			
 			while (children != null && !children.isEmpty()) {
-				all.addAll(children);
+				allChildren.addAll(children);
 				for (Argument child : children) {
 					children = child.getChildren();
 				}
 			}
 		}
+		
+		all.addAll(allChildren);
 		
 		return all;
 	}

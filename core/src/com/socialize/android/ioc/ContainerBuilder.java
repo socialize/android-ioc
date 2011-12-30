@@ -49,7 +49,7 @@ import com.socialize.android.ioc.Argument.RefType;
  */
 public class ContainerBuilder {
 
-	static final int MAX_ITERATIONS = 5;
+	static final int MAX_ITERATIONS = 10;
 	
 	private BeanBuilder builder = null;
 	private BeanMappingParser parser = null;
@@ -208,127 +208,204 @@ public class ContainerBuilder {
 		return build(primary);
 	}
 	
-	protected void resolveImports(BeanMapping mapping) throws IOException {
-		int imported = resolveImports(mapping, 0);
+	protected void resolveImports(BeanMapping original) throws IOException {
+		BeanMapping imported = new BeanMapping();
+		resolveImports(original, imported, 0);
 		imports.clear();
-		if(imported > 0) {
-			resolveDependencies(mapping);
+		int count = 0;
+		if(!imported.isEmpty()) {
+			while(resolveDependencies(original, imported, count) > 0) {
+				count++;
+			}
 		}
 	}
 	
-	protected void resolveDependencies(BeanMapping mapping) {
-		Logger.i(getClass().getSimpleName(), "Resolving import dependencies");
-		
-		Collection<BeanRef> beanRefs = mapping.getBeanRefs();
-		
-		for (BeanRef beanRef : beanRefs) {
-			Set<Argument> allArgs = beanRef.getAllArguments();
-			for (Argument argument : allArgs) {
-				if(argument.getType().equals(RefType.BEAN)) {
-					BeanRef argRef = mapping.getBeanRef(argument.getValue());
-					
-					if(argRef != null) {
-						argRef.setImported(false);
-					}
-					else {
-						Logger.w(getClass().getSimpleName(), "Could not locate bean [" +
-								argument.getValue() +
-								"] found as an argument to bean [" +
-								beanRef.getName() +
-								"] during import resolution");
-					}
-				}
-			}
-		}
-		
-		Collection<FactoryRef> factoryRefs = mapping.getFactoryRefs();
-		
-		for (FactoryRef factoryRef : factoryRefs) {
-			BeanRef argRef = mapping.getBeanRef(factoryRef.getMakes());
-			if(argRef != null) {
-				argRef.setImported(false);
-			}
-		}
-		
-		Set<String> proxyRefs = mapping.getProxyRefs();
-		
-		for (String ref : proxyRefs) {
-			BeanRef argRef = mapping.getBeanRef(ref);
-			if(argRef != null) {
-				argRef.setImported(false);
-			}			
-		}
-	}
- 	
-	protected int resolveImports(BeanMapping mapping, int recursionCount) throws IOException {
-		
-		int size = 0;
+	protected int resolveDependencies(BeanMapping original, BeanMapping imported, int recursionCount) {
 		
 		if(recursionCount > MAX_ITERATIONS) {
 			throw new RuntimeException("Too many iterations during import resolution.  Possible circular reference in bean mapping, or bean init failed.  Check the logs.");
 		}
 		
-		Collection<ImportRef> importRefs = mapping.getImportRefs();
+		int unresolved = 0;
+		
+		Logger.i(getClass().getSimpleName(), "Resolving import dependencies in loop " + recursionCount);
+		
+		Collection<BeanRef> beanRefs = original.getBeanRefs();
+		Collection<FactoryRef> factoryRefs = original.getFactoryRefs();
+		Set<String> proxyRefs = original.getProxyRefs();
+		
+		BeanMapping needed = new BeanMapping();
+		
+		for (BeanRef beanRef : beanRefs) {
+			
+			if(!beanRef.isResolved()) {
+				
+				beanRef.setResolved(true);
+				
+				Set<Argument> allArgs = beanRef.getAllArguments();
+				
+				for (Argument argument : allArgs) {
+					
+					if(argument.getType().equals(RefType.BEAN)) {
+						
+						String beanName = argument.getValue();
+						
+						if(!original.containsBean(beanName)) {
+							BeanRef argRef = imported.getBeanRef(beanName);
+							
+							if(argRef != null) {
+								needed.addBeanRef(argRef);
+								unresolved++;
+							}
+							else {
+								FactoryRef fRef = imported.getFactoryRef(beanName);
+								
+								if(fRef != null) {
+									needed.addFactoryRef(fRef);
+									unresolved++;
+								}
+								else {
+									
+									if(imported.hasProxy(beanName)) {
+										needed.addProxyRef(beanName);
+										unresolved++;
+									}
+									else {
+										Logger.w(getClass().getSimpleName(), "Could not locate bean [" +
+												beanName +
+												"] found as an argument to bean [" +
+												beanRef.getName() +
+												"] during import resolution");
+									}
+								}
+							}
+						}
+					}
+				}	
+			}
+		}
+		
+		for (FactoryRef factoryRef : factoryRefs) {
+			String beanName = factoryRef.getMakes();
+			if(!original.containsBean(beanName)) {
+				BeanRef argRef = imported.getBeanRef(beanName);
+				if(argRef != null) {
+					needed.addBeanRef(argRef);
+					unresolved++;
+				}
+				else {
+					Logger.w(getClass().getSimpleName(), "Could not locate bean [" +
+							beanName +
+							"] found as an argument to factory [" +
+							factoryRef.getName() +
+							"] during import resolution");
+				}
+			}
+		}
+		
+		for (String beanName : proxyRefs) {
+			if(!original.containsBean(beanName)) {
+				BeanRef argRef = imported.getBeanRef(beanName);
+				
+				if(argRef != null) {
+					needed.addBeanRef(argRef);
+					unresolved++;
+				}
+				else {
+					Logger.w(getClass().getSimpleName(), "Could not locate bean [" +
+							beanName +
+							"] found as proxy during import resolution");
+				}				
+			}
+		}
+		
+		if(!needed.isEmpty()) {
+			original.merge(needed);
+		}
+		
+		Logger.i(getClass().getSimpleName(), "Resolving import complete.  There are " + unresolved + " unresolved dependencies");
+		
+		return unresolved;
+	}
+
+ 	
+	protected void resolveImports(BeanMapping original, BeanMapping merged, int recursionCount) throws IOException {
+		
+		if(recursionCount > MAX_ITERATIONS) {
+			throw new RuntimeException("Too many iterations during import resolution.  Possible circular reference in bean mapping, or bean init failed.  Check the logs.");
+		}
+		
+		Collection<ImportRef> importRefs = original.getImportRefs();
 		
 		if(importRefs != null && !importRefs.isEmpty()) {
 			Set<String> invalidSources = new HashSet<String>();
 			
-			size = importRefs.size();
-			
 			for (ImportRef ref : importRefs) {
-				
+
 				BeanMapping imported = null;
-				
+
 				if(!imports.containsKey(ref.getSource())) {
-					
-					 if(!invalidSources.contains(ref.getSource())) {
-						 
-						 if(Logger.isInfoEnabled()) {
-							 	Logger.i(getClass().getSimpleName(), "Resolving imports for [" +
-							 			ref.getSource() +
-							 			"]");
-						 }
-					 
+
+					if(!invalidSources.contains(ref.getSource())) {
+
+						if(Logger.isInfoEnabled()) {
+							Logger.i(getClass().getSimpleName(), "Resolving imports for [" +
+									ref.getSource() +
+									"]");
+						}
+
 						// Try to locate the source
 						InputStream in = resourceLocator.locate(ref.getSource());
-						
+
 						if(in != null) {
 							imported = this.parser.parse(context, in);
-							
+
 							// Resolve imports for this file
-							size += resolveImports(imported, ++recursionCount);
-							
+							resolveImports(imported, merged, ++recursionCount);
+
 							imports.put(ref.getSource(), imported);
 						}
 						else {
-							
+
 							Logger.e(getClass().getSimpleName(), "Cannot resolve import of bean [" +
 									ref.getName() +
 									"] because the corresponding source [" +
 									ref.getSource() +
 									"] could not be located.");
-							
+
 							invalidSources.add(ref.getSource());	
 						}
-					 }
-					 else {
+					}
+					else {
 						Logger.e(getClass().getSimpleName(), "Cannot resolve import of bean [" +
 								ref.getName() +
 								"] because the corresponding source [" +
 								ref.getSource() +
 								"] could not be located.");
-					 }
+					}
+
+					if(imported != null) {
+						// Single bean
+						if(ref.getName() == null || ref.getName().trim().length() == 0) {
+							if(ref.isDependentOnly()) {
+								merged.merge(imported);
+							}
+							else {
+								original.merge(imported);
+							}
+						}
+					}					 
 				}
 				else {
 					imported = imports.get(ref.getSource());
 				}
-				
+
+				// Single bean
 				if(imported != null) {
-					
 					if(ref.getName() != null && ref.getName().trim().length() > 0) {
 						BeanRef beanRef = imported.getBeanRef(ref.getName());
 						if(beanRef != null) {
-							mapping.addBeanRef(beanRef);
+							merged.addBeanRef(beanRef);
 						}
 						else {
 							Logger.w(getClass().getSimpleName(), "Bean [" +
@@ -337,21 +414,9 @@ public class ContainerBuilder {
 									ref.getSource());	
 						}
 					}
-					else {
-						if(ref.isDependentOnly()) {
-							Collection<BeanRef> beanRefs = imported.getBeanRefs();
-							for (BeanRef beanRef : beanRefs) {
-								beanRef.setImported(true);
-							}
-						}
-						
-						mapping.merge(imported);
-					}
 				}
 			}
 		}
-		
-		return size;
 	}
 	
 	public Container build(BeanMapping mapping) throws IOException {
@@ -543,7 +608,7 @@ public class ContainerBuilder {
 
 		for (BeanRef beanRef : beanRefs) {
 
-			if(!beanRef.isImported() && !beanRef.isAbstractBean() && beanRef.isSingleton() && !container.containsBean(beanRef.getName())) {
+			if(!beanRef.isAbstractBean() && beanRef.isSingleton() && !container.containsBean(beanRef.getName())) {
 
 				Object bean = null;
 

@@ -1,0 +1,6 @@
+<beans>
+	<import-mapping source="4-bean-constructor-arg.xml"/>
+	<bean id="bean28" class="com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg">
+		<constructor-arg ref="bean2"/>
+	</bean>
+</beans>

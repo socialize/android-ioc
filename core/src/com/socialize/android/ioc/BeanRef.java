@@ -21,8 +21,10 @@
  */
 package com.socialize.android.ioc;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -47,6 +49,8 @@ public class BeanRef {
 	
 	private boolean initCalled = false;
 	private boolean lazyInit = false;
+	
+	private boolean imported = false;
 	
 	private boolean contextSensitive = false;
 	
@@ -139,7 +143,7 @@ public class BeanRef {
 	public void setAbstractBean(boolean abstractBean) {
 		this.abstractBean = abstractBean;
 	}
-
+	
 	protected boolean isInitCalled() {
 		return initCalled;
 	}
@@ -178,12 +182,55 @@ public class BeanRef {
 		this.contextSensitiveInitMethod = contextSensitiveInitMethod;
 	}
 
+	@Deprecated
 	public boolean isLazyInit() {
 		return lazyInit;
 	}
 
+	@Deprecated
 	public void setLazyInit(boolean lazyInit) {
 		this.lazyInit = lazyInit;
+	}
+	
+	public boolean isImported() {
+		return imported;
+	}
+
+	public void setImported(boolean imported) {
+		this.imported = imported;
+	}
+	
+	public Set<Argument> getAllArguments() {
+		
+		Set<Argument> all = new HashSet<Argument>();
+		
+		if(properties != null) all.addAll(properties);
+		if(constructorArgs != null) all.addAll(constructorArgs);
+		
+		if(initMethod != null) {
+			if(initMethod.getArguments() != null) {
+				all.addAll(initMethod.getArguments());
+			}
+		}
+		
+		if(destroyMethod != null) {
+			if(destroyMethod.getArguments() != null) {
+				all.addAll(destroyMethod.getArguments());
+			}
+		}
+		
+		for (Argument argument : all) {
+			List<Argument> children = argument.getChildren();
+			
+			while (children != null && !children.isEmpty()) {
+				all.addAll(children);
+				for (Argument child : children) {
+					children = child.getChildren();
+				}
+			}
+		}
+		
+		return all;
 	}
 
 	@Override

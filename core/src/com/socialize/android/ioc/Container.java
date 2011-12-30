@@ -73,36 +73,43 @@ public class Container {
 			
 			BeanRef beanRef = mapping.getBeanRef(name);
 			
-			if(beanRef.isAbstractBean()) {
-				Logger.w(getClass().getSimpleName(), "Cannot proxy abstract bean [" +
-						name +
-						"]");
-			}
-			else {
-				T bean = getBeanInternal(name, args);
-				
-				if(bean != null) {
-					
-					ProxyObject<T> proxy = null;
-					
-					proxy = (ProxyObject<T>) proxies.get(name);
-					
-					if(proxy == null) {
-						proxy = new ProxyObject<T>();
-						proxy.setDelegate(bean);
-						
-						if(beanRef.isSingleton()) {
-							proxies.put(name, proxy);
-						}					
-					}
-					
-					return proxy;				
+			if(beanRef != null) {
+				if(beanRef.isAbstractBean()) {
+					Logger.w(getClass().getSimpleName(), "Cannot proxy abstract bean [" +
+							name +
+							"]");
 				}
 				else {
-					Logger.w(getClass().getSimpleName(), "No bean with name [" +
-							name +
-							"] found when attempting to proxy.");
+					T bean = getBeanInternal(name, args);
+					
+					if(bean != null) {
+						
+						ProxyObject<T> proxy = null;
+						
+						proxy = (ProxyObject<T>) proxies.get(name);
+						
+						if(proxy == null) {
+							proxy = new ProxyObject<T>();
+							proxy.setDelegate(bean);
+							
+							if(beanRef.isSingleton()) {
+								proxies.put(name, proxy);
+							}					
+						}
+						
+						return proxy;				
+					}
+					else {
+						Logger.w(getClass().getSimpleName(), "No bean with name [" +
+								name +
+								"] found when attempting to proxy.");
+					}
 				}
+			}
+			else {
+				Logger.w(getClass().getSimpleName(), "Bean [" +
+						name +
+						"] does not exist and therefore cannot be proxied.  Make sure <proxy> elements exist AFTER the definition of this bean.");
 			}
 		}
 		else {
@@ -188,9 +195,9 @@ public class Container {
 						}
 					}
 				}
-				else if(beanRef.isLazyInit() && !beanRef.isInitCalled()) {
-					builder.initBean(this, beanRef, bean);
-				}	
+//				else if(beanRef.isLazyInit() && !beanRef.isInitCalled()) {
+//					builder.initBean(this, beanRef, bean);
+//				}	
 			}
 			else if(bean == null) { // might be a factory
 				Logger.w(getClass().getSimpleName(), "No such bean with name " + name);
@@ -275,6 +282,11 @@ public class Container {
 			beans = null;
 		}
 		
+		if(proxies != null) {
+			proxies.clear();
+			proxies = null;
+		}		
+		
 		destroyed = true;
 	}
 	
@@ -327,9 +339,9 @@ public class Container {
 							Object bean = builder.buildBean(this, ref);
 							builder.setBeanProperties(this, ref, bean);
 							
-							if(!ref.isLazyInit()) {
+//							if(!ref.isLazyInit()) {
 								builder.initBean(this, ref, bean);
-							}
+//							}
 							
 							putBean(ref.getName(), bean);
 							
@@ -338,15 +350,15 @@ public class Container {
 						}
 						else if(ref.isContextSensitiveInitMethod()) {
 							
-							if(ref.isLazyInit()) {
-								// Mark for re-init
-								ref.setInitCalled(false);
-							}
-							else {
+//							if(ref.isLazyInit()) {
+//								// Mark for re-init
+//								ref.setInitCalled(false);
+//							}
+//							else {
 								// Re-call init
 								Object bean = getBean(ref.getName());
 								builder.initBean(this, ref, bean);
-							}
+//							}
 						}
 					}
 				}

@@ -37,6 +37,7 @@ import com.socialize.android.ioc.BeanMapping;
 import com.socialize.android.ioc.BeanMappingParser;
 import com.socialize.android.ioc.BeanRef;
 import com.socialize.android.ioc.FactoryRef;
+import com.socialize.android.ioc.ImportRef;
 import com.socialize.android.ioc.MethodRef;
 import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
@@ -1124,6 +1125,21 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertEquals("bean2", fref.getMakes());
 		assertEquals("bean4", fref1.getMakes());
 	}
+	
+	public void testImportBean() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"26-import-bean.xml");
+		
+		assertNotNull(mapping);
+		
+		BeanRef ref = mapping.getBeanRef("bean26");
+		ImportRef ref1 = mapping.getImportRef("bean2");
+		
+		assertNotNull(ref);
+		assertNotNull(ref1);
+		
+		assertEquals("4-bean-constructor-arg.xml", ref1.getSource());
+	}	
 	
 	public void testBeanMapperParser() throws IOException {
 		

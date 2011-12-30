@@ -1,0 +1,6 @@
+<beans>
+	<import-mapping source="27-import-mapping-dependent.xml" dependentOnly="true"/>
+	<bean id="bean29" class="com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg">
+		<constructor-arg ref="bean2"/>
+	</bean>
+</beans>

@@ -171,9 +171,9 @@ public class ContainerBuilder {
 					if(property.getKey() != null) {
 						Object value = getArgumentValue(container, property, false);
 						if(value == null) {
-							Logger.w(getClass().getSimpleName(), "Failed to locate property value with key [" +
+							Logger.w(getClass().getSimpleName(), "Failed to locate value for property [" +
 									property.getKey() +
-									"] for bean [" +
+									"] of bean [" +
 									ref.getName() +
 									"].  The bean may be incomplete as a result!");
 						}

@@ -326,7 +326,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertSame(container, aware.getContainer());
 	}
 	
-	public void testContainerSize() {
+	public void testContainerSize() throws Exception {
 		
 		String beanName0 = "bean0";
 		String beanName1 = "bean1";
@@ -1153,7 +1153,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertEquals(prop, bc2.getObject().getParam());
 	}
 	
-	public void testContainerBuilderSingletonBean() {
+	public void testContainerBuilderSingletonBean()  throws Exception {
 		String beanName = "bean";
 		
 		BeanMapping mapping = new BeanMapping();
@@ -1179,7 +1179,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertTrue(beanA == beanB);
 	}
 	
-	public void testContainerBuilderNonSingletonBean() {
+	public void testContainerBuilderNonSingletonBean() throws Exception {
 		String beanName = "bean";
 		
 		BeanMapping mapping = new BeanMapping();
@@ -1205,7 +1205,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertFalse(beanA == beanB);
 	}
 	
-	public void testContainerBuilderFactoryBean() {
+	public void testContainerBuilderFactoryBean() throws Exception {
 		String beanName = "bean";
 		String factoryName = "factory";
 		
@@ -1244,7 +1244,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertFalse(beanA == beanB);
 	}
 	
-	public void testContainerBuilderFactoryBeanProperty() {
+	public void testContainerBuilderFactoryBeanProperty() throws Exception {
 		String beanName = "bean";
 		String factoryName = "factory";
 		
@@ -1274,7 +1274,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 
 	}
 	
-	public void testContainerBuilderFactoryBeanConstructorArg() {
+	public void testContainerBuilderFactoryBeanConstructorArg() throws Exception {
 		String beanName = "bean";
 		String factoryName = "factory";
 		
@@ -1306,7 +1306,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 	
 	
 	
-	public void testContainerBuilderAbstractBean() {
+	public void testContainerBuilderAbstractBean() throws Exception {
 		String beanName = "bean";
 		
 		BeanMapping mapping = new BeanMapping();
@@ -1325,7 +1325,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertNull(beanA);
 	}
 	
-	public void testContainerBuilderSingletonBeanInitMethod() {
+	public void testContainerBuilderSingletonBeanInitMethod() throws Exception {
 		String beanName = "bean";
 		
 		BeanMapping mapping = new BeanMapping();
@@ -1346,7 +1346,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 	}
 	
-	public void testContainerBuilderBeanDestroyMethod() {
+	public void testContainerBuilderBeanDestroyMethod() throws Exception {
 		String beanName = "bean";
 		
 		BeanMapping mapping = new BeanMapping();
@@ -1368,7 +1368,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 	}
 	
-	public void testContainerBuilderNonSingletonBeanInitMethod() {
+	public void testContainerBuilderNonSingletonBeanInitMethod() throws Exception {
 		String beanName = "bean";
 		
 		BeanMapping mapping = new BeanMapping();
@@ -1389,7 +1389,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 	}
 	
-	public void testContainerBuilderBeanInitMethodWithArgs() {
+	public void testContainerBuilderBeanInitMethodWithArgs() throws Exception {
 		String beanName = "bean";
 		String beanName2 = "bean2";
 		
@@ -1424,7 +1424,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertTrue(TestClassWithInitMethod.class.isAssignableFrom(beanA.getObject().getClass()));
 	}
 	
-	public void testContainerBuilderBeanInitMethodWithArgsReversed() {
+	public void testContainerBuilderBeanInitMethodWithArgsReversed() throws Exception {
 		String beanName = "bean2";
 		String beanName2 = "bean";
 		
@@ -1486,8 +1486,81 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 	}
 	
+	public void testImportBean() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"26-import-bean.xml");
+		
+		assertNotNull(mapping);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext(), parser);
+		
+		Container container = builder.build(mapping);
+		
+		Object bean = container.getBean("bean2");
+		Object bean2 = container.getBean("bean26");
+		
+		assertNotNull(bean);
+		assertNotNull(bean2);
+	}	
+	
+	public void testImportMappingDependent() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"27-import-mapping-dependent.xml");
+		
+		assertNotNull(mapping);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext(), parser);
+		
+		Container container = builder.build(mapping);
+		
+		Object bean = container.getBean("bean2");
+		Object bean2 = container.getBean("bean27");
+		Object bean4 = container.getBean("bean4");
+		
+		assertNotNull(bean);
+		assertNotNull(bean2);
+		assertNull(bean4);
+	}	
+	
+	public void testImportMappingDependentMultipleImports() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"29-import-mapping-dependent-multiple.xml");
+		
+		assertNotNull(mapping);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext(), parser);
+		
+		Container container = builder.build(mapping);
+		
+		Object bean = container.getBean("bean2");
+		Object bean2 = container.getBean("bean29");
+		Object bean4 = container.getBean("bean4");
+		
+		assertNotNull(bean);
+		assertNotNull(bean2);
+		assertNull(bean4);
+	}	
+		
+	public void testImportMappingAll() throws Exception {
+		BeanMappingParser parser = new BeanMappingParser();
+		BeanMapping mapping = parser.parse(getContext(),"28-import-mapping-all.xml");
+		
+		assertNotNull(mapping);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext(), parser);
+		
+		Container container = builder.build(mapping);
+		
+		Object bean = container.getBean("bean2");
+		Object bean2 = container.getBean("bean28");
+		Object bean4 = container.getBean("bean4");
+		
+		assertNotNull(bean);
+		assertNotNull(bean2);
+		assertNotNull(bean4);
+	}	
 
-	public void testInitMethodDependency() {
+	public void testInitMethodDependency() throws Exception {
 		
 		String beanName = "initWithCount";
 		String beanName2 = "initWithCount2";

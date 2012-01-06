@@ -3,7 +3,7 @@
 	
 	<property file="local.properties" />
     <property file="ant.properties" />
-	<property file="${library.project.dir}/ant.properties" prefix="socialize.sdk."/>
+	<property file="${library.project.dir}/ant.properties" prefix="android.ioc."/>
     <loadproperties srcFile="project.properties" />
 
     <fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project'" unless="sdk.dir"/>
@@ -32,7 +32,7 @@
 		<findbugs home="${findbugs.home}" output="xml" outputFile="findbugs-output/bcel-fb.xml">
 			<sourcePath path="${library.project.src}" />
 			<auxClasspath path="${sdkdir}"/>
-			<class location="${library.project.build}/socialize-${socialize.sdk.version}.jar" />
+			<class location="${library.project.build}/android-ioc-${android.ioc.version}.jar" />
 		</findbugs>
 		<echo>Findbugs complete.</echo>
 	</target>	

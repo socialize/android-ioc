@@ -101,7 +101,7 @@ public class ContainerBuilder {
 				
 				if(cargs != null && cargs.length > 0) {
 					
-					if(containsContext(cargs) && beanRef.isSingleton()) {
+					if(beanRef.isContextSensitive() && containsContext(cargs) && beanRef.isSingleton()) {
 						logContextConstructorWarning(beanRef);
 						beanRef.setContextSensitiveConstructor(true);
 					}
@@ -540,7 +540,7 @@ public class ContainerBuilder {
 					}
 				}
 				
-				if(!beanRef.isContextSensitiveConstructor()) {
+				if(beanRef.isContextSensitive() && !beanRef.isContextSensitiveConstructor()) {
 					beanRef.setContextSensitiveInitMethod(containsContext(args));
 				}
 				

@@ -25,9 +25,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import android.test.AndroidTestCase;
 
@@ -35,10 +37,14 @@ import com.socialize.android.ioc.BeanBuilder;
 import com.socialize.android.ioc.BeanRef;
 import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg;
+import com.socialize.android.ioc.sample.TestClassWithGenericTypeList;
+import com.socialize.android.ioc.sample.TestClassWithGenericTypeMap;
+import com.socialize.android.ioc.sample.TestClassWithGenericTypeSet;
 import com.socialize.android.ioc.sample.TestClassWithInitMethod;
 import com.socialize.android.ioc.sample.TestClassWithIntConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithListConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithWildcardMap;
+import com.socialize.android.ioc.sample.types.DerivedType;
 
 public class BeanBuilderTest extends AndroidTestCase {
 
@@ -173,5 +179,26 @@ public class BeanBuilderTest extends AndroidTestCase {
 		assertNotNull(builder.getMethodFor(TestClassWithWildcardMap.class, "setAnythingMap", map2));
 		assertNull(builder.getMethodFor(TestClassWithWildcardMap.class, "setAnythingMap", map3));
 		
+	}
+	
+	public void testGenericTypeMapMatch() {
+		BeanBuilder builder = new BeanBuilder();
+		Map<String, DerivedType> map0 = new HashMap<String, DerivedType>();
+		map0.put("foobar", new DerivedType());
+		assertNotNull(builder.getMethodFor(TestClassWithGenericTypeMap.class, "setParam",  map0));
+	}
+	
+	public void testGenericTypeListMatch() {
+		BeanBuilder builder = new BeanBuilder();
+		List<DerivedType> map0 = new LinkedList<DerivedType>();
+		map0.add(new DerivedType());
+		assertNotNull(builder.getMethodFor(TestClassWithGenericTypeList.class, "setParam",  map0));
+	}
+	
+	public void testGenericTypeSetMatch() {
+		BeanBuilder builder = new BeanBuilder();
+		Set<DerivedType> map0 = new HashSet<DerivedType>();
+		map0.add(new DerivedType());
+		assertNotNull(builder.getMethodFor(TestClassWithGenericTypeSet.class, "setParam",  map0));
 	}
 }

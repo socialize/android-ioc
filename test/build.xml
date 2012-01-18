@@ -81,8 +81,8 @@
 		<target name="clean-after">
 			<ant dir="../sample" target="clean-library-src" inheritall="false" inheritrefs="false"/>
           	<echo>Cleaning up local coverage files...</echo>
-    		<delete file="${emma.report.dir}/coverage.ec" />
-    		<delete file="${emma.report.dir}/coverage.em" />			
+    		<delete file="${emma.report.dir}/coverage.ec" verbose="true"/>
+    		<delete file="${emma.report.dir}/coverage.em" verbose="true"/>			
 		</target>
 	
 		<target name="clean-all">

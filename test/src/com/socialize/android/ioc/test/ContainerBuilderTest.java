@@ -265,6 +265,40 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 	}	
 	
+	public void testRuntimeProxyUsesDelegate() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithPrintMethod.class.getName());
+		ref.setName(beanName);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		Container container = builder.build(mapping);
+	
+		ITestClassWithPrintMethod bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertEquals("Hello World", bean.print());
+		
+		container.setRuntimeProxy(beanName, new TestClassWithPrintMethod(){
+			@Override
+			public String print() {
+				return "foobar";
+			}
+		});
+		
+		bean = container.getBean(beanName);
+
+		assertNotNull(bean);
+		
+		assertEquals("foobar", bean.print());
+	}	
+		
+	
 	public void testContainerBuilderProxyDoesNOTUseDelegateOnNonSingleton() throws Exception {
 		String beanName = "bean";
 		

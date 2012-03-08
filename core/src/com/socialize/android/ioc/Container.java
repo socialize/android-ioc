@@ -62,6 +62,41 @@ public class Container {
 		return this.mapping.getBeanRef(name);
 	}
 	
+	public <T extends Object> void setRuntimeProxy(String name, T bean) {
+		
+		BeanRef beanRef = getBeanRef(name);
+		
+		if(beanRef != null) {
+			
+			if(beanRef.isSingleton()) {
+				if(this.mapping.hasProxy(name)) {
+					Logger.w(getClass().getSimpleName(), "Proxy already defined for bean [" +
+							name +
+							"].  It will be replaced");
+				}
+				
+				mapping.addProxyRef(name);
+				
+				ProxyObject<T> proxy = new ProxyObject<T>();
+				proxy.setDelegate(bean);
+				
+				if(beanRef.isSingleton()) {
+					proxies.put(name, proxy);
+				}	
+			}
+			else {
+				Logger.w(getClass().getSimpleName(), "Bean [" +
+						name +
+						"] is a singleton bean and cannot be proxied at runtime");
+			}
+		}
+		else {
+			Logger.e(getClass().getSimpleName(), "No bean defined with name [" +
+					name +
+					"].  Proxy cannot be created");
+		}
+	}
+	
 	public <T extends Object> ProxyObject<T> getProxy(String name) {
 		return getProxy(name,  (Object[]) null);
 	}
@@ -119,6 +154,21 @@ public class Container {
 		}
 		
 		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> void getBeanAsync(String name, BeanCreationListener<T> listener, Object... args) {
+		AsyncBeanRequest<T> request = new AsyncBeanRequest<T>();
+		request.setName(name);
+		request.setArgs(args);
+		request.setBeanCreationListener(listener);
+		
+		AsyncBeanRetriever<T> retriever = new AsyncBeanRetriever<T>(this);
+		retriever.execute(request);
+	}
+	
+	public <T> void getBeanAsync(String name, BeanCreationListener<T> listener) {
+		getBeanAsync(name, listener, (Object[]) null);
 	}
 	
 	@SuppressWarnings("unchecked")

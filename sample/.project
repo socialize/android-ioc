@@ -32,9 +32,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>android-ioc_src</name>
+			<name>ioc_src</name>
 			<type>2</type>
-			<locationURI>_android_android_ioc_37cf739f/src</locationURI>
+			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/core/src</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

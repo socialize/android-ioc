@@ -45,6 +45,7 @@ import android.test.mock.MockContext;
 
 import com.google.android.testing.mocking.AndroidMock;
 import com.google.android.testing.mocking.UsesMocks;
+import com.socialize.android.ioc.AndroidIOC;
 import com.socialize.android.ioc.Argument;
 import com.socialize.android.ioc.Argument.CollectionType;
 import com.socialize.android.ioc.Argument.RefType;
@@ -272,6 +273,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		BeanRef ref = new BeanRef();
 		ref.setClassName(TestClassWithPrintMethod.class.getName());
 		ref.setName(beanName);
+		ref.setSingleton(false);
 		
 		mapping.addBeanRef(ref);
 		
@@ -297,6 +299,40 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		assertEquals("foobar", bean.print());
 	}	
+	
+	public void testStaticProxyUsesDelegate() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithPrintMethod.class.getName());
+		ref.setName(beanName);
+		
+		mapping.addBeanRef(ref);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		
+		AndroidIOC.registerProxy(beanName, new TestClassWithPrintMethod(){
+			@Override
+			public String print() {
+				return "foobar";
+			}
+		});
+		
+		Container container = builder.build(mapping);
+	
+		ITestClassWithPrintMethod bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertEquals("foobar", bean.print());
+		
+		AndroidIOC.unregisterProxy(beanName);
+		
+		bean = container.getBean(beanName);
+		
+		assertNotNull(bean);
+		assertEquals("Hello World", bean.print());
+	}		
 		
 	
 	public void testContainerBuilderProxyDoesNOTUseDelegateOnNonSingleton() throws Exception {

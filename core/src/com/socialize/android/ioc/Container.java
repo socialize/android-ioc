@@ -22,12 +22,16 @@
 package com.socialize.android.ioc;
 
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 import android.content.Context;
 
 /**
@@ -35,6 +39,10 @@ import android.content.Context;
  */
 public class Container {
 
+	protected static Map<String, Object> staticProxies = new HashMap<String, Object>();
+	protected static Map<String, Object> staticStubs = new HashMap<String, Object>();
+	protected static Set<String> staticProxiesRemoved = new HashSet<String>();
+	
 	private Map<String, Object> beans;
 	private Map<String, ProxyObject<?>> proxies;
 	private BeanMapping mapping;
@@ -62,13 +70,34 @@ public class Container {
 		return this.mapping.getBeanRef(name);
 	}
 	
+	protected static void registerProxy(String name, Object proxy) {
+		staticProxies.put(name, proxy);
+	}
+	
+	protected static void unregisterProxy(String name) {
+		staticProxies.remove(name);
+		staticProxiesRemoved.add(name);
+	}	
+	
+	protected static void registerStub(String name, Object stub) {
+		staticStubs.put(name, stub);
+	}
+	
+	protected static void unregisterStub(String name) {
+		staticStubs.remove(name);
+	}		
+	
 	public <T extends Object> void setRuntimeProxy(String name, T bean) {
+		setRuntimeProxyInternal(name, bean, false);
+	}
+	
+	protected <T extends Object> void setRuntimeProxyInternal(String name, T bean, boolean isStatic) {
 		
 		BeanRef beanRef = getBeanRef(name);
 		
 		if(beanRef != null) {
 			
-			if(beanRef.isSingleton()) {
+			if(!beanRef.isSingleton() || isStatic) {
 				if(this.mapping.hasProxy(name)) {
 					Logger.w(getClass().getSimpleName(), "Proxy already defined for bean [" +
 							name +
@@ -80,9 +109,7 @@ public class Container {
 				ProxyObject<T> proxy = new ProxyObject<T>();
 				proxy.setDelegate(bean);
 				
-				if(beanRef.isSingleton()) {
-					proxies.put(name, proxy);
-				}	
+				proxies.put(name, proxy);
 			}
 			else {
 				Logger.w(getClass().getSimpleName(), "Bean [" +
@@ -176,9 +203,22 @@ public class Container {
 		return (T) getBean(name, (Object[]) null);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public <T extends Object> T getBean(String name, Object...args) {
+		
+		if(staticStubs.containsKey(name)) {
+			return (T) staticStubs.get(name);
+		}
+		
 		if(mapping.hasProxy(name)) {
-			return getBeanProxy(name, args);
+			if(staticProxiesRemoved.contains(name)) {
+				mapping.removeProxyRef(name);
+				staticProxiesRemoved.remove(name);
+				return getBeanInternal(name, args);
+			}
+			else {
+				return getBeanProxy(name, args);
+			}
 		}
 		else {
 			return getBeanInternal(name, args);
@@ -194,7 +234,7 @@ public class Container {
 			if(beanRef != null) {
 				Class<T> beanClass = (Class<T>) Class.forName(beanRef.getClassName());
 				
-				Class<?>[] interfaces = beanClass.getInterfaces();
+				Class<?>[] interfaces = getAllInterfacesAsArray(beanClass);
 				
 				if(interfaces == null || interfaces.length == 0) {
 					Logger.w(getClass().getSimpleName(), "Bean [" +
@@ -245,9 +285,6 @@ public class Container {
 						}
 					}
 				}
-//				else if(beanRef.isLazyInit() && !beanRef.isInitCalled()) {
-//					builder.initBean(this, beanRef, bean);
-//				}	
 			}
 			else if(bean == null) { // might be a factory
 				Logger.w(getClass().getSimpleName(), "No such bean with name " + name);
@@ -417,4 +454,38 @@ public class Container {
 			this.context = context;
 		}
 	}
+	
+	protected Class<?>[] getAllInterfacesAsArray(Class<?> cls) {
+		List<Class<?>> interfaces = getAllInterfaces(cls);
+		if(interfaces != null) {
+			return interfaces.toArray(new Class<?>[interfaces.size()]);
+		}
+		return null;
+	}
+	
+
+	protected List<Class<?>> getAllInterfaces(Class<?> cls) {
+		if (cls == null) {
+			return null;
+		}
+
+		LinkedHashSet<Class<?>> interfacesFound = new LinkedHashSet<Class<?>>();
+		getAllInterfaces(cls, interfacesFound);
+
+		return new ArrayList<Class<?>>(interfacesFound);
+	}
+
+	private void getAllInterfaces(Class<?> cls, HashSet<Class<?>> interfacesFound) {
+		while (cls != null) {
+			Class<?>[] interfaces = cls.getInterfaces();
+
+			for (Class<?> i : interfaces) {
+				if (interfacesFound.add(i)) {
+					getAllInterfaces(i, interfacesFound);
+				}
+			}
+
+			cls = cls.getSuperclass();
+		}
+	}	
 }

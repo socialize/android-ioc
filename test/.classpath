@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="libext/AndroidMockGenerator-appmakr-modified.jar"/>
 	<classpathentry kind="lib" path="libs/easymock.jar"/>
 	<classpathentry kind="lib" path="libs/javassist-appmakr.jar"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

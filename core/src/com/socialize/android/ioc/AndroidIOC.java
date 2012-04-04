@@ -30,6 +30,22 @@ public class AndroidIOC implements IOCContainer {
 	private Container container;
 	private boolean initialized = false;
 	
+	public static void registerProxy(String name, Object proxy) {
+		Container.registerProxy(name, proxy);
+	}
+	
+	public static void unregisterProxy(String name) {
+		Container.unregisterProxy(name);
+	}	
+	
+	public static void registerStub(String name, Object proxy) {
+		Container.registerStub(name, proxy);
+	}
+	
+	public static void unregisterStub(String name) {
+		Container.unregisterStub(name);
+	}			
+	
 	@Override
 	public void init(Context context, InputStream...in) throws Exception {
 		init(context, new ContainerBuilder(context), in);

@@ -286,7 +286,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertNotNull(bean);
 		assertEquals("Hello World", bean.print());
 		
-		container.setRuntimeProxy(beanName, new TestClassWithPrintMethod(){
+		container.setStaticRuntimeProxy(beanName, new TestClassWithPrintMethod(){
 			@Override
 			public String print() {
 				return "foobar";

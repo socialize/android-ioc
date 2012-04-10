@@ -87,6 +87,10 @@ public class Container {
 		staticStubs.remove(name);
 	}		
 	
+	public <T extends Object> void setStaticRuntimeProxy(String name, T bean) {
+		setRuntimeProxyInternal(name, bean, true);
+	}
+	
 	public <T extends Object> void setRuntimeProxy(String name, T bean) {
 		setRuntimeProxyInternal(name, bean, false);
 	}
@@ -108,6 +112,7 @@ public class Container {
 				
 				ProxyObject<T> proxy = new ProxyObject<T>();
 				proxy.setDelegate(bean);
+				proxy.setStaticProxy(isStatic);
 				
 				proxies.put(name, proxy);
 			}

@@ -463,6 +463,10 @@ public class Container {
 		}
 	}
 	
+	public Context getContext() {
+		return context;
+	}
+
 	protected Class<?>[] getAllInterfacesAsArray(Class<?> cls) {
 		List<Class<?>> interfaces = getAllInterfaces(cls);
 		if(interfaces != null) {

@@ -4,7 +4,6 @@
 	<target name="build">
 		<antcall target="clean"/>
 		<antcall target="jar"/>
-		<antcall target="package"/>
 	</target>
 
 	<target name="jar" depends="compile-for-build, -jar"/>

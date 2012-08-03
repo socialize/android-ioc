@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Socialize Inc. 
+ * Copyright (c) 2012 Socialize Inc. 
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,11 @@ public class AndroidIOC implements IOCContainer {
 	
 	public static void unregisterStub(String name) {
 		Container.unregisterStub(name);
-	}			
+	}		
+	
+	public static void clearStubs() {
+		Container.clearStubs();
+	}
 	
 	@Override
 	public void init(Context context, InputStream...in) throws Exception {
@@ -150,5 +154,10 @@ public class AndroidIOC implements IOCContainer {
 	@Override
 	public Context getContext() {
 		return container.getContext();
+	}
+
+	@Override
+	public void onContextDestroyed(Context context) {
+		container.onContextDestroyed(context);
 	}
 }

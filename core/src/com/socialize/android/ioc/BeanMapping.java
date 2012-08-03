@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Socialize Inc. 
+ * Copyright (c) 2012 Socialize Inc. 
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal
@@ -109,6 +109,18 @@ public class BeanMapping {
 	
 	public boolean isEmpty() {
 		return beanRefs.isEmpty() && factoryRefs.isEmpty() && proxyRefs.isEmpty();
+	}
+	
+	public void clear() {
+		if(beanRefs != null) {
+			beanRefs.clear();
+		}
+		if(factoryRefs != null) {
+			factoryRefs.clear();
+		}
+		if(proxyRefs != null) {
+			proxyRefs.clear();
+		}	
 	}
 	
 	/**

@@ -62,6 +62,19 @@ public class AndroidIOC implements IOCContainer {
 	}
 	
 	@Override
+	public void init(Context context, ContainerBuilder builder, BeanMappingSource source) throws Exception {
+		if(!initialized) {
+			container = builder.build(source);
+			initialized = true;
+		}
+	}
+
+	@Override
+	public void init(Context context, BeanMappingSource source) throws Exception {
+		init(context, new ContainerBuilder(context), source);
+	}
+
+	@Override
 	public void init(Context context, InputStream...in) throws Exception {
 		init(context, new ContainerBuilder(context), in);
 	}

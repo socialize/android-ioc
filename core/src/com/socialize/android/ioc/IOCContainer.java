@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Socialize Inc. 
+ * Copyright (c) 2012 Socialize Inc. 
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal
@@ -124,6 +124,23 @@ public interface IOCContainer {
 	public void init(Context context, InputStream...in) throws Exception;
 	
 	/**
+	 * Initializes the container.
+	 * @param context The current context.
+	 * @param builder
+	 * @param source
+	 * @throws Exception
+	 */
+	public void init(Context context, ContainerBuilder builder, BeanMappingSource source) throws Exception;
+
+	/**
+	 * Initializes the container.
+	 * @param context The current context.
+	 * @param source
+	 * @throws Exception
+	 */
+	public void init(Context context, BeanMappingSource source) throws Exception;
+	
+	/**
 	 * Returns the number of beans in the container.
 	 * @return
 	 */
@@ -134,5 +151,17 @@ public interface IOCContainer {
 	 * @param context
 	 */
 	public void setContext(Context context);
+	
+	/**
+	 * Gets the current context registered in the container.
+	 * @return
+	 */
+	public Context getContext();
+	
+	/**
+	 * Called when the current context is destroyed (Activity onDestroy)
+	 * @param context
+	 */
+	public void onContextDestroyed(Context context);
 
 }

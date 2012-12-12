@@ -2,6 +2,7 @@ gen
 bin
 coverage
 test-output
+sample/src_ext
 findbugs-output
 **/coverage.em
 .settings

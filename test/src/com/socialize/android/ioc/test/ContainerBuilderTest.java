@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Socialize Inc. 
+ * Copyright (c) 2012 Socialize Inc. 
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal
@@ -286,7 +286,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertNotNull(bean);
 		assertEquals("Hello World", bean.print());
 		
-		container.setRuntimeProxy(beanName, new TestClassWithPrintMethod(){
+		container.setStaticRuntimeProxy(beanName, new TestClassWithPrintMethod(){
 			@Override
 			public String print() {
 				return "foobar";

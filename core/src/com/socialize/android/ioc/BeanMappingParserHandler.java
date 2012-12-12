@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Socialize Inc. 
+ * Copyright (c) 2012 Socialize Inc. 
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ package com.socialize.android.ioc;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
 import com.socialize.android.ioc.Argument.CollectionType;
 import com.socialize.android.ioc.Argument.RefType;
 
@@ -90,6 +89,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 			}
 			
 			currentBean.setSingleton(parseBoolean(attributes.getValue("singleton"), true));
+			currentBean.setCached(parseBoolean(attributes.getValue("cache"), false));
 			currentBean.setAbstractBean(parseBoolean(attributes.getValue("abstract"), false));
 			
 			beanMapping.addBeanRef(currentBean);

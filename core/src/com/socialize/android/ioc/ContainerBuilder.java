@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Socialize Inc. 
+ * Copyright (c) 2012 Socialize Inc. 
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,10 +37,8 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
-
 import android.app.Activity;
 import android.content.Context;
-
 import com.socialize.android.ioc.Argument.CollectionType;
 import com.socialize.android.ioc.Argument.RefType;
 
@@ -101,8 +99,12 @@ public class ContainerBuilder {
 				
 				if(cargs != null && cargs.length > 0) {
 					
-					if(beanRef.isContextSensitive() && containsContext(cargs) && beanRef.isSingleton()) {
-						logContextConstructorWarning(beanRef);
+					if(containsContext(cargs)) {
+						
+//						if( beanRef.isSingleton() ) {
+//							logContextConstructorWarning(beanRef);
+//						}
+						
 						beanRef.setContextSensitiveConstructor(true);
 					}
 					
@@ -111,8 +113,12 @@ public class ContainerBuilder {
 			}
 			else if(args != null && args.length > 0) {
 				
-				if(containsContext(args) && beanRef.isSingleton()) {
-					logContextConstructorWarning(beanRef);
+				if(containsContext(args)) {
+					
+//					if(beanRef.isSingleton()) {
+//						logContextConstructorWarning(beanRef);
+//					}
+					
 					beanRef.setContextSensitiveConstructor(true);
 				}
 				
@@ -141,12 +147,12 @@ public class ContainerBuilder {
 
 	}
 	
-	private void logContextConstructorWarning(BeanRef beanRef) {
-		Logger.w(getClass().getSimpleName(), "Bean " + beanRef.getName() + " [" +
-				beanRef.getClassName() +
-				"] defines a constructor with an Android context.  This is STRONGLY DISCORAGED for singleton beans  as changes in context may lead to orphaned beans.  Consider using an init-method");
-		
-	}
+//	private void logContextConstructorWarning(BeanRef beanRef) {
+//		Logger.w(getClass().getSimpleName(), "Bean " + beanRef.getName() + " [" +
+//				beanRef.getClassName() +
+//				"] defines a constructor with an Android context.  This is STRONGLY DISCORAGED for singleton beans  as changes in context may lead to orphaned beans.  Consider using an init-method");
+//		
+//	}
 	
 	private boolean containsContext(Object[] args) {
 		if(args != null) {
@@ -206,6 +212,18 @@ public class ContainerBuilder {
 	public Container build(InputStream...streams) throws IOException {
 		BeanMapping primary = this.parser.parse(context, streams);
 		return build(primary);
+	}
+	
+	public Container build(BeanMappingSource source) throws IOException {
+		
+		BeanMapping beanMapping = BeanMappingCache.get(source.getName());
+		
+		if(beanMapping == null) {
+			beanMapping = this.parser.parse(context, source.getSources());
+			BeanMappingCache.put(source.getName(), beanMapping);
+		}
+		
+		return build(beanMapping);
 	}
 	
 	protected void resolveImports(BeanMapping original) throws IOException {
@@ -486,6 +504,9 @@ public class ContainerBuilder {
 							ref.getName() +
 							"] initialized.");
 				}
+			}
+			else {
+				// May be factory
 			}
 		}
 		

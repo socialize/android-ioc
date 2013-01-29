@@ -698,45 +698,7 @@ public class ContainerBuilder {
 			
 			switch(arg.getType()) {
 				case BEAN:
-					// Look for the bean
-					if(!container.containsBean(arg.getValue())) {
-						BeanRef beanRef = container.getBeanRef(arg.getValue());
-						if(beanRef != null) {
-							if(!beanRef.isSingleton()) {
-								// Not a singleton, create one
-								object = container.getBean(arg.getValue());
-							}
-							else {
-								Logger.w(getClass().getSimpleName(), "No bean found with name [" +
-										arg.getValue() +
-										"].  May not have been created yet");
-							}
-						}
-						else {
-							// We can't construct this now
-							Logger.w(getClass().getSimpleName(), "No bean definition found with name [" +
-									arg.getValue() +
-									"].  May not have been created yet");
-						}
-					}
-					else {
-						object = container.getBean(arg.getValue());
-						
-						if(forInit && object != null) {
-							BeanRef beanRef = container.getBeanRef(arg.getValue());
-							if(beanRef != null && beanRef.getInitMethod() != null) {
-								// Make sure this bean has been initialized
-								if(!beanRef.isInitCalled()) {
-									// We can't init this now
-									Logger.i(getClass().getSimpleName(), "Bean argument [" +
-											beanRef.getName() +
-											"] has not been initialized yet so cannot be used as an argument for another init method");
-									object = null;
-								}
-							}
-						}
-					}
-					
+					object = getBeanValue(container, arg.getValue(), forInit);
 					break;
 					
 				case CONTEXT:
@@ -777,6 +739,56 @@ public class ContainerBuilder {
 		}
 		else {
 			Logger.e(getClass().getSimpleName(), "No argument type specified!");
+		}
+		
+		return object;
+	}
+	
+	private Object getBeanValue(Container container, String name, boolean forInit) {
+		Object object = null;
+		
+		// Look for the bean
+		if(!container.containsBean(name)) {
+			BeanRef beanRef = container.getBeanRef(name);
+			if(beanRef != null) {
+				if(!beanRef.isSingleton()) {
+					// Not a singleton, create one
+					object = container.getBean(name);
+				}
+				else {
+					Logger.w(getClass().getSimpleName(), "No bean found with name [" +
+							name +
+							"].  May not have been created yet");
+				}
+			}
+			else {
+				// We can't construct this now
+				Logger.w(getClass().getSimpleName(), "No bean definition found with name [" +
+						name +
+						"].  May not have been created yet");
+			}
+		}
+		else {
+			object = container.getBean(name);
+			
+			if(forInit && object != null) {
+				BeanRef beanRef = container.getBeanRef(name);
+				if(beanRef != null && beanRef.getInitMethod() != null) {
+					// Make sure this bean has been initialized
+					if(!beanRef.isInitCalled()) {
+						// We can't init this now
+						Logger.i(getClass().getSimpleName(), "Bean argument [" +
+								beanRef.getName() +
+								"] has not been initialized yet so cannot be used as an argument for another init method");
+						object = null;
+					}
+				}
+			}
+		}
+		
+		if(object instanceof IBeanMaker) {
+			// This is a maker bean, recurse
+			return getBeanValue(container, ((IBeanMaker)object).getBeanName(object, container), forInit);
 		}
 		
 		return object;

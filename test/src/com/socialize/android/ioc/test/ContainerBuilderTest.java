@@ -35,14 +35,11 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
-
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 import android.content.Context;
 import android.test.AndroidTestCase;
 import android.test.mock.MockContext;
-
 import com.google.android.testing.mocking.AndroidMock;
 import com.google.android.testing.mocking.UsesMocks;
 import com.socialize.android.ioc.AndroidIOC;
@@ -62,6 +59,8 @@ import com.socialize.android.ioc.ParserHandlerFactory;
 import com.socialize.android.ioc.ProxyObject;
 import com.socialize.android.ioc.sample.ITestClassWithPrintMethod;
 import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
+import com.socialize.android.ioc.sample.TestBeanMakee;
+import com.socialize.android.ioc.sample.TestBeanMaker;
 import com.socialize.android.ioc.sample.TestClassContainerAware;
 import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithBeanFactoryParam;
@@ -452,6 +451,46 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		TestClassWithIntConstructorArg bc2 = container.getBean(beanName);
 		
 		assertEquals(69, bc2.getParam());
+	}
+	
+	public void testBeanMaker() throws Exception {
+		String beanName = "bean";
+		String beanMakerName = "beanMaker";
+		String beanMakeeName = "beanMakee";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		BeanRef makerRef = new BeanRef();
+		makerRef.setClassName(TestBeanMaker.class.getName());
+		makerRef.addProperty(new Argument("beanName", beanMakeeName, RefType.STRING));
+		makerRef.setName(beanMakerName);
+		makerRef.setSingleton(true);
+		
+		BeanRef makeeRef = new BeanRef();
+		makeeRef.setClassName(TestBeanMakee.class.getName());
+		makeeRef.setName(beanMakeeName);
+		makeeRef.setSingleton(true);			
+		
+		BeanRef beanRef = new BeanRef();
+		beanRef.setClassName(TestClassWithBeanProperty.class.getName());
+		beanRef.addProperty(new Argument("bean", beanMakerName, RefType.BEAN));
+		beanRef.setName(beanName);
+		beanRef.setSingleton(true);		
+		
+		mapping.addBeanRef(makerRef);
+		mapping.addBeanRef(beanRef);
+		mapping.addBeanRef(makeeRef);
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		Container container = builder.build(mapping);
+		
+		TestClassWithBeanProperty bean = container.getBean(beanName);
+		assertNotNull(bean);
+		
+		Object object = bean.getBean();
+		
+		assertNotNull(object);
+		assertTrue(object instanceof TestBeanMakee);
 	}
 	
 	public void testExtraConstructorArgsInt() throws Exception {

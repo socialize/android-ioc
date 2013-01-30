@@ -291,7 +291,7 @@ public class Container {
 			
 			if(beanRef != null) {
 				if(bean == null) {
-					if(!beanRef.isSingleton()) {
+					if(!beanRef.isSingleton() || beanRef.isLazy()) {
 						bean = builder.buildBean(this, beanRef, args);
 						
 						if(bean == null) {
@@ -300,6 +300,10 @@ public class Container {
 						else {
 							builder.setBeanProperties(this, beanRef, bean);
 							builder.initBean(this, beanRef, bean);
+							
+							if(beanRef.isSingleton()) {
+								putBean(beanRef.getName(), bean);
+							}
 						}
 					}
 				}

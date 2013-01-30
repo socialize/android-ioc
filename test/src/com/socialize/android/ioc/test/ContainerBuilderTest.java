@@ -65,6 +65,7 @@ import com.socialize.android.ioc.sample.TestClassContainerAware;
 import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithBeanFactoryParam;
 import com.socialize.android.ioc.sample.TestClassWithBeanProperty;
+import com.socialize.android.ioc.sample.TestClassWithConstructorCounter;
 import com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg;
 import com.socialize.android.ioc.sample.TestClassWithDualListConstructorArg;
 import com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg;
@@ -477,9 +478,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		beanRef.setName(beanName);
 		beanRef.setSingleton(true);		
 		
-		mapping.addBeanRef(makerRef);
 		mapping.addBeanRef(beanRef);
 		mapping.addBeanRef(makeeRef);
+		mapping.addBeanRef(makerRef);
 		
 		ContainerBuilder builder = new ContainerBuilder(getContext());
 		Container container = builder.build(mapping);
@@ -1313,6 +1314,110 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		assertFalse(beanA == beanB);
 	}
+	
+	public void testContainerBuilderLazyBean() throws Exception {
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithConstructorCounter.class.getName());
+		ref.setName(beanName);
+		ref.setLazy(true);
+		mapping.addBeanRef(ref);
+		
+		TestClassWithConstructorCounter.CONSTRUCTOR_COUNT = 0;
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		Container container = builder.build(mapping);
+		
+		Object beanA = container.getBean(beanName);
+		Object beanB = container.getBean(beanName);
+		
+		assertNotNull(beanA);
+		assertNotNull(beanB);
+		assertTrue(beanA == beanB);
+		assertEquals(1, TestClassWithConstructorCounter.CONSTRUCTOR_COUNT);
+	}
+	
+	public void testContainerBuilderWithLazyBeanProperty() throws Exception {
+		String lazyName = "lazyBean";
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithConstructorCounter.class.getName());
+		ref.setName(lazyName);
+		ref.setLazy(true);
+		
+		BeanRef bean = new BeanRef();
+		bean.setClassName(TestClassWithBeanProperty.class.getName());
+		bean.setName(beanName);
+		bean.addProperty(new Argument("bean", lazyName, RefType.BEAN));
+				
+		mapping.addBeanRef(ref);
+		mapping.addBeanRef(bean);
+		
+		TestClassWithConstructorCounter.CONSTRUCTOR_COUNT = 0;
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		Container container = builder.build(mapping);
+		
+		TestClassWithBeanProperty beanA = container.getBean(beanName);
+		TestClassWithConstructorCounter beanB = beanA.getBean();
+		TestClassWithConstructorCounter beanC = container.getBean(lazyName);
+		
+		assertNotNull(beanA);
+		assertNotNull(beanB);
+		assertNotNull(beanC);
+		assertTrue(beanB == beanC);
+		
+		assertEquals(1, TestClassWithConstructorCounter.CONSTRUCTOR_COUNT);
+	}	
+	
+
+	public void testContainerBuilderWithLazyBeanMakerProperty() throws Exception {
+		String lazyName = "lazyBean";
+		String makerName = "makerBean";
+		String beanName = "bean";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		BeanRef ref = new BeanRef();
+		ref.setClassName(TestClassWithConstructorCounter.class.getName());
+		ref.setName(lazyName);
+		ref.setLazy(true);
+		
+		BeanRef maker = new BeanRef();
+		maker.setClassName(TestBeanMaker.class.getName());
+		maker.setName(makerName);
+		maker.addProperty(new Argument("beanName", lazyName, RefType.STRING));		
+		
+		BeanRef bean = new BeanRef();
+		bean.setClassName(TestClassWithBeanProperty.class.getName());
+		bean.setName(beanName);
+		bean.addProperty(new Argument("bean", makerName, RefType.BEAN));
+				
+		mapping.addBeanRef(ref);
+		mapping.addBeanRef(bean);
+		mapping.addBeanRef(maker);
+		
+		TestClassWithConstructorCounter.CONSTRUCTOR_COUNT = 0;
+		
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		Container container = builder.build(mapping);
+		
+		TestClassWithBeanProperty beanA = container.getBean(beanName);
+		TestClassWithConstructorCounter beanB = beanA.getBean();
+		TestClassWithConstructorCounter beanC = container.getBean(lazyName);
+		
+		assertNotNull(beanA);
+		assertNotNull(beanB);
+		assertNotNull(beanC);
+		assertTrue(beanB == beanC);
+		
+		assertEquals(1, TestClassWithConstructorCounter.CONSTRUCTOR_COUNT);
+	}		
 	
 	public void testContainerBuilderFactoryBean() throws Exception {
 		String beanName = "bean";

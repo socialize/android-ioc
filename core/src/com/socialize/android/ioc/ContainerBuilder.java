@@ -86,7 +86,6 @@ public class ContainerBuilder {
 				Object[] cargs = getArguments(container, constructorArgs, false);
 				if(cargs != null && cargs.length > 0) {
 					if(args != null && args.length > 0) {
-						// Concat
 						Object[] concat = new Object[cargs.length + args.length];
 						System.arraycopy(cargs, 0, concat, 0, cargs.length);
 						System.arraycopy(args, 0, concat, cargs.length, args.length);
@@ -100,11 +99,6 @@ public class ContainerBuilder {
 				if(cargs != null && cargs.length > 0) {
 					
 					if(containsContext(cargs)) {
-						
-//						if( beanRef.isSingleton() ) {
-//							logContextConstructorWarning(beanRef);
-//						}
-						
 						beanRef.setContextSensitiveConstructor(true);
 					}
 					
@@ -114,11 +108,6 @@ public class ContainerBuilder {
 			else if(args != null && args.length > 0) {
 				
 				if(containsContext(args)) {
-					
-//					if(beanRef.isSingleton()) {
-//						logContextConstructorWarning(beanRef);
-//					}
-					
 					beanRef.setContextSensitiveConstructor(true);
 				}
 				
@@ -147,13 +136,6 @@ public class ContainerBuilder {
 
 	}
 	
-//	private void logContextConstructorWarning(BeanRef beanRef) {
-//		Logger.w(getClass().getSimpleName(), "Bean " + beanRef.getName() + " [" +
-//				beanRef.getClassName() +
-//				"] defines a constructor with an Android context.  This is STRONGLY DISCORAGED for singleton beans  as changes in context may lead to orphaned beans.  Consider using an init-method");
-//		
-//	}
-	
 	private boolean containsContext(Object[] args) {
 		if(args != null) {
 			for (Object obj : args) {
@@ -166,41 +148,74 @@ public class ContainerBuilder {
 		return false;
 	}
 	
-	public void setBeanProperties(Container container, BeanRef ref, Object bean)  {
-		try {
-			Logger.i(getClass().getSimpleName(), "Setting properties on bean " + ref.getName());
-			
-			List<Argument> properties = ref.getProperties();
-			
-			if(properties != null && properties.size() > 0) {
-				for (Argument property : properties) {
-					if(property.getKey() != null) {
-						Object value = getArgumentValue(container, property, false);
-						if(value == null) {
-							Logger.w(getClass().getSimpleName(), "Failed to locate value for property [" +
-									property.getKey() +
-									"] of bean [" +
-									ref.getName() +
-									"].  The bean may be incomplete as a result!");
+	public void setBeanProperties(Container container, BeanRef ref, Object bean) {
+		setBeanProperties(container, ref, bean, null);
+	}
+	
+	public void setBeanProperties(Container container, BeanRef ref, Object bean, List<SetPropertyLater> setLater)  {
+		
+		if(!ref.isPropertiesSet()) {
+			try {
+				Logger.i(getClass().getSimpleName(), "Setting properties on bean " + ref.getName());
+				
+				List<Argument> properties = ref.getProperties();
+				
+				if(properties != null && properties.size() > 0) {
+					for (Argument property : properties) {
+						if(property.getKey() != null) {
+							setBeanProperty(container, ref, bean, property, setLater);
 						}
 						else {
-							builder.setProperty(ref, bean, property.getKey(), value);
+							Logger.e(getClass().getSimpleName(), "Cannot set property on bean [" +
+									ref.getName() +
+									"] with null name");
 						}
 					}
-					else {
-						Logger.e(getClass().getSimpleName(), "Cannot set property on bean [" +
-								ref.getName() +
-								"] with null name");
-					}
 				}
+				
+				Logger.i(getClass().getSimpleName(), "Properties set on bean " + ref.getName());
+				
+				ref.setPropertiesSet(true);
 			}
-			
-			Logger.i(getClass().getSimpleName(), "Properties set on bean " + ref.getName());
+			catch (Exception e) {
+				Logger.e(getClass().getSimpleName(), "Failed to set properties on bean [" +
+						ref.getName() +
+						"]", e);
+			}
 		}
-		catch (Exception e) {
-			Logger.e(getClass().getSimpleName(), "Failed to set properties on bean [" +
-					ref.getName() +
-					"]", e);
+	}
+	
+	private void setBeanProperty(Container container, BeanRef ref, Object bean, Argument property, List<SetPropertyLater> setLater) {
+		Object value = getArgumentValue(container, property, false);
+		if(value == null) {
+			
+			// Try to set later
+			if(setLater != null) {
+				SetPropertyLater later = new SetPropertyLater();
+				later.ref = ref;
+				later.bean = bean;
+				later.arg = property;
+				setLater.add(later);
+			}
+			else {
+				Logger.w(getClass().getSimpleName(), "Failed to locate value for property [" +
+						property.getKey() +
+						"] of bean [" +
+						ref.getName() +
+						"].  The bean may be incomplete as a result!");
+			}
+		}
+		else {
+			try {
+				builder.setProperty(ref, bean, property.getKey(), value);
+			}
+			catch (Exception e) {
+				Logger.e(getClass().getSimpleName(), "Failed to set property [" +
+						property.getKey() +
+						"] on bean [" +
+						ref.getName() +
+						"]", e);
+			}
 		}
 	}
 	
@@ -460,15 +475,25 @@ public class ContainerBuilder {
 		// Set properties
 		Map<String, Object> beans = container.getBeans();
 		
-		Set<Entry<String, Object>> entrySet = beans.entrySet();
+		// We may add to the set, so create a copy to avoid modification errors
+		Set<Entry<String, Object>> entrySet = new HashSet<Map.Entry<String,Object>>(beans.entrySet());
+		
+		List<SetPropertyLater> setLaterProperties = new LinkedList<SetPropertyLater>();
 		
 		for (Entry<String, Object> entry : entrySet) {
 			BeanRef ref = mapping.getBeanRef(entry.getKey());
 			
 			if(ref != null) { // Might be a factory
 				Object bean = entry.getValue();
-				setBeanProperties(container, ref, bean);
+				setBeanProperties(container, ref, bean, setLaterProperties);
 			}
+		}
+		
+		if(!setLaterProperties.isEmpty()) {
+			for (SetPropertyLater later : setLaterProperties) {
+				setBeanProperty(container, later.ref, later.bean, later.arg, null);
+			}
+			setLaterProperties.clear();
 		}
 		
 		initBeans(container, mapping, beans, 0);
@@ -637,7 +662,7 @@ public class ContainerBuilder {
 
 		for (BeanRef beanRef : beanRefs) {
 
-			if(!beanRef.isAbstractBean() && beanRef.isSingleton() && !container.containsBean(beanRef.getName())) {
+			if(!beanRef.isAbstractBean() && !beanRef.isLazy() && beanRef.isSingleton() && !container.containsBean(beanRef.getName())) {
 
 				Object bean = null;
 
@@ -751,7 +776,7 @@ public class ContainerBuilder {
 		if(!container.containsBean(name)) {
 			BeanRef beanRef = container.getBeanRef(name);
 			if(beanRef != null) {
-				if(!beanRef.isSingleton()) {
+				if(!beanRef.isSingleton() || beanRef.isLazy()) {
 					// Not a singleton, create one
 					object = container.getBean(name);
 				}
@@ -788,7 +813,22 @@ public class ContainerBuilder {
 		
 		if(object instanceof IBeanMaker) {
 			// This is a maker bean, recurse
-			return getBeanValue(container, ((IBeanMaker)object).getBeanName(object, container), forInit);
+			BeanRef beanRef = container.getBeanRef(name);
+			
+			// It's possible this maker has not had it's properties set yet.. so set them
+			setBeanProperties(container, beanRef, object);
+			
+			String beanName = ((IBeanMaker)object).getBeanName(object, container);
+			
+			if(beanName == null) {
+				Logger.w(getClass().getSimpleName(), "Bean maker with name [" +
+						name +
+						"] returned null for bean name");
+				return null;
+			}
+			else {
+				return getBeanValue(container, beanName, forInit);
+			}
 		}
 		
 		return object;
@@ -997,5 +1037,11 @@ public class ContainerBuilder {
 
 	public void setContext(Context context) {
 		this.context = context;
+	}
+	
+	class SetPropertyLater {
+		BeanRef ref;
+		Object bean;
+		Argument arg;
 	}
 }

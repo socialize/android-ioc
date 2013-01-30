@@ -1,4 +1,5 @@
 <beans>
 	<bean id="bean30" class="com.socialize.android.ioc.sample.TestClassWithInitAndDestroy" singleton="false"/>
 	<bean id="bean31" class="com.socialize.android.ioc.sample.TestClassWithInitAndDestroy" abstract="true"/>
+	<bean id="bean32" class="com.socialize.android.ioc.sample.TestClassWithInitAndDestroy" lazy="true"/>
 </beans>

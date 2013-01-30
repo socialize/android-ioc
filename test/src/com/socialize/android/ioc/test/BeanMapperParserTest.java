@@ -1075,21 +1075,29 @@ public class BeanMapperParserTest extends AndroidTestCase {
 		assertEquals("foobar", argument.getValue());
 	}
 	
-	public void testSingletonAndAbstract() throws Exception {
+	public void testSingletonAndLazyAndAbstract() throws Exception {
 		BeanMappingParser parser = new BeanMappingParser();
 		BeanMapping mapping = parser.parse(getContext(),"20-singleton-and-abstract.xml");
 		assertNotNull(mapping);
 		BeanRef ref = mapping.getBeanRef("bean30");
 		BeanRef ref1 = mapping.getBeanRef("bean31");
+		BeanRef ref2 = mapping.getBeanRef("bean32");
 		
 		assertNotNull(ref);
 		assertNotNull(ref1);
+		assertNotNull(ref2);
 		
 		assertFalse(ref.isSingleton());
 		assertFalse(ref.isAbstractBean());
+		assertFalse(ref.isLazy());
 		
 		assertTrue(ref1.isSingleton());
 		assertTrue(ref1.isAbstractBean());
+		assertFalse(ref1.isLazy());
+		
+		assertTrue(ref2.isSingleton());
+		assertFalse(ref2.isAbstractBean());
+		assertTrue(ref2.isLazy());		
 	}
 	
 	

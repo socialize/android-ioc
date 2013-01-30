@@ -49,7 +49,8 @@ public class BeanRef {
 	private boolean abstractBean = false;
 	
 	private boolean initCalled = false;
-	private boolean lazyInit = false;
+	private boolean propertiesSet = false;
+	private boolean lazy = false;
 	
 	private boolean resolved = false;
 	
@@ -193,14 +194,20 @@ public class BeanRef {
 		this.contextSensitiveInitMethod = contextSensitiveInitMethod;
 	}
 
-	@Deprecated
-	public boolean isLazyInit() {
-		return lazyInit;
+	public boolean isPropertiesSet() {
+		return propertiesSet;
+	}
+	
+	public void setPropertiesSet(boolean propertiesSet) {
+		this.propertiesSet = propertiesSet;
 	}
 
-	@Deprecated
-	public void setLazyInit(boolean lazyInit) {
-		this.lazyInit = lazyInit;
+	public boolean isLazy() {
+		return lazy;
+	}
+
+	public void setLazy(boolean lazy) {
+		this.lazy = lazy;
 	}
 	
 	public Set<Argument> getAllArguments() {

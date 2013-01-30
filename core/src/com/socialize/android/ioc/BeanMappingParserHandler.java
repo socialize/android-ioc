@@ -91,6 +91,7 @@ public class BeanMappingParserHandler extends DefaultHandler {
 			currentBean.setSingleton(parseBoolean(attributes.getValue("singleton"), true));
 			currentBean.setCached(parseBoolean(attributes.getValue("cache"), false));
 			currentBean.setAbstractBean(parseBoolean(attributes.getValue("abstract"), false));
+			currentBean.setLazy(parseBoolean(attributes.getValue("lazy"), false));
 			
 			beanMapping.addBeanRef(currentBean);
 		}

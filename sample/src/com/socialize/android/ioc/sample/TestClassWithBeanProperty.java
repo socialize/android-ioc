@@ -4,8 +4,9 @@ public class TestClassWithBeanProperty {
 
 	private Object bean;
 
-	public Object getBean() {
-		return bean;
+	@SuppressWarnings("unchecked")
+	public <T extends Object> T getBean() {
+		return (T) bean;
 	}
 
 	public void setBean(Object bean) {

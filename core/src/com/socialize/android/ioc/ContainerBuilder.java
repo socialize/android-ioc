@@ -154,7 +154,7 @@ public class ContainerBuilder {
 	
 	public void setBeanProperties(Container container, BeanRef ref, Object bean, List<SetPropertyLater> setLater)  {
 		
-		if(!ref.isPropertiesSet()) {
+		if(!ref.isSingleton() || !ref.isPropertiesSet()) {
 			try {
 				Logger.i(getClass().getSimpleName(), "Setting properties on bean " + ref.getName());
 				
@@ -175,7 +175,9 @@ public class ContainerBuilder {
 				
 				Logger.i(getClass().getSimpleName(), "Properties set on bean " + ref.getName());
 				
-				ref.setPropertiesSet(true);
+				if(ref.isSingleton()) {
+					ref.setPropertiesSet(true);
+				}
 			}
 			catch (Exception e) {
 				Logger.e(getClass().getSimpleName(), "Failed to set properties on bean [" +
@@ -234,8 +236,25 @@ public class ContainerBuilder {
 		BeanMapping beanMapping = BeanMappingCache.get(source.getName());
 		
 		if(beanMapping == null) {
-			beanMapping = this.parser.parse(context, source.getSources());
-			BeanMappingCache.put(source.getName(), beanMapping);
+			InputStream[] sources = source.getSources();
+			try {
+				beanMapping = this.parser.parse(context, sources);
+				BeanMappingCache.put(source.getName(), beanMapping);
+			}
+			finally {
+				IOException ex = null;
+				for (InputStream in : sources) {
+					try {
+						in.close();
+					}
+					catch (IOException e) {
+						ex = e;
+					}
+				}
+				if(ex != null) {
+					throw ex;
+				}
+			}
 		}
 		
 		return build(beanMapping);

@@ -55,7 +55,6 @@ public class BeanRef {
 	private boolean resolved = false;
 	
 	private boolean contextSensitive = false;
-	
 	private boolean contextSensitiveConstructor = false;
 	private boolean contextSensitiveInitMethod = false;
 	

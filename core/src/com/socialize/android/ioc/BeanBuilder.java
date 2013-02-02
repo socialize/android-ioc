@@ -299,22 +299,15 @@ public class BeanBuilder {
 
 	public Method getMethodFor(Class<?> clazz, String name, Object...args) {
 		Method[] methods = clazz.getMethods();
-		Method compatibleMethod = null;
 		for (Method method : methods) {
 			if (method.getName().equals(name)) {
 				Class<?>[] params = method.getParameterTypes();
 				Type[] types = method.getGenericParameterTypes();
 				if(isMethodMatched(params, types, args)) {
-					compatibleMethod = method;
-					break;
+					return method;
 				}
 			}
 		}
-
-		if (compatibleMethod != null) {
-			return compatibleMethod;
-		}
-
 		return null;
 	}
 	

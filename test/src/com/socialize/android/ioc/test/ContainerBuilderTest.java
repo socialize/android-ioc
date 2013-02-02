@@ -1315,6 +1315,68 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		assertFalse(beanA == beanB);
 	}
 	
+	public void testPropertySetCounts() throws Exception {
+		
+		String propertyBeanName = "propertyBean";
+		String nonSingletonBeanName = "nonSingletonBean";
+		String singletonBeanName = "singletonBeanName";
+		
+		BeanMapping mapping = new BeanMapping();
+		
+		BeanRef propertyBeanRef = new BeanRef();
+		propertyBeanRef.setClassName(TestClassWithConstructorCounter.class.getName());
+		propertyBeanRef.setName(propertyBeanName);
+		
+		BeanRef singletonBeanRef = new BeanRef();
+		singletonBeanRef.setClassName(TestClassWithBeanProperty.class.getName());
+		singletonBeanRef.setName(singletonBeanName);
+		singletonBeanRef.addProperty(new Argument("bean", propertyBeanName, RefType.BEAN));
+		
+		BeanRef nonSingletonBeanRef = new BeanRef();
+		nonSingletonBeanRef.setClassName(TestClassWithBeanProperty.class.getName());
+		nonSingletonBeanRef.setName(nonSingletonBeanName);
+		nonSingletonBeanRef.setSingleton(false);
+		nonSingletonBeanRef.addProperty(new Argument("bean", propertyBeanName, RefType.BEAN));
+
+		mapping.addBeanRef(propertyBeanRef);
+		mapping.addBeanRef(nonSingletonBeanRef);
+		mapping.addBeanRef(singletonBeanRef);
+				
+		ContainerBuilder builder = new ContainerBuilder(getContext());
+		Container container = builder.build(mapping);
+		
+		// Get the singleton
+		TestClassWithBeanProperty sing0 = container.getBean(singletonBeanName);
+		TestClassWithBeanProperty bean0 = container.getBean(nonSingletonBeanName);
+		
+		assertFalse(sing0 == bean0);
+		assertNotNull(sing0.getBean());
+		assertNotNull(bean0.getBean());
+		assertTrue(sing0.getBean() == bean0.getBean());
+		
+		assertEquals(1, sing0.PROPERTY_SET_CALLS);
+		assertEquals(1, bean0.PROPERTY_SET_CALLS);
+		
+		// Now get again
+		TestClassWithBeanProperty sing1 = container.getBean(singletonBeanName);
+		TestClassWithBeanProperty bean1 = container.getBean(nonSingletonBeanName);
+		
+		assertFalse(sing1 == bean1);
+		assertFalse(bean0 == bean1);
+		
+		assertTrue(sing0 == sing1);
+		
+		assertNotNull(sing1.getBean());
+		assertNotNull(bean1.getBean());
+		assertTrue(sing0.getBean() == sing1.getBean());		
+		assertTrue(sing0.getBean() == bean1.getBean());		
+		assertTrue(sing1.getBean() == bean1.getBean());
+		assertTrue(bean0.getBean() == bean1.getBean());	
+		
+		assertEquals(1, sing1.PROPERTY_SET_CALLS);
+		assertEquals(1, bean1.PROPERTY_SET_CALLS);
+	}
+	
 	public void testContainerBuilderLazyBean() throws Exception {
 		String beanName = "bean";
 		

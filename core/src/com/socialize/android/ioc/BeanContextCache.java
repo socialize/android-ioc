@@ -124,8 +124,13 @@ public class BeanContextCache {
 	}
 	
 	public void setContext(Context context) {
-		this.context = context;
-		getBeanCache();
+		if(this.context != context) {
+			if(this.context != null) {
+				onContextDestroyed(this.context);
+			}
+			this.context = context;
+			getBeanCache();
+		}
 	}
 
 	public void onContextDestroyed(Context context) {

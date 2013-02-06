@@ -163,10 +163,7 @@ public class Container {
 						if(proxy == null) {
 							proxy = new ProxyObject<T>();
 							proxy.setDelegate(bean);
-							
-//							if(beanRef.isSingleton()) {
-								proxies.put(name, proxy);
-//							}					
+							proxies.put(name, proxy);
 						}
 						else if(!beanRef.isSingleton() && !proxy.isStaticProxy()) {
 							proxy.setDelegate(bean);
@@ -305,6 +302,13 @@ public class Container {
 								putBean(beanRef.getName(), bean);
 							}
 						}
+					}
+				}
+				 
+				if(bean instanceof IBeanMaker) {
+					String subBeanName = ((IBeanMaker)bean).getBeanName(bean, this);
+					if(subBeanName != null) {
+						return getBeanLocal(subBeanName, args);
 					}
 				}
 			}
@@ -465,10 +469,7 @@ public class Container {
 							// We have a new context, so we need to rebuild this bean
 							Object bean = builder.buildBean(this, ref);
 							builder.setBeanProperties(this, ref, bean);
-							
-//							if(!ref.isLazyInit()) {
-								builder.initBean(this, ref, bean);
-//							}
+							builder.initBean(this, ref, bean);
 							
 							putBean(ref.getName(), bean);
 							
@@ -476,16 +477,9 @@ public class Container {
 							replaced.add(ref);
 						}
 						else if(ref.isContextSensitiveInitMethod()) {
-							
-//							if(ref.isLazyInit()) {
-//								// Mark for re-init
-//								ref.setInitCalled(false);
-//							}
-//							else {
-								// Re-call init
-								Object bean = getBean(ref.getName());
-								builder.initBean(this, ref, bean);
-//							}
+							// Re-call init
+							Object bean = getBean(ref.getName());
+							builder.initBean(this, ref, bean);
 						}
 					}
 				}

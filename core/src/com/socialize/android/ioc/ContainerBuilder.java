@@ -62,7 +62,7 @@ public class ContainerBuilder {
 	
 	public ContainerBuilder(Context context, BeanMappingParser parser) {
 		super();
-		builder = new BeanBuilder();
+		builder = new BeanBuilder(context);
 		resourceLocator = new ResourceLocator(context);
 		imports = new HashMap<String, BeanMapping>();
 		this.parser = parser;

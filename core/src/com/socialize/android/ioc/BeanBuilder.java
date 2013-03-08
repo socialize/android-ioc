@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import android.content.Context;
 
 /**
  * 
@@ -40,23 +41,40 @@ import java.util.Set;
  * 
  */
 public class BeanBuilder {
+	
+	private Context context;
+	private Allocator allocator;
+
+	public BeanBuilder() {
+		super();
+	}
+	
+	public BeanBuilder(Context context) {
+		super();
+		initForSafeAllocations(context);
+	}
+	
+	public void initForSafeAllocations(Context context) {
+		this.context = context;
+		this.allocator = new DefaultAllocator();
+	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Object> T construct(String className) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+	public <T extends Object> T construct(String className) throws Exception, ClassNotFoundException {
 		return (T) construct(className, (Object[]) null);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Object> T construct(String className, Object...args) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException,
+	public <T extends Object> T construct(String className, Object...args) throws Exception,
 			ClassNotFoundException {
 		return (T) construct((Class<T>) Class.forName(className), args);
 	}
 
-	public <T extends Object> T construct(Class<T> clazz) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public <T extends Object> T construct(Class<T> clazz) throws Exception {
 		return (T) construct(clazz, (Object[]) null);
 	}
 
-	public <T extends Object> T construct(Class<T> clazz, Object...args) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public <T extends Object> T construct(Class<T> clazz, Object...args) throws Exception {
 
 		T object = null;
 
@@ -77,7 +95,12 @@ public class BeanBuilder {
 						"] is deprecated.  It will be used but should be reviewed for continued use");
 			}
 			
-			object = matched.newInstance(args);
+			if(allocator != null) {
+				object = allocator.allocate(context, matched, args);
+			}
+			else {
+				object = matched.newInstance(args);
+			}
 		}
 		else {
 			// No constructor found.

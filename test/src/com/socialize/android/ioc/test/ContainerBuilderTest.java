@@ -377,7 +377,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		BeanMapping mapping = new BeanMapping();
 		BeanRef ref = new BeanRef();
-		ref.setClassName(TestClassContainerAware.class.getName());
+		ref.setClassName("com.socialize.android.ioc.sample.TestClassContainerAware");
 		ref.setName(beanName);
 		mapping.addBeanRef(ref);
 		
@@ -462,7 +462,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		BeanMapping mapping = new BeanMapping();
 		
 		BeanRef makerRef = new BeanRef();
-		makerRef.setClassName(TestBeanMaker.class.getName());
+		makerRef.setClassName("com.socialize.android.ioc.sample.TestBeanMaker");
 		makerRef.addProperty(new Argument("beanName", beanMakeeName, RefType.STRING));
 		makerRef.setName(beanMakerName);
 		makerRef.setSingleton(true);
@@ -1451,7 +1451,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref.setLazy(true);
 		
 		BeanRef maker = new BeanRef();
-		maker.setClassName(TestBeanMaker.class.getName());
+		maker.setClassName("com.socialize.android.ioc.sample.TestBeanMaker");
 		maker.setName(makerName);
 		maker.addProperty(new Argument("beanName", lazyName, RefType.STRING));		
 		

@@ -476,6 +476,7 @@ public class ContainerBuilder {
 		resolveImports(mapping);
 		
 		Container container = new Container(mapping, this);
+        container.setContext(context);
 		
 		// Setup static proxies
 		if(Container.staticProxies.size() > 0) {

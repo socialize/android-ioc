@@ -13,7 +13,7 @@
 		<pathelement path="../core/bin/classes"/>
 		<pathelement path="../sample/bin/classes"/>
 		<pathelement path="libs/AndroidMockRuntime-appmakr-modified.jar" />
-		<pathelement path="${sdk.dir}/platforms/android-7/android.jar" />
+		<pathelement path="${sdk.dir}/platforms/android-17/android.jar" />
 		<pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
 		<pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
 		<pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />

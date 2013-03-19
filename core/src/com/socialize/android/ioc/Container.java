@@ -405,8 +405,13 @@ public class Container {
 		staticProxies.clear();
 		staticStubs.clear();
 		staticProxiesRemoved.clear();
+
+        if(beanContextCache != null) {
+            beanContextCache.destroy();
+        }
+
 		BeanMappingCache.destroy();
-		
+		context = null;
 		destroyed = true;
 	}
 	
@@ -443,6 +448,7 @@ public class Container {
 		if(beanContextCache != null) {
 			beanContextCache.onContextDestroyed(context);
 		}
+        this.context = null;
 	}
 
 	public void setContext(Context context) {

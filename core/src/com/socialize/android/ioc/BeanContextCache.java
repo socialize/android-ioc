@@ -21,6 +21,7 @@
  */
 package com.socialize.android.ioc;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,11 +37,10 @@ import android.view.ViewGroup;
  * @author Jason Polites
  */
 public class BeanContextCache {
-	
-	
+
 	private static final Map<Context, Map<String, List<CacheEntry>>> cache = new HashMap<Context, Map<String,List<CacheEntry>>>();
 	
-	private Context context;
+	private WeakReference<Context> context;
 	
 	public BeanContextCache() {
 		super();
@@ -64,45 +64,63 @@ public class BeanContextCache {
 			object = container.getBeanLocal(name, args);
 		}
 		else {
-			List<CacheEntry> entries = getBeanCache().get(name);
-			
-			if(entries != null && entries.size() > 0) {
-				object = matchEntry(entries, args);
-			}
-			
-			if(object == null) {
-				object = container.getBeanLocal(name, args);
-				
-				if(object != null) {
-					
-					if(beanRef != null && beanRef.isContextSensitive() && beanRef.isCached()) {
-						// Cache
-						CacheEntry entry = new CacheEntry();
-						entry.object = object;
-						entry.name = name;
-						entry.args = args;
-						
-						if(entries == null) {
-							entries = new ArrayList<BeanContextCache.CacheEntry>();
-						}
-						
-						entries.add(entry);
-						
-						getBeanCache().put(name, entries);
-					}
-				}
-			}
-			else {
-				if(object instanceof View) {
-					Object parent = ((View)object).getParent();
-					if(parent instanceof ViewGroup) {
-						((ViewGroup)parent).removeView((View)object);
-					}
-				}
-			}
+
+            if(this.context != null) {
+
+                Context ctx = this.context.get();
+
+                if(ctx != null) {
+
+                    Map<String, List<CacheEntry>> beanCache = getBeanCache(ctx);
+
+                    if(beanCache != null) {
+                        List<CacheEntry> entries = beanCache.get(name);
+
+                        if(entries != null && entries.size() > 0) {
+                            object = matchEntry(entries, args);
+                        }
+
+                        if(object == null) {
+                            object = container.getBeanLocal(name, args);
+
+                            if(object != null) {
+
+                                if(beanRef != null && beanRef.isContextSensitive() && beanRef.isCached()) {
+                                    // Cache
+                                    CacheEntry entry = new CacheEntry();
+                                    entry.object = object;
+                                    entry.name = name;
+                                    entry.args = args;
+
+                                    if(entries == null) {
+                                        entries = new ArrayList<BeanContextCache.CacheEntry>();
+                                    }
+
+                                    entries.add(entry);
+
+                                    getBeanCache(this.context.get()).put(name, entries);
+                                }
+                            }
+                        }
+                        else {
+                            if(object instanceof View) {
+                                Object parent = ((View)object).getParent();
+                                if(parent instanceof ViewGroup) {
+                                    ((ViewGroup)parent).removeView((View)object);
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    Logger.e(Logger.LOG_KEY, "Context was null in cache");
+                }
+            }
+            else {
+                Logger.e(Logger.LOG_KEY, "Context reference was null in cache");
+            }
 		}
-		
-		
+
 		return object;
 	}
 	
@@ -112,7 +130,7 @@ public class BeanContextCache {
 		Object[] args;
 	}
 
-	private Map<String, List<CacheEntry>> getBeanCache() {
+	private Map<String, List<CacheEntry>> getBeanCache(Context context) {
 		Map<String, List<CacheEntry>> map = cache.get(context);
 		if(map == null) {
 			map = new TreeMap<String, List<CacheEntry>>();
@@ -122,22 +140,34 @@ public class BeanContextCache {
 		
 		return cache.get(context);
 	}
-	
-	public void setContext(Context context) {
-		if(this.context != context) {
-			if(this.context != null) {
-				onContextDestroyed(this.context);
-			}
-			this.context = context;
-			getBeanCache();
-		}
-	}
+
+    public void setContext(Context context) {
+        if(this.context != null) {
+            Context ctx = this.context.get();
+            if(ctx != context) {
+                if(ctx != null) {
+                    onContextDestroyed(ctx);
+                }
+                this.context = new WeakReference<Context>(context);
+                getBeanCache(context);
+            }
+        }
+        else {
+            this.context = new WeakReference<Context>(context);
+            getBeanCache(context);
+        }
+    }
 
 	public void onContextDestroyed(Context context) {
 		Map<String, List<CacheEntry>> map = cache.get(context);
 		if(map != null) {
 			map.clear();
 		}
-		cache.remove(context); 
+		cache.remove(context);
 	}
+
+    public void destroy() {
+        this.context = null;
+        cache.clear();
+    }
 }

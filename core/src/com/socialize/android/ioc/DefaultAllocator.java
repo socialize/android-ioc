@@ -6,7 +6,7 @@ import android.content.Context;
 
 public class DefaultAllocator implements Allocator {
 	@Override
-	public <T> T allocate(Context context, Constructor<T> constructor, Object... args) throws Exception {
+	public <T> T allocate(Constructor<T> constructor, Object... args) throws Exception {
 		return constructor.newInstance(args);
 	}
 }

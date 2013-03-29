@@ -33,15 +33,13 @@ import android.content.Context;
 public class ResourceLocator {
 
 	private ClassLoaderProvider classLoaderProvider;
-	private Context context;
-	
-	public ResourceLocator(Context context) {
+
+	public ResourceLocator() {
 		super();
 		this.classLoaderProvider = new ClassLoaderProvider();
-		this.context = context;
 	}
 
-	public InputStream locateInAssets(String name) throws IOException {
+	public InputStream locateInAssets(Context context, String name) throws IOException {
 		InputStream in = null;
 		
 		try {
@@ -99,9 +97,9 @@ public class ResourceLocator {
 		return in;
 	}
 	
-	public InputStream locate(String name) throws IOException {
+	public InputStream locate(Context context, String name) throws IOException {
 		
-		InputStream in = locateInAssets(name);
+		InputStream in = locateInAssets(context, name);
 		
 		if(in == null) {
 			in = locateInClassPath(name);

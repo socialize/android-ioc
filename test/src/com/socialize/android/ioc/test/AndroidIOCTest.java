@@ -51,11 +51,11 @@ public class AndroidIOCTest extends AndroidTestCase {
 	@UsesMocks ({ContainerBuilder.class, Container.class})
 	public void testAndroidIOCInitWithMultipleConfig() throws Exception {
 		
-		ContainerBuilder builder = AndroidMock.createMock(ContainerBuilder.class, getContext());
+		ContainerBuilder builder = AndroidMock.createMock(ContainerBuilder.class);
 		Container container = AndroidMock.createMock(Container.class);
 		InputStream[] in = new InputStream[2];
 		
-		AndroidMock.expect(builder.build(in)).andReturn(container);
+		AndroidMock.expect(builder.build(getContext(), in)).andReturn(container);
 		
 		AndroidMock.replay(builder);
 		
@@ -67,7 +67,7 @@ public class AndroidIOCTest extends AndroidTestCase {
 	
 	@UsesMocks ({ContainerBuilder.class, Container.class, InputStream.class})
 	public void testAndroidIOCSize() throws Exception {
-		ContainerBuilder builder = AndroidMock.createMock(ContainerBuilder.class, getContext());
+		ContainerBuilder builder = AndroidMock.createMock(ContainerBuilder.class);
 		Container container = AndroidMock.createMock(Container.class);
 		InputStream in = AndroidMock.createMock(InputStream.class);
 		
@@ -79,7 +79,7 @@ public class AndroidIOCTest extends AndroidTestCase {
 		
 		final int returned = 10;
 		
-		AndroidMock.expect(builder.build(AndroidMock.eq(inArray))).andReturn(container);
+		AndroidMock.expect(builder.build(AndroidMock.eq(mockContext), AndroidMock.eq(inArray))).andReturn(container);
 		AndroidMock.expect(container.size()).andReturn(returned);
 		
 		AndroidMock.replay(builder);
@@ -95,7 +95,7 @@ public class AndroidIOCTest extends AndroidTestCase {
 	
 	@UsesMocks ({ContainerBuilder.class, Container.class, InputStream.class})
 	public void testDestroy() throws Exception {
-		ContainerBuilder builder = AndroidMock.createMock(ContainerBuilder.class, getContext());
+		ContainerBuilder builder = AndroidMock.createMock(ContainerBuilder.class);
 		Container container = AndroidMock.createMock(Container.class);
 		InputStream in = AndroidMock.createMock(InputStream.class);
 		
@@ -105,7 +105,7 @@ public class AndroidIOCTest extends AndroidTestCase {
 		
 		AndroidIOC ioc = new AndroidIOC();
 		
-		AndroidMock.expect(builder.build(AndroidMock.eq(inArray))).andReturn(container);
+		AndroidMock.expect(builder.build(AndroidMock.eq(mockContext), AndroidMock.eq(inArray))).andReturn(container);
 		container.destroy();
 		
 		AndroidMock.replay(builder);

@@ -60,11 +60,11 @@ public class Container {
 		proxies = new LinkedHashMap<String, ProxyObject<?>>();
 	}
 
-	protected Container(BeanMapping mapping, ContainerBuilder builder) {
+	protected Container(Context context, BeanMapping mapping, ContainerBuilder builder) {
 		this();
 		this.mapping = mapping;
 		this.builder = builder;
-		this.context = builder.getContext();
+		this.context = context;
 	}
 	
 	protected BeanRef getBeanRef(String name) {
@@ -452,17 +452,13 @@ public class Container {
 	}
 
 	public void setContext(Context context) {
-		
+		// Clear context cache
 		beanContextCache.setContext(context);
 		
 		if(!destroyed) {
 			
 			if(this.context != null && this.context != context) {
-				
-				// Clear context cache
-				// Set for any new beans
-				builder.setContext(context);
-				
+
 				// Now look for existing singletons
 				Collection<BeanRef> beanRefs = this.mapping.getBeanRefs();
 				

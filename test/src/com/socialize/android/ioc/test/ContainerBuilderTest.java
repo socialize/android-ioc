@@ -21,64 +21,22 @@
  */
 package com.socialize.android.ioc.test;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.Vector;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import android.content.Context;
 import android.test.AndroidTestCase;
 import android.test.mock.MockContext;
 import com.google.android.testing.mocking.AndroidMock;
 import com.google.android.testing.mocking.UsesMocks;
-import com.socialize.android.ioc.AndroidIOC;
-import com.socialize.android.ioc.Argument;
+import com.socialize.android.ioc.*;
 import com.socialize.android.ioc.Argument.CollectionType;
 import com.socialize.android.ioc.Argument.RefType;
-import com.socialize.android.ioc.BeanMapping;
-import com.socialize.android.ioc.BeanMappingParser;
-import com.socialize.android.ioc.BeanMappingParserHandler;
-import com.socialize.android.ioc.BeanRef;
-import com.socialize.android.ioc.Container;
-import com.socialize.android.ioc.ContainerBuilder;
-import com.socialize.android.ioc.FactoryRef;
-import com.socialize.android.ioc.IBeanFactory;
-import com.socialize.android.ioc.MethodRef;
-import com.socialize.android.ioc.ParserHandlerFactory;
-import com.socialize.android.ioc.ProxyObject;
-import com.socialize.android.ioc.sample.ITestClassWithPrintMethod;
-import com.socialize.android.ioc.sample.SubClassOfTestClassWithInitMethod;
-import com.socialize.android.ioc.sample.TestBeanMakee;
-import com.socialize.android.ioc.sample.TestBeanMaker;
-import com.socialize.android.ioc.sample.TestClassContainerAware;
-import com.socialize.android.ioc.sample.TestClassWithBeanConstructorArg;
-import com.socialize.android.ioc.sample.TestClassWithBeanFactoryParam;
-import com.socialize.android.ioc.sample.TestClassWithBeanProperty;
-import com.socialize.android.ioc.sample.TestClassWithConstructorCounter;
-import com.socialize.android.ioc.sample.TestClassWithContextConstuctorArg;
-import com.socialize.android.ioc.sample.TestClassWithDualListConstructorArg;
-import com.socialize.android.ioc.sample.TestClassWithDualMapConstructorArg;
-import com.socialize.android.ioc.sample.TestClassWithInitAndDestroy;
-import com.socialize.android.ioc.sample.TestClassWithInitMethod;
-import com.socialize.android.ioc.sample.TestClassWithInitMethodTakingBean;
-import com.socialize.android.ioc.sample.TestClassWithIntConstructorArg;
-import com.socialize.android.ioc.sample.TestClassWithMapProperty;
-import com.socialize.android.ioc.sample.TestClassWithMultipleConstructorArg;
-import com.socialize.android.ioc.sample.TestClassWithMultipleProperties;
-import com.socialize.android.ioc.sample.TestClassWithPrintMethod;
-import com.socialize.android.ioc.sample.TestClassWithSetConstructorArg;
-import com.socialize.android.ioc.sample.TestClassWithStringListConstructorArg;
+import com.socialize.android.ioc.sample.*;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.lang.reflect.Proxy;
+import java.util.*;
 
 
 public class ContainerBuilderTest extends AndroidTestCase {
@@ -122,16 +80,16 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		AndroidMock.replay(mapping0);
 		AndroidMock.replay(mapping1);
 		
-		ContainerBuilder builder = new ContainerBuilder(context, parser) {
+		ContainerBuilder builder = new ContainerBuilder(parser) {
 			@Override
-			public Container build(BeanMapping mapping) {
+			public Container build(Context context, BeanMapping mapping) {
 				// Don't want this to be tested in this test.
 				// We will verify the actual build process in a more detailed integration test.
 				return null;
 			}
 		};
 		
-		builder.build(streams);
+		builder.build(getContext(), streams);
 		
 		AndroidMock.verify(factory);
 		AndroidMock.verify(handler);
@@ -148,9 +106,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref.setName(beanName);
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -169,9 +127,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref);
 		mapping.addProxyRef(beanName);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -191,9 +149,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref);
 		mapping.addProxyRef(beanName);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		ProxyObject<TestClassWithPrintMethod> proxy = container.getProxy(beanName);
 		
@@ -241,9 +199,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref);
 		mapping.addProxyRef(beanName);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 	
 		ITestClassWithPrintMethod bean = container.getBean(beanName);
 		
@@ -277,9 +235,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 	
 		ITestClassWithPrintMethod bean = container.getBean(beanName);
 		
@@ -310,7 +268,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
 		AndroidIOC.registerProxy(beanName, new TestClassWithPrintMethod(){
 			@Override
@@ -319,7 +277,7 @@ public class ContainerBuilderTest extends AndroidTestCase {
 			}
 		});
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 	
 		ITestClassWithPrintMethod bean = container.getBean(beanName);
 		
@@ -347,9 +305,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref);
 		mapping.addProxyRef(beanName);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 	
 		ITestClassWithPrintMethod bean = container.getBean(beanName);
 		
@@ -381,9 +339,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref.setName(beanName);
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -422,9 +380,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref1);
 		mapping.addBeanRef(ref2);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		assertEquals(3, container.size());
 	}
@@ -440,9 +398,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -482,8 +440,8 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(makeeRef);
 		mapping.addBeanRef(makerRef);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
-		Container container = builder.build(mapping);
+		ContainerBuilder builder = new ContainerBuilder();
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithBeanProperty bean = container.getBean(beanName);
 		assertNotNull(bean);
@@ -505,9 +463,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithMultipleConstructorArg bean = null;
 		
@@ -527,9 +485,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithMultipleConstructorArg bean = null;
 		
@@ -549,9 +507,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithMultipleConstructorArg bean = null;
 		
@@ -572,9 +530,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithMultipleConstructorArg bean = null;
 		
@@ -595,9 +553,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithMultipleConstructorArg bean = null;
 		
@@ -633,9 +591,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -678,9 +636,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithMultipleConstructorArg bean = null;
 		
@@ -717,9 +675,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -793,9 +751,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -860,9 +818,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -939,9 +897,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -995,9 +953,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -1030,9 +988,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -1057,9 +1015,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -1083,9 +1041,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -1126,9 +1084,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(beanName);
 		
@@ -1166,9 +1124,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref);
 		mapping.addBeanRef(ref2);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(bean1Name);
 		Object bean2 = container.getBean(bean2Name);
@@ -1205,9 +1163,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref2);
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(bean1Name);
 		Object bean2 = container.getBean(bean2Name);
@@ -1244,9 +1202,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref2);
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean(bean1Name);
 		Object bean2 = container.getBean(bean2Name);
@@ -1273,9 +1231,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref.setSingleton(true);
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object beanA = container.getBean(beanName);
 		Object beanB = container.getBean(beanName);
@@ -1299,9 +1257,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref.setSingleton(false);
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object beanA = container.getBean(beanName);
 		Object beanB = container.getBean(beanName);
@@ -1342,8 +1300,8 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(nonSingletonBeanRef);
 		mapping.addBeanRef(singletonBeanRef);
 				
-		ContainerBuilder builder = new ContainerBuilder(getContext());
-		Container container = builder.build(mapping);
+		ContainerBuilder builder = new ContainerBuilder();
+		Container container = builder.build(getContext(), mapping);
 		
 		// Get the singleton
 		TestClassWithBeanProperty sing0 = container.getBean(singletonBeanName);
@@ -1389,8 +1347,8 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		TestClassWithConstructorCounter.CONSTRUCTOR_COUNT = 0;
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
-		Container container = builder.build(mapping);
+		ContainerBuilder builder = new ContainerBuilder();
+		Container container = builder.build(getContext(), mapping);
 		
 		Object beanA = container.getBean(beanName);
 		Object beanB = container.getBean(beanName);
@@ -1422,8 +1380,8 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		TestClassWithConstructorCounter.CONSTRUCTOR_COUNT = 0;
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
-		Container container = builder.build(mapping);
+		ContainerBuilder builder = new ContainerBuilder();
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithBeanProperty beanA = container.getBean(beanName);
 		TestClassWithConstructorCounter beanB = beanA.getBean();
@@ -1466,8 +1424,8 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		TestClassWithConstructorCounter.CONSTRUCTOR_COUNT = 0;
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
-		Container container = builder.build(mapping);
+		ContainerBuilder builder = new ContainerBuilder();
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithBeanProperty beanA = container.getBean(beanName);
 		TestClassWithConstructorCounter beanB = beanA.getBean();
@@ -1499,9 +1457,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addFactoryRef(fRef);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object beanA = container.getBean(beanName);
 		
@@ -1538,9 +1496,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref);
 		mapping.addFactoryRef(fRef);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithBeanFactoryParam beanA = container.getBean(beanName);
 		
@@ -1568,9 +1526,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref);
 		mapping.addFactoryRef(fRef);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithBeanFactoryParam beanA = container.getBean(beanName);
 		
@@ -1592,9 +1550,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref.setAbstractBean(true);
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object beanA = container.getBean(beanName);
 		
@@ -1612,9 +1570,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref.setInitMethod(new MethodRef("doInit"));
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithInitMethod beanA = container.getBean(beanName);
 		
@@ -1632,9 +1590,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref.setDestroyMethod(new MethodRef("destroy"));
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithInitAndDestroy beanA = container.getBean(beanName);
 		
@@ -1655,9 +1613,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		ref.setInitMethod(new MethodRef("doInit"));
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithInitMethod beanA = container.getBean(beanName);
 		
@@ -1689,9 +1647,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		mapping.addBeanRef(ref2);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithInitMethodTakingBean beanA = container.getBean(beanName2);
 		
@@ -1723,9 +1681,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref2);
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithInitMethodTakingBean beanA = container.getBean(beanName2);
 		
@@ -1745,15 +1703,15 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		AndroidMock.expect(parser.parse(getContext(), filename)).andReturn(null);
 		AndroidMock.replay(parser);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext(), parser) {
+		ContainerBuilder builder = new ContainerBuilder(parser) {
 			@Override
-			public Container build(BeanMapping mapping) {
+			public Container build(Context context, BeanMapping mapping) {
 				set.add("ContainerBuilt");
 				return null;
 			}
 		};
 		
-		builder.build(filename);
+		builder.build(getContext(), filename);
 		
 		assertEquals(1, set.size());
 		assertEquals("ContainerBuilt", set.iterator().next());
@@ -1768,9 +1726,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		assertNotNull(mapping);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext(), parser);
+		ContainerBuilder builder = new ContainerBuilder(parser);
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean("bean2");
 		Object bean2 = container.getBean("bean26");
@@ -1785,9 +1743,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		assertNotNull(mapping);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext(), parser);
+		ContainerBuilder builder = new ContainerBuilder(parser);
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean("bean2");
 		Object bean2 = container.getBean("bean27");
@@ -1804,9 +1762,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		assertNotNull(mapping);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext(), parser);
+		ContainerBuilder builder = new ContainerBuilder(parser);
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean("bean2");
 		Object bean2 = container.getBean("bean29");
@@ -1823,9 +1781,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		
 		assertNotNull(mapping);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext(), parser);
+		ContainerBuilder builder = new ContainerBuilder(parser);
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		Object bean = container.getBean("bean2");
 		Object bean2 = container.getBean("bean28");
@@ -1859,9 +1817,9 @@ public class ContainerBuilderTest extends AndroidTestCase {
 		mapping.addBeanRef(ref2);
 		mapping.addBeanRef(ref);
 		
-		ContainerBuilder builder = new ContainerBuilder(getContext());
+		ContainerBuilder builder = new ContainerBuilder();
 		
-		Container container = builder.build(mapping);
+		Container container = builder.build(getContext(), mapping);
 		
 		TestClassWithInitMethod beanA = container.getBean(beanName);
 		TestClassWithInitMethod beanB = container.getBean(beanName2);

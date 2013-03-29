@@ -41,7 +41,7 @@ public class BeanContextCache {
 	private static final Map<Context, Map<String, List<CacheEntry>>> cache = new HashMap<Context, Map<String,List<CacheEntry>>>();
 	
 	private WeakReference<Context> context;
-	
+
 	public BeanContextCache() {
 		super();
 	}
@@ -56,7 +56,7 @@ public class BeanContextCache {
 	}
 	
 	public Object get(Container container, String name, Object...args) {
-		
+
 		Object object = null;
 		BeanRef beanRef = container.getBeanRef(name);
 		
@@ -64,6 +64,10 @@ public class BeanContextCache {
 			object = container.getBeanLocal(name, args);
 		}
 		else {
+
+			if(this.context == null || this.context.get() == null) {
+				setContext(container.getContext());
+			}
 
             if(this.context != null) {
 

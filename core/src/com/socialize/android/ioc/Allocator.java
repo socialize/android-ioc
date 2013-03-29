@@ -5,6 +5,6 @@ import android.content.Context;
 
 public interface Allocator {
 
-	public <T> T allocate(Context context, Constructor<T> constructor, Object... args) throws Exception;
+	public <T> T allocate(Constructor<T> constructor, Object... args) throws Exception;
 
 }

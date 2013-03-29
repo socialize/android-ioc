@@ -42,20 +42,10 @@ import android.content.Context;
  */
 public class BeanBuilder {
 	
-	private Context context;
 	private Allocator allocator;
 
 	public BeanBuilder() {
 		super();
-	}
-	
-	public BeanBuilder(Context context) {
-		super();
-		initForSafeAllocations(context);
-	}
-	
-	public void initForSafeAllocations(Context context) {
-		this.context = context;
 		this.allocator = new DefaultAllocator();
 	}
 
@@ -96,7 +86,7 @@ public class BeanBuilder {
 			}
 			
 			if(allocator != null) {
-				object = allocator.allocate(context, matched, args);
+				object = allocator.allocate(matched, args);
 			}
 			else {
 				object = matched.newInstance(args);

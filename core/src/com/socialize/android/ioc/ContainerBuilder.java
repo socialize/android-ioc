@@ -51,22 +51,20 @@ public class ContainerBuilder {
 	
 	private BeanBuilder builder = null;
 	private BeanMappingParser parser = null;
-	private Context context;
 	private ResourceLocator resourceLocator;
 	
 	private Map<String, BeanMapping> imports;
 	
-	public ContainerBuilder(Context context) {
-		this(context, new BeanMappingParser());
+	public ContainerBuilder() {
+		this(new BeanMappingParser());
 	}
 	
-	public ContainerBuilder(Context context, BeanMappingParser parser) {
+	public ContainerBuilder(BeanMappingParser parser) {
 		super();
-		builder = new BeanBuilder(context);
-		resourceLocator = new ResourceLocator(context);
+		builder = new BeanBuilder();
+		resourceLocator = new ResourceLocator();
 		imports = new HashMap<String, BeanMapping>();
 		this.parser = parser;
-		this.context = context;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -221,17 +219,17 @@ public class ContainerBuilder {
 		}
 	}
 	
-	public Container build(String filename) throws IOException {
+	public Container build(Context context, String filename) throws IOException {
 		BeanMapping mapping = this.parser.parse(context, filename);
-		return build(mapping);
+		return build(context, mapping);
 	}
 	
-	public Container build(InputStream...streams) throws IOException {
+	public Container build(Context context, InputStream...streams) throws IOException {
 		BeanMapping primary = this.parser.parse(context, streams);
-		return build(primary);
+		return build(context, primary);
 	}
 	
-	public Container build(BeanMappingSource source) throws IOException {
+	public Container build(Context context, BeanMappingSource source) throws IOException {
 		
 		BeanMapping beanMapping = BeanMappingCache.get(source.getName());
 		
@@ -257,12 +255,12 @@ public class ContainerBuilder {
 			}
 		}
 		
-		return build(beanMapping);
+		return build(context, beanMapping);
 	}
 	
-	protected void resolveImports(BeanMapping original) throws IOException {
+	protected void resolveImports(Context context, BeanMapping original) throws IOException {
 		BeanMapping imported = new BeanMapping();
-		resolveImports(original, imported, 0);
+		resolveImports(context, original, imported, 0);
 		imports.clear();
 		int count = 0;
 		if(!imported.isEmpty()) {
@@ -381,7 +379,7 @@ public class ContainerBuilder {
 	}
 
  	
-	protected void resolveImports(BeanMapping original, BeanMapping merged, int recursionCount) throws IOException {
+	protected void resolveImports(Context context, BeanMapping original, BeanMapping merged, int recursionCount) throws IOException {
 		
 		if(recursionCount > MAX_ITERATIONS) {
 			throw new RuntimeException("Too many iterations during import resolution.  Possible circular reference in bean mapping, or bean init failed.  Check the logs.");
@@ -407,13 +405,13 @@ public class ContainerBuilder {
 						}
 
 						// Try to locate the source
-						InputStream in = resourceLocator.locate(ref.getSource());
+						InputStream in = resourceLocator.locate(context, ref.getSource());
 
 						if(in != null) {
 							imported = this.parser.parse(context, in);
 
 							// Resolve imports for this file
-							resolveImports(imported, merged, ++recursionCount);
+							resolveImports(context, imported, merged, ++recursionCount);
 
 							imports.put(ref.getSource(), imported);
 						}
@@ -471,13 +469,12 @@ public class ContainerBuilder {
 		}
 	}
 	
-	public Container build(BeanMapping mapping) throws IOException {
+	public Container build(Context context, BeanMapping mapping) throws IOException {
 		
-		resolveImports(mapping);
+		resolveImports(context, mapping);
 		
-		Container container = new Container(mapping, this);
-        container.setContext(context);
-		
+		Container container = new Container(context, mapping, this);
+
 		// Setup static proxies
 		if(Container.staticProxies.size() > 0) {
 			Set<Entry<String, Object>> entries = Container.staticProxies.entrySet();
@@ -739,6 +736,7 @@ public class ContainerBuilder {
 	
 	private Object getArgumentValue(Container container, Argument arg, boolean forInit) {
 		Object object = null;
+
 		if(arg.getType() != null) {
 			
 			switch(arg.getType()) {
@@ -747,16 +745,20 @@ public class ContainerBuilder {
 					break;
 					
 				case CONTEXT:
-					object = context;
+					object = container.getContext();
 					break;
 					
 				case ACTIVITY:
 					
-					if(!(context instanceof Activity)) {
-						Logger.e(getClass().getSimpleName(), "Argument of type activity found but current context is not an Activity.  The container MUST be initialized from an Actvity for activity type arguments.");
+					if(!(container.getContext() instanceof Activity)) {
+						Logger.e(getClass().getSimpleName(),
+								"Argument of type activity found but current context is not an Activity.  " +
+										"The container MUST be initialized from an Actvity for activity type arguments. Expected context but was [" +
+										container.getContext() +
+										"]");
 					}
 					
-					object = context;
+					object = container.getContext();
 					
 					break;
 					
@@ -1051,14 +1053,6 @@ public class ContainerBuilder {
 		return list;
 	}
 
-	public Context getContext() {
-		return context;
-	}
-
-	public void setContext(Context context) {
-		this.context = context;
-	}
-	
 	class SetPropertyLater {
 		BeanRef ref;
 		Object bean;

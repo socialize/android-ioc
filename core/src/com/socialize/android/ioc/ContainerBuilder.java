@@ -77,7 +77,8 @@ public class ContainerBuilder {
 		Object bean = null;
 		
 		try {
-			Logger.i(getClass().getSimpleName(), "Creating bean " + beanRef.getName());
+			if(Logger.isInfoEnabled())
+				Logger.i(getClass().getSimpleName(), "Creating bean " + beanRef.getName());
 			
 			List<Argument> constructorArgs = beanRef.getConstructorArgs();
 			if(constructorArgs != null && constructorArgs.size() > 0) {
@@ -154,7 +155,8 @@ public class ContainerBuilder {
 		
 		if(!ref.isSingleton() || !ref.isPropertiesSet()) {
 			try {
-				Logger.i(getClass().getSimpleName(), "Setting properties on bean " + ref.getName());
+				if(Logger.isInfoEnabled())
+					Logger.i(getClass().getSimpleName(), "Setting properties on bean " + ref.getName());
 				
 				List<Argument> properties = ref.getProperties();
 				
@@ -170,8 +172,9 @@ public class ContainerBuilder {
 						}
 					}
 				}
-				
-				Logger.i(getClass().getSimpleName(), "Properties set on bean " + ref.getName());
+
+				if(Logger.isInfoEnabled())
+					Logger.i(getClass().getSimpleName(), "Properties set on bean " + ref.getName());
 				
 				if(ref.isSingleton()) {
 					ref.setPropertiesSet(true);
@@ -277,8 +280,9 @@ public class ContainerBuilder {
 		}
 		
 		int unresolved = 0;
-		
-		Logger.i(getClass().getSimpleName(), "Resolving import dependencies in loop " + recursionCount);
+
+		if(Logger.isInfoEnabled())
+			Logger.i(getClass().getSimpleName(), "Resolving import dependencies in loop " + recursionCount);
 		
 		Collection<BeanRef> beanRefs = original.getBeanRefs();
 		Collection<FactoryRef> factoryRefs = original.getFactoryRefs();
@@ -533,18 +537,20 @@ public class ContainerBuilder {
 			if(ref != null) {
 				Object bean = entry.getValue();
 				if(!initBean(container, ref, bean)) {
-					Logger.i(getClass().getSimpleName(), "Cannot init bean [" +
-							ref.getName() +
-							"] now.  Marking for later init...");
-					
+
+					if(Logger.isInfoEnabled())
+						Logger.i(getClass().getSimpleName(), "Cannot init bean [" +
+								ref.getName() +
+								"] now.  Marking for later init...");
+
 					doLaterBeans.put(entry.getKey(), entry.getValue());
 				}
 				else {
 					ref.setInitCalled(true);
-					
-					Logger.i(getClass().getSimpleName(), "Bean [" +
-							ref.getName() +
-							"] initialized.");
+					if(Logger.isInfoEnabled())
+						Logger.i(getClass().getSimpleName(), "Bean [" +
+								ref.getName() +
+								"] initialized.");
 				}
 			}
 			else {
@@ -559,8 +565,9 @@ public class ContainerBuilder {
 	
 	public void destroyBean(Container container, BeanRef beanRef, Object bean) {
 		if(bean != null && beanRef.getDestroyMethod() != null) {
-			
-			Logger.i(getClass().getSimpleName(), "Destroying bean " + beanRef.getName());
+
+			if(Logger.isInfoEnabled())
+				Logger.i(getClass().getSimpleName(), "Destroying bean " + beanRef.getName());
 			
 			Object[] args = getArguments(container, beanRef.getDestroyMethod().getArguments(), false);
 			
@@ -688,7 +695,8 @@ public class ContainerBuilder {
 					
 					if(bean == null) {
 						// We can't construct this now, flag for later.
-						Logger.i(getClass().getSimpleName(), "Cannot create bean [" +
+						if(Logger.isInfoEnabled())
+							Logger.i(getClass().getSimpleName(), "Cannot create bean [" +
 								beanRef.getName() +
 								"] now due to dependent bean not existing.  Marking for later creation");
 						
@@ -824,9 +832,11 @@ public class ContainerBuilder {
 					// Make sure this bean has been initialized
 					if(!beanRef.isInitCalled()) {
 						// We can't init this now
-						Logger.i(getClass().getSimpleName(), "Bean argument [" +
-								beanRef.getName() +
-								"] has not been initialized yet so cannot be used as an argument for another init method");
+						if(Logger.isInfoEnabled())
+							Logger.i(getClass().getSimpleName(), "Bean argument [" +
+									beanRef.getName() +
+									"] has not been initialized yet so cannot be used as an argument for another init method");
+
 						object = null;
 					}
 				}
@@ -895,11 +905,11 @@ public class ContainerBuilder {
 					
 					if(value == null && !child.getType().equals(RefType.NULL)) {
 						// Can't complete so just abort
-						
-						Logger.i(getClass().getSimpleName(), "Cannot create list for argument [" +
-								arg.getKey() +
-								"] now due to dependent bean not existing.  Marking for later creation");
-						
+						if(Logger.isInfoEnabled())
+							Logger.i(getClass().getSimpleName(), "Cannot create list for argument [" +
+									arg.getKey() +
+									"] now due to dependent bean not existing.  Marking for later creation");
+
 						return null;
 					}
 					

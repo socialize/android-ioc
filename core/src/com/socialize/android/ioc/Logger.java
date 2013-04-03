@@ -27,7 +27,7 @@ public class Logger {
 
 	public static String LOG_KEY = "AndroidIOC";
 	
-	public static int logLevel = Log.INFO;
+	public static int logLevel = Log.WARN;
 	
 	static {
 		if(Log.isLoggable(LOG_KEY, Log.DEBUG)) {
@@ -70,5 +70,9 @@ public class Logger {
 	
 	public static boolean isInfoEnabled() {
 		return (logLevel <= Log.INFO);
+	}
+
+	public static boolean isDebugEnabled() {
+		return (logLevel <= Log.DEBUG);
 	}
 }

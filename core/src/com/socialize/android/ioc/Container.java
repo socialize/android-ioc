@@ -335,10 +335,11 @@ public class Container {
 			}
 			
 			if(nullCount > 0) {
-				
-				Logger.i(getClass().getSimpleName(), "Some arguments passed to getBean were null for bean [" +
-						beanName +
-						"].  Stripping nulls from argument list");				
+
+				if(Logger.isInfoEnabled())
+					Logger.i(getClass().getSimpleName(), "Some arguments passed to getBean were null for bean [" +
+							beanName +
+							"].  Stripping nulls from argument list");
 				
 				if(nullCount < args.length) {
 					nonNull = new Object[args.length - nullCount];
@@ -424,7 +425,7 @@ public class Container {
 		Object old = beans.get(name);
 		
 		if(old != null) {
-			Logger.i(getClass().getSimpleName(), "Replacing existing bean instance [" +
+			Logger.d(getClass().getSimpleName(), "Replacing existing bean instance [" +
 					name +
 					"]");
 			

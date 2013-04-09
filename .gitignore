@@ -8,5 +8,6 @@ findbugs-output
 *.settings
 *.iml
 build
+**/local.properties
 test/coverage-results
 test/junit-results

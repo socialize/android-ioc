@@ -257,6 +257,10 @@ public class ContainerBuilder {
 				}
 			}
 		}
+		else {
+			// Reset any property set variables in bean refs for this mapping
+			beanMapping.reset();
+		}
 		
 		return build(context, beanMapping);
 	}

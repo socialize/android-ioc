@@ -73,6 +73,12 @@ public class BeanRef {
 			properties.add(arg);
 		}
 	}
+
+	public void reset() {
+		resolved = false;
+		propertiesSet = false;
+		initCalled = false;
+	}
 	
 	public String getName() {
 		return name;

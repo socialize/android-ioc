@@ -47,6 +47,13 @@ public class BeanMapping {
 		this.importRefs = new LinkedHashMap<String, ImportRef>();
 	}
 
+	public void reset() {
+		Collection<BeanRef> values = beanRefs.values();
+		for (BeanRef value : values) {
+			value.reset();
+		}
+	}
+
 	public boolean containsBean(String name) {
 		return beanRefs.containsKey(name) || factoryRefs.containsKey(name);
 	}

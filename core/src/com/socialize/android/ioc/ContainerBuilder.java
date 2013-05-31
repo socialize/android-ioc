@@ -77,8 +77,8 @@ public class ContainerBuilder {
 		Object bean = null;
 		
 		try {
-			if(Logger.isInfoEnabled())
-				Logger.i(getClass().getSimpleName(), "Creating bean " + beanRef.getName());
+			if(Logger.isDebugEnabled())
+				Logger.d(getClass().getSimpleName(), "Creating bean " + beanRef.getName());
 			
 			List<Argument> constructorArgs = beanRef.getConstructorArgs();
 			if(constructorArgs != null && constructorArgs.size() > 0) {
@@ -117,7 +117,8 @@ public class ContainerBuilder {
 			}
 			
 			if(bean != null) {
-				Logger.i(getClass().getSimpleName(), "Bean " + beanRef.getName() + " created");
+				if(Logger.isDebugEnabled())
+					Logger.d(getClass().getSimpleName(), "Bean " + beanRef.getName() + " created");
 			}
 		}
 		catch (Exception e) {
@@ -132,7 +133,6 @@ public class ContainerBuilder {
 		}
 
 		return (T) bean;
-
 	}
 	
 	private boolean containsContext(Object[] args) {
@@ -155,8 +155,8 @@ public class ContainerBuilder {
 		
 		if(!ref.isSingleton() || !ref.isPropertiesSet()) {
 			try {
-				if(Logger.isInfoEnabled())
-					Logger.i(getClass().getSimpleName(), "Setting properties on bean " + ref.getName());
+				if(Logger.isDebugEnabled())
+					Logger.d(getClass().getSimpleName(), "Setting properties on bean " + ref.getName());
 				
 				List<Argument> properties = ref.getProperties();
 				
@@ -173,8 +173,8 @@ public class ContainerBuilder {
 					}
 				}
 
-				if(Logger.isInfoEnabled())
-					Logger.i(getClass().getSimpleName(), "Properties set on bean " + ref.getName());
+				if(Logger.isDebugEnabled())
+					Logger.d(getClass().getSimpleName(), "Properties set on bean " + ref.getName());
 				
 				if(ref.isSingleton()) {
 					ref.setPropertiesSet(true);
@@ -285,8 +285,8 @@ public class ContainerBuilder {
 		
 		int unresolved = 0;
 
-		if(Logger.isInfoEnabled())
-			Logger.i(getClass().getSimpleName(), "Resolving import dependencies in loop " + recursionCount);
+		if(Logger.isDebugEnabled())
+			Logger.d(getClass().getSimpleName(), "Resolving import dependencies in loop " + recursionCount);
 		
 		Collection<BeanRef> beanRefs = original.getBeanRefs();
 		Collection<FactoryRef> factoryRefs = original.getFactoryRefs();
@@ -406,8 +406,8 @@ public class ContainerBuilder {
 
 					if(!invalidSources.contains(ref.getSource())) {
 
-						if(Logger.isInfoEnabled()) {
-							Logger.i(getClass().getSimpleName(), "Resolving imports for [" +
+						if(Logger.isDebugEnabled()) {
+							Logger.d(getClass().getSimpleName(), "Resolving imports for [" +
 									ref.getSource() +
 									"]");
 						}
@@ -542,8 +542,8 @@ public class ContainerBuilder {
 				Object bean = entry.getValue();
 				if(!initBean(container, ref, bean)) {
 
-					if(Logger.isInfoEnabled())
-						Logger.i(getClass().getSimpleName(), "Cannot init bean [" +
+					if(Logger.isDebugEnabled())
+						Logger.d(getClass().getSimpleName(), "Cannot init bean [" +
 								ref.getName() +
 								"] now.  Marking for later init...");
 
@@ -551,8 +551,8 @@ public class ContainerBuilder {
 				}
 				else {
 					ref.setInitCalled(true);
-					if(Logger.isInfoEnabled())
-						Logger.i(getClass().getSimpleName(), "Bean [" +
+					if(Logger.isDebugEnabled())
+						Logger.d(getClass().getSimpleName(), "Bean [" +
 								ref.getName() +
 								"] initialized.");
 				}
@@ -570,8 +570,8 @@ public class ContainerBuilder {
 	public void destroyBean(Container container, BeanRef beanRef, Object bean) {
 		if(bean != null && beanRef.getDestroyMethod() != null) {
 
-			if(Logger.isInfoEnabled())
-				Logger.i(getClass().getSimpleName(), "Destroying bean " + beanRef.getName());
+			if(Logger.isDebugEnabled())
+				Logger.d(getClass().getSimpleName(), "Destroying bean " + beanRef.getName());
 			
 			Object[] args = getArguments(container, beanRef.getDestroyMethod().getArguments(), false);
 			
@@ -699,8 +699,8 @@ public class ContainerBuilder {
 					
 					if(bean == null) {
 						// We can't construct this now, flag for later.
-						if(Logger.isInfoEnabled())
-							Logger.i(getClass().getSimpleName(), "Cannot create bean [" +
+						if(Logger.isDebugEnabled())
+							Logger.d(getClass().getSimpleName(), "Cannot create bean [" +
 								beanRef.getName() +
 								"] now due to dependent bean not existing.  Marking for later creation");
 						
@@ -836,8 +836,8 @@ public class ContainerBuilder {
 					// Make sure this bean has been initialized
 					if(!beanRef.isInitCalled()) {
 						// We can't init this now
-						if(Logger.isInfoEnabled())
-							Logger.i(getClass().getSimpleName(), "Bean argument [" +
+						if(Logger.isDebugEnabled())
+							Logger.d(getClass().getSimpleName(), "Bean argument [" +
 									beanRef.getName() +
 									"] has not been initialized yet so cannot be used as an argument for another init method");
 
@@ -909,8 +909,8 @@ public class ContainerBuilder {
 					
 					if(value == null && !child.getType().equals(RefType.NULL)) {
 						// Can't complete so just abort
-						if(Logger.isInfoEnabled())
-							Logger.i(getClass().getSimpleName(), "Cannot create list for argument [" +
+						if(Logger.isDebugEnabled())
+							Logger.d(getClass().getSimpleName(), "Cannot create list for argument [" +
 									arg.getKey() +
 									"] now due to dependent bean not existing.  Marking for later creation");
 

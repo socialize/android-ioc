@@ -336,8 +336,8 @@ public class Container {
 			
 			if(nullCount > 0) {
 
-				if(Logger.isInfoEnabled())
-					Logger.i(getClass().getSimpleName(), "Some arguments passed to getBean were null for bean [" +
+				if(Logger.isDebugEnabled())
+					Logger.d(getClass().getSimpleName(), "Some arguments passed to getBean were null for bean [" +
 							beanName +
 							"].  Stripping nulls from argument list");
 				

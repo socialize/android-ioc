@@ -43,8 +43,8 @@ public class ResourceLocator {
 		InputStream in = null;
 		
 		try {
-			if(Logger.isInfoEnabled()) {
-				Logger.i(getClass().getSimpleName(), "Looking for " +
+			if(Logger.isDebugEnabled()) {
+				Logger.d(getClass().getSimpleName(), "Looking for " +
 						name +
 						" in asset path...");
 			}
@@ -52,8 +52,8 @@ public class ResourceLocator {
 			in = context.getAssets().open(name);
 			
 			if(in != null) {
-				if(Logger.isInfoEnabled()) {
-					Logger.i(getClass().getSimpleName(),"Found " +
+				if(Logger.isDebugEnabled()) {
+					Logger.d(getClass().getSimpleName(),"Found " +
 							name +
 							" in asset path");
 				}
@@ -61,8 +61,8 @@ public class ResourceLocator {
 		}
 		catch (IOException ignore) {
 			// Ignore this, just means no override.
-			if(Logger.isInfoEnabled()) {
-				Logger.i(getClass().getSimpleName(),"No file found in assets with name [" +
+			if(Logger.isDebugEnabled()) {
+				Logger.d(getClass().getSimpleName(),"No file found in assets with name [" +
 						name +
 						"].");
 			}
@@ -77,8 +77,8 @@ public class ResourceLocator {
 		
 		if(classLoaderProvider != null) {
 			
-			if(Logger.isInfoEnabled()) {
-				Logger.i(getClass().getSimpleName(),"Looking for " +
+			if(Logger.isDebugEnabled()) {
+				Logger.d(getClass().getSimpleName(),"Looking for " +
 						name +
 						" in classpath...");
 			}
@@ -86,8 +86,8 @@ public class ResourceLocator {
 			in = classLoaderProvider.getClassLoader().getResourceAsStream(name);
 			
 			if(in != null) {
-				if(Logger.isInfoEnabled()) {
-					Logger.i(getClass().getSimpleName(),"Found " +
+				if(Logger.isDebugEnabled()) {
+					Logger.d(getClass().getSimpleName(),"Found " +
 							name +
 							" in classpath");
 				}

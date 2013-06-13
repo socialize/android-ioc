@@ -21,9 +21,9 @@
  */
 package com.socialize.android.ioc;
 
-import java.io.InputStream;
-
 import android.content.Context;
+
+import java.io.InputStream;
 
 /**
  * 
@@ -39,7 +39,7 @@ public interface IOCContainer {
 	 * @param name The name of the bean.
 	 * @return The bean.
 	 */
-	public <T extends Object> T getBean(String name);
+	public <T> T getBean(String name);
 	
 	/**
 	 * Gets the bean denoted by the given name (id).  
@@ -52,7 +52,7 @@ public interface IOCContainer {
 	 * Only applies to non-singleton beans!
 	 * @return The bean.
 	 */
-	public <T extends Object> T getBean(String name, Object...args);
+	public <T> T getBean(String name, Object...args);
 	
 	/**
 	 * Gets the bean denoted by the given name (id).  
@@ -61,7 +61,7 @@ public interface IOCContainer {
 	 * @param name The name of the bean.
 	 * @param listener A listener called after the bean was created/retrieved.
 	 */
-	public <T extends Object> void getBeanAsync(String name, BeanCreationListener<T> listener);
+	public <T> void getBeanAsync(String name, BeanCreationListener<T> listener);
 	
 	/**
 	 * If this bean is defined as non-singleton, it will be instantiated in this call using
@@ -73,7 +73,7 @@ public interface IOCContainer {
 	 * the arguments provided here will be appended to the set of arguments used when instantiating the bean.
 	 * Only applies to non-singleton beans!
 	 */
-	public <T extends Object> void getBeanAsync(String name, BeanCreationListener<T> listener, Object...args);
+	public <T> void getBeanAsync(String name, BeanCreationListener<T> listener, Object...args);
 	
 	/**
 	 * Returns the proxy for the given bean.  A &lt;proxy&lt; element must exist in the bean configuration.
@@ -82,7 +82,7 @@ public interface IOCContainer {
 	 * @return A proxy with the same type as the original bean, but where all method calls can be delegated.  
 	 * By default methods are delegated to the original bean.
 	 */
-	public <T extends Object> ProxyObject<T> getProxy(String name);
+	public <T> ProxyObject<T> getProxy(String name);
 	
 	/**
 	 * Returns the proxy for the given bean.  A &lt;proxy&lt; element must exist in the bean configuration.
@@ -91,7 +91,7 @@ public interface IOCContainer {
 	 * @return A proxy with the same type as the original bean, but where all method calls can be delegated.  
 	 * By default methods are delegated to the original bean.
 	 */
-	public <T extends Object> ProxyObject<T> getProxy(String name, Object...args);
+	public <T> ProxyObject<T> getProxy(String name, Object...args);
 	
 	/**
 	 * Sets a proxy object for the bean of the given type.

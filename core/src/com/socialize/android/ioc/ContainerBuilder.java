@@ -764,7 +764,9 @@ public class ContainerBuilder {
 					
 					if(!(container.getContext() instanceof Activity)) {
 						Logger.e(getClass().getSimpleName(),
-								"Argument of type activity found but current context is not an Activity.  " +
+								"Argument [" +
+                                        arg.getKey() +
+                                        "] of type activity found but current context is not an Activity.  " +
 										"The container MUST be initialized from an Actvity for activity type arguments. Expected context but was [" +
 										container.getContext() +
 										"]");
